@@ -50,21 +50,20 @@ AtlDef <- c(-85.6, -83.1, 32.2, 34.5)
 ## --------------
 
 # Create empty files to write lines to
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Units", "24hrPM", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Units", "24hrPM", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Units", "24hrPM", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Units", "24hrPM", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "/home/jhbelle/EPAdata/CalifObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "/home/jhbelle/EPAdata/MdwstObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "/home/jhbelle/EPAdata/ColoradoObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
 
 # Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
 for (year in seq(2007,2015)){
-  Dat <- read.csv(sprintf("T:/EohProjs/CDC_climatechange/Jess/Dissertation/USEPADailyData/daily_88101_%d.csv", year), stringsAsFactors = F)[,c(1:8,10,12,13,15,17,21,22)]
-  Dat <- subset(Dat, Dat$Observation.Count == 1)[,c(1:8,10,11,13:15)]
-  Dat$Longitude = as.integer(Dat$Longitude)
-  Dat$Latitude = as.integer(Dat$Latitude)
-  write.table(SiteSort(Dat, AtlDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, CalifDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, ColoradoDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, MidwestDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  Dat <- read.csv(sprintf("/home/jhbelle/EPAdata/USEPA24hr/daily_88101_%d.csv", year), stringsAsFactors = F)[,c(1:8,12,15,17,21)]
+  print(nrow(Dat))
+  Dat <- subset(Dat, Dat$Observation.Count == 1)[,c(1:9,11,12)]
+  write.table(SiteSort(Dat, AtlDef), file="/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, CalifDef), file="/home/jhbelle/EPAdata/CalifObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, ColoradoDef), file="/home/jhbelle/EPAdata/ColoradoObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, MidwestDef), file="/home/jhbelle/EPAdata/MdwstObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
   rm(Dat)
   gc()
 }
@@ -73,22 +72,22 @@ for (year in seq(2007,2015)){
 # Hourly FRM PM_2.5 observations
 ## --------------
 
+## --------------
 # Create empty files to write lines to
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Time", "DateGMT", "TimeGMT", "1hrPM", "Units", "MDL", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs1hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Time", "DateGMT", "TimeGMT", "1hrPM", "Units", "MDL", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs1hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Time", "DateGMT", "TimeGMT", "1hrPM", "Units", "MDL", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs1hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Time", "DateGMT", "TimeGMT", "1hrPM", "Units", "MDL", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs1hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Time", "DateGMT", "TimeGMT", "1hrPM", "MDL", "MethodCode"), "/home/jhbelle/EPAdata/AtlObs1hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Time", "DateGMT", "TimeGMT", "1hrPM", "MDL", "MethodCode"), "/home/jhbelle/EPAdata/CalifObs1hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Time", "DateGMT", "TimeGMT", "1hrPM", "MDL", "MethodCode"), "/home/jhbelle/EPAdata/MdwstObs1hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "Time", "DateGMT", "TimeGMT", "1hrPM", "MDL", "MethodCode"), "/home/jhbelle/EPAdata/ColoradoObs1hrFRM.csv", row.names=F, col.names = F, sep=",")
 
 # Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
 # NOTE: No hourly observations in 2007
 for (year in seq(2008,2015)){
-  Dat <- read.csv(sprintf("T:/EohProjs/CDC_climatechange/Jess/Dissertation/USEPAHourlyData/hourly_88101_%d.csv", year), stringsAsFactors = F)[,c(1:8,10:16,20,21)]
-  Dat$Longitude = as.integer(Dat$Longitude)
-  Dat$Latitude = as.integer(Dat$Latitude)
-  write.table(SiteSort(Dat, AtlDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs1hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, CalifDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs1hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, ColoradoDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs1hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, MidwestDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs1hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  Dat <- read.csv(sprintf("/home/jhbelle/EPAdata/USEPA1hr/hourly_88101_%d.csv", year), stringsAsFactors = F)[,c(1:8,10:14,16,20)]
+  print(nrow(Dat))
+  write.table(SiteSort(Dat, AtlDef), file="/home/jhbelle/EPAdata/AtlObs1hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, CalifDef), file="/home/jhbelle/EPAdata/CalifObs1hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, ColoradoDef), file="/home/jhbelle/EPAdata/ColoradoObs1hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, MidwestDef), file="/home/jhbelle/EPAdata/MdwstObs1hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
   rm(Dat)
   gc()
 }
@@ -98,21 +97,20 @@ for (year in seq(2008,2015)){
 ## --------------
 
 # Create empty files to write lines to
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Units", "24hrPMSpec", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Units", "24hrPMSpec", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Units", "24hrPMSpec", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Units", "24hrPMSpec", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "/home/jhbelle/EPAdata/AtlObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "/home/jhbelle/EPAdata/CalifObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "/home/jhbelle/EPAdata/MdwstObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "/home/jhbelle/EPAdata/ColoradoObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
 
 # Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
 for (year in seq(2007,2015)){
-  Dat <- read.csv(sprintf("T:/EohProjs/CDC_climatechange/Jess/Dissertation/USEPASpeciatedPM/daily_SPEC_%d/daily_SPEC_%d.csv", year, year), stringsAsFactors = F)[,c(1:9,12,13,15,17,21,22)]
-  Dat <- subset(Dat, Dat$Observation.Count == 1)[,c(1:11,13:15)]
-  Dat$Longitude = as.integer(Dat$Longitude)
-  Dat$Latitude = as.integer(Dat$Latitude)
-  write.table(SiteSort(Dat, AtlDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, CalifDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, ColoradoDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, MidwestDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+  Dat <- read.csv(sprintf("/home/jhbelle/EPAdata/USEPASpec/daily_SPEC_%d.csv", year, year), stringsAsFactors = F)[,c(1:9,12,15,17,21)]
+  print(nrow(Dat))
+  Dat <- subset(Dat, Dat$Observation.Count == 1)[,c(1:10,12,13)]
+  write.table(SiteSort(Dat, AtlDef), file="/home/jhbelle/EPAdata/AtlObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, CalifDef), file="/home/jhbelle/EPAdata/CalifObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, ColoradoDef), file="/home/jhbelle/EPAdata/ColoradoObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, MidwestDef), file="/home/jhbelle/EPAdata/MdwstObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
   rm(Dat)
   gc()
 }
@@ -123,21 +121,22 @@ for (year in seq(2007,2015)){
 ## --------------
 
 # Create empty files to write lines to
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "BlankValue"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRMBlanks.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "BlankValue"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRMBlanks.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "BlankValue"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRMBlanks.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "BlankValue"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRMBlanks.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "BlankValue"), "/home/jhbelle/EPAdata/AtlObs24hrFRMBlanks.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "BlankValue"), "/home/jhbelle/EPAdata/CalifObs24hrFRMBlanks.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "BlankValue"), "/home/jhbelle/EPAdata/MdwstObs24hrFRMBlanks.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "BlankValue"), "/home/jhbelle/EPAdata/ColoradoObs24hrFRMBlanks.csv", row.names=F, col.names = F, sep=",")
 
 # Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
 for (year in seq(2007,2015)){
-  Dat <- read.csv(sprintf("T:/EohProjs/CDC_climatechange/Jess/Dissertation/USEPABlanks/blanks_all_%d.csv", year, year), stringsAsFactors = F)[,c(1:7,10:13)]
+  Dat <- read.csv(sprintf("/home/jhbelle/EPAdata/USEPABlanks/blanks_all_%d.csv", year, year), stringsAsFactors = F)[,c(1:7,10:13)]
+  print(nrow(Dat))
   Dat <- subset(Dat, (Dat$Parameter.Code == 88370 | Dat$Parameter.Code == 88380) & (Dat$Blank.Type == "FIELD" | Dat$Blank.Type == "FIELD 24HR"))[,c(1:7,9,11)]
   Dat$Longitude = as.integer(Dat$Longitude)
   Dat$Latitude = as.integer(Dat$Latitude)
-  write.table(SiteSort(Dat, AtlDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRMBlanks.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, CalifDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRMBlanks.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, ColoradoDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRMBlanks.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, MidwestDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRMBlanks.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, AtlDef), file="/home/jhbelle/EPAdata/AtlObs24hrFRMBlanks.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, CalifDef), file="/home/jhbelle/EPAdata/CalifObs24hrFRMBlanks.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, ColoradoDef), file="/home/jhbelle/EPAdata/ColoradoObs24hrFRMBlanks.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, MidwestDef), file="/home/jhbelle/EPAdata/MdwstObs24hrFRMBlanks.csv", append=T, row.names=F, col.name=F, sep=",")
   rm(Dat)
   gc()
 }
@@ -146,35 +145,37 @@ for (year in seq(2007,2015)){
 # Hourly Speciated FRM PM_2.5 observations
 ## --------------
 
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Time", "DateGMT", "TimeGMT", "1hrPMSpec", "Units", "MDL", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs1hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Time", "DateGMT", "TimeGMT", "1hrPMSpec", "Units", "MDL", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs1hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Time", "DateGMT", "TimeGMT", "1hrPMSpec", "Units", "MDL", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs1hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Time", "DateGMT", "TimeGMT", "1hrPMSpec", "Units", "MDL", "MethodCode", "MethodName"), "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs1hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+#write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Time", "DateGMT", "TimeGMT", "1hrPMSpec", "Units", "MDL", "MethodCode", "MethodName"), "/home/jhbelle/EPAdata/AtlObs1hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+#write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Time", "DateGMT", "TimeGMT", "1hrPMSpec", "Units", "MDL", "MethodCode", "MethodName"), "/home/jhbelle/EPAdata/CalifObs1hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+#write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Time", "DateGMT", "TimeGMT", "1hrPMSpec", "Units", "MDL", "MethodCode", "MethodName"), "/home/jhbelle/EPAdata/MdwstObs1hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+#write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "Time", "DateGMT", "TimeGMT", "1hrPMSpec", "Units", "MDL", "MethodCode", "MethodName"), "/home/jhbelle/EPAdata/ColoradoObs1hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
 
 # Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
 # NOTE: No hourly observations in 2007
-for (year in seq(2007,2015)){
-  Dat <- read.csv(sprintf("T:/EohProjs/CDC_climatechange/Jess/Dissertation/USEPASpeciatedPM/hourly_SPEC_%d/hourly_SPEC_%d.csv", year, year), stringsAsFactors = F)[,c(1:16,20,21)]
-  Dat$Longitude = as.integer(Dat$Longitude)
-  Dat$Latitude = as.integer(Dat$Latitude)
-  write.table(SiteSort(Dat, AtlDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs1hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, CalifDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs1hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, ColoradoDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs1hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, MidwestDef), file="T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs1hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  rm(Dat)
-  gc()
-}
+#for (year in seq(2007,2015)){
+#  Dat <- read.csv(sprintf("T:/EohProjs/CDC_climatechange/Jess/Dissertation/USEPASpeciatedPM/hourly_SPEC_%d/hourly_SPEC_%d.csv", year, year), stringsAsFactors = F)[,c(1:16,20,21)]
+#  Dat$Longitude = as.integer(Dat$Longitude)
+#  Dat$Latitude = as.integer(Dat$Latitude)
+#  write.table(SiteSort(Dat, AtlDef), file="/home/jhbelle/EPAdata/AtlObs1hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+#  write.table(SiteSort(Dat, CalifDef), file="/home/jhbelle/EPAdata/CalifObs1hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+#  write.table(SiteSort(Dat, ColoradoDef), file="/home/jhbelle/EPAdata/ColoradoObs1hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+#  write.table(SiteSort(Dat, MidwestDef), file="/home/jhbelle/EPAdata/MdwstObs1hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+#  rm(Dat)
+#  gc()
+#}
 
 ## -----------------
 # Mapping and site analysis - hourly to 24 hr comparisons
 ## -----------------
 
 # Atlanta - read in Atl datasets
-Atl24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRM.csv", stringsAsFactors = F)
+Atl24 <- read.csv("/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records from Atl24 and rewrite file
 Atl24 <- unique(Atl24)
 # Read in 1 hour data
-Atl1 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs1hrFRM.csv", stringsAsFactors = F)
+Atl1 <- read.csv("/home/jhbelle/EPAdata/AtlObs1hrFRM.csv", stringsAsFactors = F)
+Atl1$Date <- as.Date(Atl1$Date, "%Y-%m-%d")
+Atl1 <- subset(Atl1, Atl1$Date > as.Date("2007-04-01", "%Y-%m-%d") & Atl1$Date < as.Date("2015-03-31", "%Y-%m-%d"))
 
 Comp1hr24hr(Atl1, Atl24)
 # At each site need: seasonal mean PM2.5 value, number of observations of each type, number of unique days with observations of each type, mean absolute square difference between hourly and 24 hour results and between speciated and non-speciated results, date range, method mode
@@ -211,11 +212,14 @@ aggregate(X1hrPM ~ Time, Atl1, mean)
 # RMSE = 13.6340
 
 # California - read in datasets
-Calif24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRM.csv", stringsAsFactors = F)
+Calif24 <- read.csv("/home/jhbelle/EPAdata/CalifObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records and rewrite file
 Calif24 <- unique(Calif24)
 # Read in 1 hour data
-Calif1 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs1hrFRM.csv", stringsAsFactors = F)
+Calif1 <- read.csv("/home/jhbelle/EPAdata/CalifObs1hrFRM.csv", stringsAsFactors = F)
+Calif1$Date <- as.Date(Calif1$Date, "%Y-%m-%d")
+Calif1 <- subset(Calif1, Calif1$Date > as.Date("2007-04-01", "%Y-%m-%d") & Calif1$Date < as.Date("2015-03-31", "%Y-%m-%d"))
+
 # Run comparisons
 Comp1hr24hr(Calif1, Calif24)
 # 24 hr summary: 117 24 hr monitors, with average values between 6 and 35 micrograms/m^3; Seasonal variability ranges from site to site, with lows in spring/summer; Many missing methods codes; Number of recorded observations per site ranges from 2 to 2813, with most having a few hundred, but many with over 1000.
@@ -231,11 +235,13 @@ Comp1hr24hr(Calif1, Calif24)
 
 
 # Midwest - read in datasets
-Mdwst24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRM.csv", stringsAsFactors = F)
+Mdwst24 <- read.csv("/home/jhbelle/EPAdata/MdwstObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records and rewrite file
 Mdwst24 <- unique(Mdwst24)
 # Read in 1 hour data
-Mdwst1 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs1hrFRM.csv", stringsAsFactors = F)
+Mdwst1 <- read.csv("/home/jhbelle/EPAdata/MdwstObs1hrFRM.csv", stringsAsFactors = F)
+Mdwst1$Date <- as.Date(Mdwst1$Date, "%Y-%m-%d")
+Mdwst1 <- subset(Mdwst1, Mdwst1$Date > as.Date("2007-04-01", "%Y-%m-%d") & Mdwst1$Date < as.Date("2015-03-31", "%Y-%m-%d"))
 # Run comparisons
 Comp1hr24hr(Mdwst1, Mdwst24)
 # No hourly observations in Midwest - may need to redefine study area - Moved to Indiana
@@ -250,11 +256,13 @@ Comp1hr24hr(Mdwst1, Mdwst24)
 # Difference tables: mean differences are typically negative, and tend to be higher when comparing hourly measurements to 24hour gravimetric (1-2.5 versus 0.05) ones; RMSEs follow same pattern, with values from 0.05 to 2 for same type comparisons, and 1.8 to 6.5 for two type comparisons
 
 # Colorado - read in datasets
-Colorado24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRM.csv", stringsAsFactors = F)
+Colorado24 <- read.csv("/home/jhbelle/EPAdata/ColoradoObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records and rewrite file
 Colorado24 <- unique(Colorado24)
 # Read in 1 hour data
-Colorado1 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs1hrFRM.csv", stringsAsFactors = F)
+Colorado1 <- read.csv("/home/jhbelle/EPAdata/ColoradoObs1hrFRM.csv", stringsAsFactors = F)
+Colorado1$Date <- as.Date(Colorado1$Date, "%Y-%m-%d")
+Colorado1 <- subset(Colorado1, Colorado1$Date > as.Date("2007-04-01", "%Y-%m-%d") & Colorado1$Date < as.Date("2015-03-31", "%Y-%m-%d"))
 # Run comparisons
 Comp1hr24hr(Colorado1, Colorado24)
 # 24 hour summary - 24 monitors. Mean values range from 3.5 to 10, with the lowest values in the spring, and the highest in winter - although a few stations show the reverse pattern, with the lowest values in winter and the highest in summer;
@@ -272,19 +280,20 @@ Comp1hr24hr(Colorado1, Colorado24)
 ## -----------------
 
 # Atlanta - read in Atl datasets
-Atl24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRM.csv", stringsAsFactors = F)
+Atl24 <- read.csv("/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records from Atl24 and rewrite file
 Atl24 <- unique(Atl24)
 # Need to handle cases with multiple monitors at a single site
 # Remove the observations from the beta attenuation monitor - known to be biased high - just removing all POC=3 observations since the only one in the speciated dataset with that value is the one we don't want
-Atl24 <- subset(Atl24, Atl24$POC != 3)
+#Atl24 <- subset(Atl24, Atl24$POC != 3)
 # Need one value per station per day - use POC 1 preferentially; POC 2 if POC 1 is absent
 Atl24 <- ddply(Atl24, .(State, County, Site, Date), POCsort)
 Atl24$Date <- as.Date(Atl24$Date, "%Y-%m-%d")
+Atl24 <- subset(Atl24, Atl24$Date > as.Date("2007-04-01", "%Y-%m-%d") & Atl24$Date < as.Date("2015-03-31", "%Y-%m-%d"))
 # Read in speciated data from CSN
-AtlSpec24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRMSpec.csv", stringsAsFactors = F)
+AtlSpec24 <- read.csv("/home/jhbelle/EPAdata/AtlObs24hrFRMSpec.csv", stringsAsFactors = F)
 # Read in blank values for EC/OC correction
-AtlBlanks <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRMBlanks.csv", stringsAsFactors = F)
+AtlBlanks <- read.csv("/home/jhbelle/EPAdata/AtlObs24hrFRMBlanks.csv", stringsAsFactors = F)
 AtlBlanks$Date2 <- as.character(as.Date(AtlBlanks$Date, "%Y-%m-%d"), "%m")
 # Calculate monthly/year average blank values associated with 88370 and 88380 observations - where average is taken across study area
 MonthBlanks <- aggregate(AtlBlanks$BlankValue, by=list(AtlBlanks$Date2, AtlBlanks$ParameterCode), mean, na.rm=T)
@@ -294,7 +303,7 @@ MonthBlanks$BlankValue.Improve <- c(1.1, 1.3, 1.2, 1.4, 1.6, 1.7, 1.8, 1.9, 1.5,
 rm(AtlBlanks)
 # Calculate mass fractions - parameter names: Sulfate=1.375*88403, Nitrate=1.29*88306, OC=1.8*(88320 | (88370 - blank) | ((88305 + 88307) - 1.3*(88307) - a_i)/1.2), Crustal=2.2*88104 + 2.49*88165 + 1.63*88111 + 2.42*88126 + 1.94*88161, Salt=1.8*88115, EC=1.3*(88307) | 88321 | (88380 - blank_88380), Other=Remaining fraction (may be negative)
 # Subset EPA data to only include parameters of interest
-AtlSpec24 <- subset(AtlSpec24, AtlSpec24$ParameterCode %in% c(88403, 88306, 88320, 88370, 88305, 88307, 88104, 88165, 88111, 88126, 88161, 88115, 88321, 88380))[,c(1:4,10,12)]
+AtlSpec24 <- subset(AtlSpec24, AtlSpec24$ParameterCode %in% c(88403, 88306, 88320, 88370, 88305, 88307, 88104, 88165, 88111, 88126, 88161, 88115, 88321, 88380))[,c(1:4,10,11)]
 AtlSpec <- MassRecon(AtlSpec24, Atl24, MonthBlanks)
 SpecTables(AtlSpec)
 ## Plot 1 - mass fractions (daily), no axis restrictions: There are a few days with outlandishly large/negative othe fractions and large/negative OM fractions. These are observations where the gravimetric mass is far smaller than the reconstructed mass. 3 worst are from same station. Should consider eliminating the worst of these observations at a minimum.
@@ -311,7 +320,7 @@ length(unique(Atl24$Date)) # There are 3,163 distinct days with gravimetric obse
 # 5 stations running speciated observations at any particular day
 
 # Colorado - read in Colorado datasets
-Col24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRM.csv", stringsAsFactors = F)
+Col24 <- read.csv("/home/jhbelle/EPAdata/ColoradoObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records from Col24 and rewrite file
 Col24 <- unique(Col24)
 # Need to handle cases with multiple monitors at a single site
@@ -320,10 +329,11 @@ Col24 <- subset(Col24, Col24$POC != 3)
 # Need one value per station per day - use POC 1 preferentially; POC 2 if POC 1 is absent
 Col24 <- ddply(Col24, .(State, County, Site, Date), POCsort)
 Col24$Date <- as.Date(Col24$Date, "%Y-%m-%d")
+Col24 <- subset(Col24, Col24$Date > as.Date("2007-04-01", "%Y-%m-%d") & Col24$Date < as.Date("2015-03-31", "%Y-%m-%d"))
 # Read in speciated data from CSN
-ColSpec24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRMSpec.csv", stringsAsFactors = F)
+ColSpec24 <- read.csv("/home/jhbelle/EPAdata/ColoradoObs24hrFRMSpec.csv", stringsAsFactors = F)
 # Read in blank values for EC/OC correction
-ColBlanks <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/ColoradoObs24hrFRMBlanks.csv", stringsAsFactors = F)
+ColBlanks <- read.csv("/home/jhbelle/EPAdata/ColoradoObs24hrFRMBlanks.csv", stringsAsFactors = F)
 ColBlanks$Date2 <- as.character(as.Date(ColBlanks$Date, "%Y-%m-%d"), "%m")
 # Calculate monthly/year average blank values associated with 88370 and 88380 observations - where average is taken across study area
 MonthBlanks <- aggregate(ColBlanks$BlankValue, by=list(ColBlanks$Date2, ColBlanks$ParameterCode), mean, na.rm=T)
@@ -333,7 +343,7 @@ MonthBlanks$BlankValue.Improve <- c(1.1, 1.3, 1.2, 1.4, 1.6, 1.7, 1.8, 1.9, 1.5,
 rm(ColBlanks)
 # Calculate mass fractions - parameter names: Sulfate=1.375*88403, Nitrate=1.29*88306, OC=1.8*(88320 | (88370 - blank) | ((88305 + 88307) - 1.3*(88307) - a_i)/1.2), Crustal=2.2*88104 + 2.49*88165 + 1.63*88111 + 2.42*88126 + 1.94*88161, Salt=1.8*88115, EC=1.3*(88307) | 88321 | (88380 - blank_88380), Other=Remaining fraction (may be negative)
 # Subset EPA data to only include parameters of interest
-ColSpec24 <- subset(ColSpec24, ColSpec24$ParameterCode %in% c(88403, 88306, 88320, 88370, 88305, 88307, 88104, 88165, 88111, 88126, 88161, 88115, 88321, 88380))[,c(1:4,10,12)]
+ColSpec24 <- subset(ColSpec24, ColSpec24$ParameterCode %in% c(88403, 88306, 88320, 88370, 88305, 88307, 88104, 88165, 88111, 88126, 88161, 88115, 88321, 88380))[,c(1:4,10,11)]
 ColSpec <- MassRecon(ColSpec24, Col24, MonthBlanks)
 SpecTables(ColSpec)
 # At most have 3 stations running speciated results at a given point in time, only 2 prior to 2010
@@ -355,7 +365,7 @@ aggregate(X24hrPM ~ Month, Col24, mean)
 aggregate(X1hrPM ~ Time, Colorado1, mean)
 
 # Indiana - read in Midwest datasets
-Mdwst24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRM.csv", stringsAsFactors = F)
+Mdwst24 <- read.csv("/home/jhbelle/EPAdata/MdwstObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records from Mdwst24 and rewrite file
 Mdwst24 <- unique(Mdwst24)
 # Need to handle cases with multiple monitors at a single site
@@ -364,10 +374,11 @@ Mdwst24 <- subset(Mdwst24, Mdwst24$POC != 3)
 # Need one value per station per day - use POC 1 preferentially; POC 2 if POC 1 is absent
 Mdwst24 <- ddply(Mdwst24, .(State, County, Site, Date), POCsort)
 Mdwst24$Date <- as.Date(Mdwst24$Date, "%Y-%m-%d")
+Mdwst24 <- subset(Mdwst24, Mdwst24$Date > as.Date("2007-04-01", "%Y-%m-%d") & Mdwst24$Date < as.Date("2015-03-31", "%Y-%m-%d"))
 # Read in speciated data from CSN
-MdwstSpec24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRMSpec.csv", stringsAsFactors = F)
+MdwstSpec24 <- read.csv("/home/jhbelle/EPAdata/MdwstObs24hrFRMSpec.csv", stringsAsFactors = F)
 # Read in blank values for EC/OC correction
-MdwstBlanks <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/MdwstObs24hrFRMBlanks.csv", stringsAsFactors = F)
+MdwstBlanks <- read.csv("/home/jhbelle/EPAdata/MdwstObs24hrFRMBlanks.csv", stringsAsFactors = F)
 MdwstBlanks$Date2 <- as.character(as.Date(MdwstBlanks$Date, "%Y-%m-%d"), "%m")
 # Calculate monthly/year average blank values associated with 88370 and 88380 observations - where average is taken across study area
 MonthBlanks <- aggregate(MdwstBlanks$BlankValue, by=list(MdwstBlanks$Date2, MdwstBlanks$ParameterCode), mean, na.rm=T)
@@ -377,7 +388,7 @@ MonthBlanks$BlankValue.Improve <- c(1.1, 1.3, 1.2, 1.4, 1.6, 1.7, 1.8, 1.9, 1.5,
 rm(MdwstBlanks)
 # Calculate mass fractions - parameter names: Sulfate=1.375*88403, Nitrate=1.29*88306, OC=1.8*(88320 | (88370 - blank) | ((88305 + 88307) - 1.3*(88307) - a_i)/1.2), Crustal=2.2*88104 + 2.49*88165 + 1.63*88111 + 2.42*88126 + 1.94*88161, Salt=1.8*88115, EC=1.3*(88307) | 88321 | (88380 - blank_88380), Other=Remaining fraction (may be negative)
 # Subset EPA data to only include parameters of interest
-MdwstSpec24 <- subset(MdwstSpec24, MdwstSpec24$ParameterCode %in% c(88403, 88306, 88320, 88370, 88305, 88307, 88104, 88165, 88111, 88126, 88161, 88115, 88321, 88380))[,c(1:4,10,12)]
+MdwstSpec24 <- subset(MdwstSpec24, MdwstSpec24$ParameterCode %in% c(88403, 88306, 88320, 88370, 88305, 88307, 88104, 88165, 88111, 88126, 88161, 88115, 88321, 88380))[,c(1:4,10,11)]
 MdwstSpec24 <- rbind.data.frame(MdwstSpec24, c(18, 65, "3", 88321, "2007-01-06", NA))
 MdwstSpec24 <- rbind.data.frame(MdwstSpec24, c(18, 65, "3", 88320, "2007-01-06", NA))
 MdwstSpec <- MassRecon(MdwstSpec24, Mdwst24, MonthBlanks) # This is broken?
@@ -402,7 +413,7 @@ aggregate(X24hrPM ~ Month, Mdwst24, mean)
 aggregate(X1hrPM ~ Time, Mdwst1, mean)
 
 # California - read in California datasets
-Calif24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRM.csv", stringsAsFactors = F)
+Calif24 <- read.csv("/home/jhbelle/EPAdata/CalifObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records from Calif24 and rewrite file
 Calif24 <- unique(Calif24)
 # Need to handle cases with multiple monitors at a single site
@@ -411,10 +422,11 @@ Calif24 <- subset(Calif24, Calif24$POC != 3)
 # Need one value per station per day - use POC 1 preferentially; POC 2 if POC 1 is absent
 Calif24 <- ddply(Calif24, .(State, County, Site, Date), POCsort)
 Calif24$Date <- as.Date(Calif24$Date, "%Y-%m-%d")
+Calif24 <- subset(Calif24, Calif24$Date > as.Date("2007-04-01", "%Y-%m-%d") & Calif24$Date < as.Date("2015-03-31", "%Y-%m-%d"))
 # Read in speciated data from CSN
-CalifSpec24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRMSpec.csv", stringsAsFactors = F)
+CalifSpec24 <- read.csv("/home/jhbelle/EPAdata/CalifObs24hrFRMSpec.csv", stringsAsFactors = F)
 # Read in blank values for EC/OC correction
-CalifBlanks <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/CalifObs24hrFRMBlanks.csv", stringsAsFactors = F)
+CalifBlanks <- read.csv("/home/jhbelle/EPAdata/CalifObs24hrFRMBlanks.csv", stringsAsFactors = F)
 CalifBlanks$Date2 <- as.character(as.Date(CalifBlanks$Date, "%Y-%m-%d"), "%m")
 # Calculate monthly/year average blank values associated with 88370 and 88380 observations - where average is taken across study area
 MonthBlanks <- aggregate(CalifBlanks$BlankValue, by=list(CalifBlanks$Date2, CalifBlanks$ParameterCode), mean, na.rm=T)
@@ -424,7 +436,7 @@ MonthBlanks$BlankValue.Improve <- c(1.1, 1.3, 1.2, 1.4, 1.6, 1.7, 1.8, 1.9, 1.5,
 rm(CalifBlanks)
 # Calculate mass fractions - parameter names: Sulfate=1.375*88403, Nitrate=1.29*88306, OC=1.8*(88320 | (88370 - blank) | ((88305 + 88307) - 1.3*(88307) - a_i)/1.2), Crustal=2.2*88104 + 2.49*88165 + 1.63*88111 + 2.42*88126 + 1.94*88161, Salt=1.8*88115, EC=1.3*(88307) | 88321 | (88380 - blank_88380), Other=Remaining fraction (may be negative)
 # Subset EPA data to only include parameters of interest
-CalifSpec24 <- subset(CalifSpec24, CalifSpec24$ParameterCode %in% c(88403, 88306, 88320, 88370, 88305, 88307, 88104, 88165, 88111, 88126, 88161, 88115, 88321, 88380))[,c(1:4,10,12)]
+CalifSpec24 <- subset(CalifSpec24, CalifSpec24$ParameterCode %in% c(88403, 88306, 88320, 88370, 88305, 88307, 88104, 88165, 88111, 88126, 88161, 88115, 88321, 88380))[,c(1:4,10,11)]
 CalifSpec <- MassRecon(CalifSpec24, Calif24, MonthBlanks)
 SpecTables(CalifSpec)
 # 15 sites, some with highly suspect results (OC fractions consistently over 100, or extended gaps in data record)
@@ -456,7 +468,7 @@ ggplot(CalifSpec, aes(x=as.numeric(as.character(Date, "%m")))) + stat_summary(ae
 AtlGE100 <- ifelse(AtlSpec$SulfateFrac > 1 | AtlSpec$NitrateFrac > 1 | AtlSpec$SoilFrac > 1 | AtlSpec$ECFrac > 100 | AtlSpec$OCFrac > 100 | AtlSpec$OtherFrac < -1 | AtlSpec$OtherFrac > 1, 1, 0)
 SubAtlProb <- subset(AtlSpec, AtlGE100 == 1)
 View(SubAtlProb) # 10 observations meet criteria, most have unusually low 24 hour masses
-Atl24 <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAdatProc/AtlObs24hrFRM.csv", stringsAsFactors = F)
+Atl24 <- read.csv("/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records from Atl24 and rewrite file
 Atl24 <- unique(Atl24)
 # Need to handle cases with multiple monitors at a single site
@@ -468,7 +480,11 @@ View(Atl) # 3 had discrepancies between different POCs
 AtlSpecClean <- subset(AtlSpec, AtlGE100 == 0)
 AtlSpecClean[,17:22] <- AtlSpecClean[,c(9:14)]/AtlSpecClean$ReconMass
 summary(AtlSpecClean)
+aggregate(AtlSpecClean$OtherFrac*100, list(as.character(AtlSpecClean$Date, "%m")), mean)
 AtlSpec_2 <- AtlSpecClean[,c(4,17:22)]
+summary(AtlSpec_2[,2:7]*100)
+aggregate(AtlSpec_2[,2:7]*100, list(as.character(AtlSpec_2$Date, "%m")), mean)
+
 AtlSpecPlt <- reshape(AtlSpec_2, direction="long", varying=list(2:7))
 ggplot(AtlSpecPlt, aes(x=as.integer(as.character(Date, "%m")), color=as.factor(time), y=SulfateFrac)) + stat_summary(geom="line", fun.y = "mean", size=2) + ylab("Proportion of mass") + scale_x_continuous("Month of year", breaks=c(2,6,10)) + ggtitle(expression("Average " * PM[2.5] * " Composition")) + scale_color_discrete("Species", labels = c("1"=expression("Sulfate, " * SO[4]), "2"=expression("Nitrate, " * NO[3]), "3"="Salt, NaCl", "4"="Soil", "5"="EC", "6"="OC")) + theme_classic()
 
@@ -480,9 +496,24 @@ Col <- merge(Col24, SubColProb, by=c("State", "County", "Site", "Date"), all.y=T
 View(Col) # 3 had discrepancies between different POCs
 ColSpecClean <- subset(ColSpec, ColGE100 == 0)
 ColSpec[,17:22] <- ColSpec[,c(9:14)]/ColSpec$ReconMass
-summary(ColSpecClean)
+summary(ColSpecClean[,9:14])
+aggregate(ColSpecClean$OtherFrac*100, list(as.character(ColSpecClean$Date, "%m")), mean)
 ColSpec_2 <- ColSpecClean[,c(4,17:22)]
+summary(ColSpec_2[,2:7]*100)
+aggregate(ColSpec_2[,2:7]*100, list(as.character(ColSpec_2$Date, "%m")), mean)
 
+CalifGE100 <- ifelse(CalifSpec$SulfateFrac > 1 | CalifSpec$NitrateFrac > 1 | CalifSpec$SoilFrac > 1 | CalifSpec$ECFrac > 100 | CalifSpec$OCFrac > 100 | CalifSpec$OtherFrac < -1 | CalifSpec$OtherFrac > 1, 1, 0)
+SubCalifProb <- subset(CalifSpec, CalifGE100 == 1)
+Calif24$Date <- as.Date(Calif24$Date, "%Y-%m-%d")
+Calif <- merge(Calif24, SubCalifProb, by=c("State", "County", "Site", "Date"), all.y=T)
+View(Calif) # 3 had discrepancies between different POCs
+CalifSpecClean <- subset(CalifSpec, CalifGE100 == 0)
+CalifSpec[,17:22] <- CalifSpec[,c(9:14)]/CalifSpec$ReconMass
+summary(CalifSpecClean[,9:14])
+aggregate(CalifSpecClean$OtherFrac*100, list(as.character(CalifSpecClean$Date, "%m")), mean)
+CalifSpec_2 <- CalifSpecClean[,c(4,17:22)]
+summary(CalifSpec_2[,2:7]*100)
+aggregate(CalifSpec_2[,2:7]*100, list(as.character(CalifSpec_2$Date, "%m")), mean)
 
 MdwstGE100 <- ifelse(MdwstSpec$SulfateFrac > 1 | MdwstSpec$NitrateFrac > 1 | MdwstSpec$SoilFrac > 1 | MdwstSpec$ECFrac > 100 | MdwstSpec$OCFrac > 100 | MdwstSpec$OtherFrac < -1 | MdwstSpec$OtherFrac > 1, 1, 0)
 SubMdwstProb <- subset(MdwstSpec, MdwstGE100 == 1)
@@ -491,8 +522,9 @@ Mdwst <- merge(Mdwst24, SubMdwstProb, by=c("State", "County", "Site", "Date"), a
 View(Mdwst) # 3 had discrepancies between different POCs
 MdwstSpecClean <- subset(MdwstSpec, MdwstGE100 == 0)
 MdwstSpec[,17:22] <- MdwstSpec[,c(9:14)]/MdwstSpec$ReconMass
-summary(MdwstSpecClean)
+summary(MdwstSpecClean[9:14])
 summary(MdwstSpecClean$OtherFrac*100)
+aggregate(MdwstSpecClean$OtherFrac*100, list(as.character(MdwstSpecClean$Date, "%m")),mean)
 MdwstSpec_2 <- MdwstSpecClean[,c(4,17:22)]
 summary(MdwstSpec_2[,2:7]*100)
 aggregate(MdwstSpec_2[,2:7]*100, list(as.character(MdwstSpec_2$Date, "%m")), mean)
