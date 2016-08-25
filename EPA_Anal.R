@@ -10,6 +10,7 @@
 ##    NOTE: Processing 24 hour PM, 24 hour Speciated PM, 1 Hr PM, and 1 Hr Speciated separately and including weather data for each observation, if available
 ## -----------------------
 
+setwd("/home/jhbelle/Aim1Repo/")
 # Read in libraries
 library(plyr)
 source("Functions_EPA_Proc.R")
@@ -319,13 +320,13 @@ ggplot(CalifSpec, aes(x=as.numeric(as.character(Date, "%m")))) + stat_summary(ae
 AtlGE100 <- ifelse(AtlSpec$SulfateFrac > 1 | AtlSpec$NitrateFrac > 1 | AtlSpec$SoilFrac > 1 | AtlSpec$ECFrac > 100 | AtlSpec$OCFrac > 100 | AtlSpec$OtherFrac < -1 | AtlSpec$OtherFrac > 1, 1, 0)
 SubAtlProb <- subset(AtlSpec, AtlGE100 == 1)
 View(SubAtlProb) # 10 observations meet criteria, most have unusually low 24 hour masses
-Atl24 <- read.csv("/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", stringsAsFactors = F)
+#Atl24 <- read.csv("/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", stringsAsFactors = F)
 # Remove any duplicated records from Atl24 and rewrite file
-Atl24 <- unique(Atl24)
+#Atl24 <- unique(Atl24)
 # Need to handle cases with multiple monitors at a single site
 # Remove the observations from the beta attenuation monitor - known to be biased high - just removing all POC=3 observations since the only one in the speciated dataset with that value is the one we don't want
-Atl24 <- subset(Atl24, Atl24$POC != 3)
-Atl24$Date <- as.Date(Atl24$Date, "%Y-%m-%d")
+#Atl24 <- subset(Atl24, Atl24$POC != 3)
+#Atl24$Date <- as.Date(Atl24$Date, "%Y-%m-%d")
 Atl <- merge(Atl24, SubAtlProb, by=c("State", "County", "Site", "Date"), all.y=T)
 View(Atl) # 3 had discrepancies between different POCs
 AtlSpecClean <- subset(AtlSpec, AtlGE100 == 0)
@@ -358,7 +359,7 @@ SubCalifProb <- subset(CalifSpec, CalifGE100 == 1)
 Calif24$Date <- as.Date(Calif24$Date, "%Y-%m-%d")
 Calif <- merge(Calif24, SubCalifProb, by=c("State", "County", "Site", "Date"), all.y=T)
 View(Calif) # 3 had discrepancies between different POCs
-CalifSpecClean <- subset(CalifSpec, CalifGE100 == 0)
+CalifSpecClean <- subset(CalifSpec, CalifGE100 == 0 & CalifSpec$County != 63)
 CalifSpec[,17:22] <- CalifSpec[,c(9:14)]/CalifSpec$ReconMass
 summary(CalifSpecClean[,9:14])
 aggregate(CalifSpecClean$OtherFrac*100, list(as.character(CalifSpecClean$Date, "%m")), mean)
@@ -379,3 +380,12 @@ aggregate(MdwstSpecClean$OtherFrac*100, list(as.character(MdwstSpecClean$Date, "
 MdwstSpec_2 <- MdwstSpecClean[,c(4,17:22)]
 summary(MdwstSpec_2[,2:7]*100)
 aggregate(MdwstSpec_2[,2:7]*100, list(as.character(MdwstSpec_2$Date, "%m")), mean)
+
+## ---------------
+## Write cleaned files to disk - combine all study sites into single files
+## ---------------
+
+# 24 hour observations
+D24hr <- rbind.data.frame(Atl24[,1:11], Col24[,1:11], Mdwst24[,1:11], Calif24[,1:11])
+D24hr$StudyArea <- c(rep("Atl", nrow(Atl24)), rep("Col", nrow(Col24)), rep("Mdwst", nrow(Mdwst24)), rep("Calif", nrow(Calif24)))
+write.csv(D24hr, "D24hr.csv")

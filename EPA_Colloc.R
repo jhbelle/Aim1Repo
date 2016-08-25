@@ -18,6 +18,9 @@ source("Functions_EPA_Proc.R")
 ## Prep and write files for collocations
 ## --------------
 #For each region, need list of all monitors and days with a 24hour gravimetric average
+# Read in files output from EPA_Anal.R
+
+
 
 ## --------------
 ## Make file of station locations and capabilities for mapping
