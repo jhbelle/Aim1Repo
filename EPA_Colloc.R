@@ -19,8 +19,9 @@ source("Functions_EPA_Proc.R")
 ## --------------
 #For each region, need list of all monitors and days with a 24hour gravimetric average
 # Read in files output from EPA_Anal.R
-
-
+G24hr <- read.csv("/home/jhbelle/EPAdata/CleanedData/G24hr.csv")
+H1hr <-- read.csv("/home/jhbelle/EPAdata/CleanedData/H1hr.csv")
+S24hr <- read.csv("/home/jhbelle/EPAdata/CleanedData/S24hr.csv")
 
 ## --------------
 ## Make file of station locations and capabilities for mapping

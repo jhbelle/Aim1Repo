@@ -14,8 +14,17 @@
 library(plyr)
 source("Functions_EPA_Proc.R")
 
-# Read in hourly observations for each study site and combine into 
-# For each day, construct and save a multipart polygon with the MODIS granule boundaries in the CONUS for terra (bounded by: -140 W; -57 E; 56 N; 16 S)
+# For each day in the full time series, construct and save a multipart polygon with the MODIS granule boundaries in the CONUS for terra (bounded by: -140 W; -57 E; 56 N; 16 S)
+
+
+# For each day, construct and save a multipart polygon with the MODIS granule boundaries in the CONUS for aqua (bounded by: -140 W; -57 E; 56 N; 16 S)
+
+
+
+# Read in hourly observations
+H1hr <- read.csv("/home/jhbelle/EPAdata/CleanedData/H1hr.csv")
+
+
 # Get list of which granules each station falls under for each day
 # Calculate representativeness for terra passtimes
 # Write file

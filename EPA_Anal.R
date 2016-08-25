@@ -386,6 +386,18 @@ aggregate(MdwstSpec_2[,2:7]*100, list(as.character(MdwstSpec_2$Date, "%m")), mea
 ## ---------------
 
 # 24 hour observations
-D24hr <- rbind.data.frame(Atl24[,1:11], Col24[,1:11], Mdwst24[,1:11], Calif24[,1:11])
-D24hr$StudyArea <- c(rep("Atl", nrow(Atl24)), rep("Col", nrow(Col24)), rep("Mdwst", nrow(Mdwst24)), rep("Calif", nrow(Calif24)))
-write.csv(D24hr, "D24hr.csv")
+G24hr <- rbind.data.frame(Atl24[,1:11], Col24[,1:11], Mdwst24[,1:11], Calif24[,1:11])
+G24hr$StudyArea <- c(rep("Atl", nrow(Atl24)), rep("Col", nrow(Col24)), rep("Mdwst", nrow(Mdwst24)), rep("Calif", nrow(Calif24)))
+#ggplot(G24hr, aes(x=Date, color=StudyArea, y=X24hrPM)) + stat_summary(geom="line", fun.y="mean")
+write.csv(G24hr, "/home/jhbelle/EPAdata/CleanedData/G24hr.csv")
+
+# 1 hour observations
+H1hr <- rbind.data.frame(Atl1[,1:15], Colorado1, Mdwst1, Calif1)
+H1hr$StudyArea <- c(rep("Atl", nrow(Atl1)), rep("Col", nrow(Colorado1)), rep("Mdwst", nrow(Mdwst1)), rep("Calif", nrow(Calif1)))
+#ggplot(O1hr, aes(x=Date, color=StudyArea, y=X1hrPM)) + stat_summary(geom="line", fun.y="mean")
+write.csv(H1hr, "/home/jhbelle/EPAdata/CleanedData/H1hr.csv")
+
+# Speciated observations 
+S24hr <- rbind.data.frame(AtlSpecClean, ColSpecClean, MdwstSpecClean, CalifSpecClean)
+S24hr$StudyArea <- c(rep("Atl", nrow(AtlSpecClean)), rep("Col", nrow(ColSpecClean)), rep("Mdwst", nrow(MdwstSpecClean)), rep("Calif", nrow(CalifSpecClean)))
+write.csv(S24hr, "/home/jhbelle/EPAdata/CleanedData/S24hr.csv")
