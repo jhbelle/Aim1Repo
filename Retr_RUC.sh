@@ -13,7 +13,7 @@ source /home/jhbelle/.profile
 var=( sp 10u 10v cape cin prate sd hpbl h h vis cape cin r )
 lev=( surface heightAboveGround heightAboveGround surface surface surface surface surface cloudBase cloudTop surface pressureFromGroundLayer pressureFromGroundLayer heightAboveGround )
 day=2007-04-01
-while [ "$day" != 2008-04-01 ]; do
+while [ "$day" != 2008-01-01 ]; do
     #echo $day
     year=$(date +%Y -d "$day")
     month=$(date +%m -d "$day")
