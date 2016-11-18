@@ -8,7 +8,7 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString
   ; - maiacString: string: The regex expression for the first part of the maiac files. Ex. "MAIAC[AT]AOT.h08v04."
   ; Open and create text file for data, then close so can reopen as append later when actually needed
   OPENW, 1, collocFile
-  PRINTF, 1, "State, County, Site, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA"
+  PRINTF, 1, "State, County, Site, Juldate, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA"
   CLOSE, 1
   ; Read in CalifG24hr.csv
   G24hr = READ_CSV(siteDat, HEADER=G24hrHead)
@@ -46,7 +46,7 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString
           ; Write data to a text file
           OPENU, 2, collocFile, /APPEND
           FOR J = 0, N_ELEMENTS(AODQA)-1 DO BEGIN
-            PRINTF, 2, 6, G24hr.(WHERE(G24hrHead EQ "County"))[I], G24hr.(WHERE(G24hrHead EQ "Site"))[I], G24hr.(WHERE(G24hrHead EQ "Date"))[I], TStamp, TerraAquaFlag, G24hr.(WHERE(G24hrHead EQ "X24hrPM"))[I], AOD47[J], AOD55[J], AODQA[J], FORMAT='(4(I5, ", "), 3(A15, ", "), D, 3(", ", I5))'
+            PRINTF, 2, 6, G24hr.(WHERE(G24hrHead EQ "County"))[I], G24hr.(WHERE(G24hrHead EQ "Site"))[I], JulDate, G24hr.(WHERE(G24hrHead EQ "Date"))[I], TStamp, TerraAquaFlag, G24hr.(WHERE(G24hrHead EQ "X24hrPM"))[I], AOD47[J], AOD55[J], AODQA[J], FORMAT='(4(I5, ", "), 3(A15, ", "), D, 3(", ", I5))'
           ENDFOR
           CLOSE, 2
         ENDIF

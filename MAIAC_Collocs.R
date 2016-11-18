@@ -30,7 +30,7 @@ ConvQA <- function(intnum, intlength=16){
   return(as.character(rem))
 }
 
-# Define QA values
+# Function to define QA values
 DefQA <- function(dat, qafield){
   convqaval <- ConvQA(dat[,c(qafield)])
   # Cloud contamination flags
@@ -65,6 +65,9 @@ for (i in seq(1:length(Collocfiles))){
   Header = gsub(" ", "", Collocs[[1]])
   Collocs[[1]] = NULL
   Collocs <- ldply(Collocs, ProcDat, header=Header)
+  Collocs$State = as.integer(Collocs$State)
+  Collocs$County = as.integer(Collocs$County)
+  Collocs$Site = as.integer(Collocs$Site)
   NearFile <- read.csv(NearPairs[i])
   NearFile <- NearFile[,c("State", "County", "Site", "NEAR_DIST")]
   Collocs <- merge(Collocs, NearFile)
@@ -87,6 +90,7 @@ CollocDat$AOD47 <- CollocDat$AOD47*Scaleval
 
 
 # Loop over radii and create text file for each radius - note that distances in near file are meters
+# Summary measures are sum of QA values in each category (15), Total Num records, Mean AOD for each overpass time and EPA station record
 radii = c(5, 10, 20, 30, 40) # km
 for (radius in radii){
   
