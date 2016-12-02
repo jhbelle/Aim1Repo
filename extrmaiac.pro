@@ -19,8 +19,8 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
   ; Read in Near40kmh08v04_2.csv
   Near= READ_CSV(nearFile, HEADER=NearHead)
   ; Loop over rows in CalifG24hr.csv
-  ;FOR I = 0, sz(1)-1 DO BEGIN
-  FOR I = 0, 1 DO BEGIN
+  FOR I = 0, sz(1)-1 DO BEGIN
+  ;FOR I = 0, 1 DO BEGIN
     ; Extract date field and calculate the julian day
     CurDate = strsplit(G24hr.(WHERE(G24hrHead EQ "Date"))[I], "-", /EXTRACT)
     Juldate = JULDAY(CurDate[1], CurDate[2], CurDate[0]) - JULDAY(12, 31, CurDate[0]-1)
@@ -30,8 +30,8 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
       ; Get the indexes for the MAIAC file that are within 40 km of this station
       Index = Near.(WHERE(NearHead EQ "index"))[Int]
       ; Get a list of MAIAC files for this day and loop over
-      ;f = FILE_SEARCH(STRING(fPath + CurDate[0] + "/"), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
-      f = FILE_SEARCH(STRING(fPath), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
+      f = FILE_SEARCH(STRING(fPath + CurDate[0] + "/"), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
+      ;f = FILE_SEARCH(STRING(fPath), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
       FOREACH file, f DO BEGIN
 	   ; Open maiac file and extract AOD 47; AOD 55, and the AOD QA field
         FID = EOS_GD_OPEN(file)
