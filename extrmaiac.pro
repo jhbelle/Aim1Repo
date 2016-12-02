@@ -1,4 +1,4 @@
-pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString
+pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, LocTStamp
   ; Extracts MAIAC values within pre-calculated radii from station locations using index values
   ; Takes as input 
   ; - nearFile: string: The result of near table operation in arcGIS, followed by table joins using the results of extrlatlonmaiac.pro. Ex. "/aqua/Jess/Data/Near40kmh08v05_2.csv"
@@ -6,6 +6,8 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString
   ; - siteDat: string: The site data containing the EPA station records with dates - currently expected that all sites are in same state. Ex: "/aqua/Jess/Data/CalifG24hr.csv"
   ; - fPath: string: the file path of the MAIAC files, with a folder for each year. Ex: "/terra/MAIAC_Jess/h08v04/"
   ; - maiacString: string: The regex expression for the first part of the maiac files. Ex. "MAIAC[AT]AOT.h08v04."
+  ; - LocTAFlag: integer: The location in the filepath/name string where the Terra/Aqua Flag is
+  ; - LocTStamp: integer: The location in the filepath/name string where the timestamp starts
   ; Open and create text file for data, then close so can reopen as append later when actually needed
   OPENW, 1, collocFile
   PRINTF, 1, "State, County, Site, Juldate, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA"
@@ -17,7 +19,8 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString
   ; Read in Near40kmh08v04_2.csv
   Near= READ_CSV(nearFile, HEADER=NearHead)
   ; Loop over rows in CalifG24hr.csv
-  FOR I = 0, sz(1)-1 DO BEGIN
+  ;FOR I = 0, sz(1)-1 DO BEGIN
+  FOR I = 0, 1 DO BEGIN
     ; Extract date field and calculate the julian day
     CurDate = strsplit(G24hr.(WHERE(G24hrHead EQ "Date"))[I], "-", /EXTRACT)
     Juldate = JULDAY(CurDate[1], CurDate[2], CurDate[0]) - JULDAY(12, 31, CurDate[0]-1)
@@ -27,7 +30,8 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString
       ; Get the indexes for the MAIAC file that are within 40 km of this station
       Index = Near.(WHERE(NearHead EQ "index"))[Int]
       ; Get a list of MAIAC files for this day and loop over
-      f = FILE_SEARCH(STRING(fPath + CurDate[0] + "/"), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
+      ;f = FILE_SEARCH(STRING(fPath + CurDate[0] + "/"), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
+      f = FILE_SEARCH(STRING(fPath), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
       FOREACH file, f DO BEGIN
 	   ; Open maiac file and extract AOD 47; AOD 55, and the AOD QA field
         FID = EOS_GD_OPEN(file)
@@ -41,8 +45,8 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString
           AOD55 = AOD55[Index]
           AODQA = AODQA[Index]
           ; Get Time stamp and terra aqua flag fields
-          TerraAquaFlag = STRMID(file, 35, 1)
-          TStamp = STRMID(file, 54, 4)
+          TerraAquaFlag = STRMID(file, LocTAFlag, 1)
+          TStamp = STRMID(file, LocTStamp, 4)
           ; Write data to a text file
           OPENU, 2, collocFile, /APPEND
           FOR J = 0, N_ELEMENTS(AODQA)-1 DO BEGIN
