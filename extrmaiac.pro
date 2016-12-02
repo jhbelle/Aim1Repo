@@ -8,6 +8,7 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
   ; - maiacString: string: The regex expression for the first part of the maiac files. Ex. "MAIAC[AT]AOT.h08v04."
   ; - LocTAFlag: integer: The location in the filepath/name string where the Terra/Aqua Flag is
   ; - LocTStamp: integer: The location in the filepath/name string where the timestamp starts
+  ; NOTE: Some fields are expected to exist in certain files and have been named below; The date field is expected to be formatted YYYY-MM-DD
   ; Open and create text file for data, then close so can reopen as append later when actually needed
   OPENW, 1, collocFile
   PRINTF, 1, "State, County, Site, Juldate, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA"
