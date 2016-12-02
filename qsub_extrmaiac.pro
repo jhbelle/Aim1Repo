@@ -1,3 +1,4 @@
+cd, "T:\eohprojs\CDC_climatechange\Jess\Dissertation\Aim1Repo"
 
 print, 'Job started'
 
