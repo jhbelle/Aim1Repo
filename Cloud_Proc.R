@@ -56,11 +56,13 @@ ReadClouds <- function(datline, loc1km="E://CalifCloudCollocs1km/", loc5km="E://
     # Convert fill values to missing
     dat5km$CloudTopHgt[dat5km$CloudTopHgt == CloudHeightFill] = NA
     # Calculate statistics for cloud top height
-    MCldHgt <- aggregate(CloudTopHgt ~ Time, dat5km, median)
-    Clouds <- merge(Clouds, MCldHgt, all=T)
-    if (nrow(Clouds) < length(levels(as.factor(dat1km$Time)))){
-
+    if (sum(!is.na(dat5km$CloudTopHgt)) > 0){
+      MCldHgt <- aggregate(CloudTopHgt ~ Time, dat5km, median)
+    } else {
+      CloudTopHgt = rep(NA, length(Time))
+      MCldHgt <- cbind.data.frame(Time, CloudTopHgt)
     }
+    Clouds <- merge(Clouds, MCldHgt, all=T)
     # Create output dataset
     outDat <- cbind.data.frame(Clouds, PAnyCld, PSingleCld, PMultiCld)
     rm(MCldHgt, Clouds, PAnyCld, PSingleCld, PMultiCld)
