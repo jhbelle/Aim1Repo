@@ -22,7 +22,7 @@ ReadClouds <- function(datline, loc1km="E://CalifCloudCollocs1km/", loc5km="E://
   if (sum(dat1km$Multi > 0)){
     dat1km$Multi <- cut(dat1km$Multi, c(-0.5,0.5,1.5,10), c("None", "Single", "Multi"))
     Multitable <- xtabs(~ Multi + Time, dat1km)
-    PAnyCld = (Multitable[2,] + Multitable[3,])/Multitable[1,]
+    PAnyCld = (Multitable[2,] + Multitable[3,])/(Multitable[1,] + Multitable[2,] + Multitable[3,])
     PSingleCld = Multitable[2,]/(Multitable[2,] + Multitable[3,])
     PMultiCld = Multitable[3,]/(Multitable[2,] + Multitable[3,])
     # Convert fill values to missing
@@ -84,3 +84,15 @@ ReadClouds <- function(datline, loc1km="E://CalifCloudCollocs1km/", loc5km="E://
 library(plyr)
 Out5km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=5)
 write.csv(Out5km, "E://CloudAgg_5km.csv")
+
+Out10km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=10)
+write.csv(Out10km, "E://CloudAgg_10km.csv")
+
+Out20km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=20)
+write.csv(Out20km, "E://CloudAgg_20km.csv")
+
+Out30km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=30)
+write.csv(Out30km, "E://CloudAgg_30km.csv")
+
+Out40km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=40)
+write.csv(Out40km, "E://CloudAgg_40km.csv")
