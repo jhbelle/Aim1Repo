@@ -28,7 +28,7 @@ Mountain = subset(GridDat, GridDat$Longitude > -115 & GridDat$Longitude <= -102)
 Central = subset(GridDat, GridDat$Longitude > -102 & GridDat$Longitude <= -87)
 Eastern = subset(GridDat, GridDat$Longitude > -87 & GridDat$Longitude <= -75)
 FullVarList = c("10u_heightAboveGround", "10v_heightAboveGround", "cape_pressureFromGroundLayer", "cape_surface", "cin_pressureFromGroundLayer", "cin_surface", "h_cloudBase", "h_cloudTop", "hpbl_surface", "prate_surface", "r_heightAboveGround", "sd_surface", "sp_surface", "vis_surface")
-SubVarList = c("10u_heightAboveGrou nd", "10v_heightAboveGround", "prate_surface", "r_heightAboveGround", "sd_surface", "vis_surface") 
+SubVarList = c("10u_heightAboveGround", "10v_heightAboveGround", "prate_surface", "r_heightAboveGround", "sd_surface", "vis_surface") 
 
 # Create empty datasets to start time zones
 Pacific_curDay = makeEmptyDat(Pacific, SubVarList)
@@ -45,6 +45,12 @@ Mountain_nextDay = makeEmptyDat(Mountain, SubVarList)
 MCount_nextDay = makeEmptyDat(Mountain, SubVarList)
 Central_nextDay = makeEmptyDat(Central, SubVarList)
 CCount_nextDay = makeEmptyDat(Central, SubVarList)
+
+# Create empty T/A datasets to start
+TerraGridDat = makeEmptyDat(GridDat, FullVarList)
+TerraCounts = makeEmptyDat(GridDat, FullVarList)
+AquaGridDat = makeEmptyDat(GridDat, FullVarList)
+AquaCounts = makeEmptyDat(GridDat, FullVarList)
 
 # -------------
 # Process RUC/RAP text files to hdf
@@ -64,57 +70,14 @@ for (day in Days){
   TGM <- read.csv(sprintf("%s%d/MOD03_%s.txt", TerraGeoMeta, Year, as.character(day, "%Y-%m-%d")), skip=2, stringsAsFactors=F)
   TGM <- subset(TGM, TGM$DayNightFlag == "D" & TGM$EastBoundingCoord >= -130 & TGM$WestBoundingCoord >=-75 & TGM$SouthBoundingCoord <= 45 & TGM$NorthBoundingCoord >= 20)
   TGM$StartDateTime <- strptime(TGM$StartDateTime, "%Y-%m-%d %H:%M")
-  # Create 0 value data vectors for each T/A variable
-  Tdat <- makeEmpyDat(GridDat, FullVarList)
-  Tdat_Count <- makeEmptyDat(GridDat, FullVarList)
-  Adat <- makeEmptyDat(GridDat, FullVarList)
-  Adat_Count <- makeEmptyDat(GridDat, FullVarList)
   # Iterate over hours
-  for hour in seq(0,23){
+  for (hour in seq(0,23)){
     # Check if files exist for this hour/day - nm - faster to attempt to read files than to search directory
     #DayHrFiles <- list.files(RUCRAPloc, sprintf("ruc2anl_130_%s_%02d_*.txt", as.character(day, "%Y%m%d", hour)))
     # Check for Aqua passes associated with this hour (H-15min <= t < H+45 min)
     APhrs <- subset(AGM, AGM$StartDateTime >= strptime(paste(as.character(day, "%Y/%m/%d"), hour), "%Y/%m/%d %H") - 15*60 & AGM$StartDateTime <= strptime(paste(as.character(day, "%Y/%m/%d"), hour), "%Y/%m/%d %H") + 45*60)
     # Check for Terra passes associated with this hour (H-15min <= t < H+45 min)
     TPhrs <- subset(TGM, TGM$StartDateTime >= strptime(paste(as.character(day, "%Y/%m/%d"), hour), "%Y/%m/%d %H") - 15*60 & TGM$StartDateTime <= strptime(paste(as.character(day, "%Y/%m/%d"), hour), "%Y/%m/%d %H") + 45*60)
-    # Get appropriate day for each time zone
-    if (hour == 16){
-      P = Pacific_nextDay
-      PCount = PCount_nextDay
-      M = Mountain_curDay
-      MCount = MCount_curDay
-      C = Central_curDay
-      CCount = CCount_curDay
-      E = Eastern_curDay
-      ECount = ECount_curDay
-    } else if (hour == 17){
-      P = Pacific_nextDay
-      PCount = PCount_nextDay
-      M = Mountain_nextDay
-      MCount = MCount_nextDay
-      C = Central_curDay
-      CCount = CCount_curDay
-      E = Eastern_curDay
-      ECount = ECount_curDay
-    } else if (hour == 18){
-      P = Pacific_nextDay
-      PCount = PCount_nextDay
-      M = Mountain_nextDay
-      MCount = MCount_nextDay
-      C = Central_nextDay
-      CCount = CCount_nextDay
-      E = Eastern_curDay
-      ECount = ECount_curDay
-    } else {
-      P = Pacific_curDay
-      PCount = PCount_curDay
-      M = Mountain_curDay
-      MCount = MCount_curDay
-      C = Central_curDay
-      CCount = CCount_curDay
-      E = Eastern_curDay
-      ECount = ECount_curDay
-    } 
     # Create variable list - if any Aqua or Terra passes associated with hour use full list, otherwise only smaller list for 24hr values
     if (nrow(APhrs) > 0 | nrow(TPhrs) > 0){
       ProdTA = T
@@ -126,22 +89,79 @@ for (day in Days){
     # Iterate over variables
     for (var in varlist){
       # Read in data
-      dat = read.table(, header=T)[,1:3]
-      # If applicable, add to A/T datasets
-      if (nrow(APhrs) > 0){
-      }
-      if (nrow(TPhrs) > 0){
-      }
-      # Add 24hr vars to appropriate time zone/day combos
-      if (var %in% SubVarList){
-        
+      dat = try(read.table(sprintf("%sruc2anl_130_%s_%02d_%s.txt", RUCRAPloc, as.character(day, "%Y%m%d"), hour, var), header=T)[,1:3], silent=T)
+      if (is.data.frame(dat)){
+        # If applicable, add to A/T datasets
+        if (nrow(APhrs) > 0){
+          APOut = ddply(APhrs, .(StartDateTime), RetValsGran, gridDat=GridDat, dat=dat)
+          APOut = aggregate(Value. ~ Latitude + Longitude, APOut, sum)
+          APCount = aggregate(Value. ~ Latitude + Longitude, APOut, length)
+        }
+        if (nrow(TPhrs) > 0){
+          TPOut = ddply(TPhrs, .(StartDateTime), RetValsGran, gridDat=GridDat, dat=dat)
+          TPOut = aggregate(Value. ~ Latitude + Longitude, TPOut, sum)
+          TPCount = aggregate(Value. ~ Latitude + Longitude, TPOut, length)
+        }
+        # Add 24hr vars to appropriate time zone/day combos
+        if (var %in% SubVarList){
+          if (hour == 16){
+            P = Pacific_nextDay
+            PCount = PCount_nextDay
+            M = Mountain_curDay
+            MCount = MCount_curDay
+            C = Central_curDay
+            CCount = CCount_curDay
+            E = Eastern_curDay
+            ECount = ECount_curDay
+          } else if (hour == 17){
+            P = Pacific_nextDay
+            PCount = PCount_nextDay
+            M = Mountain_nextDay
+            MCount = MCount_nextDay
+            C = Central_curDay
+            CCount = CCount_curDay
+            E = Eastern_curDay
+            ECount = ECount_curDay
+          } else if (hour == 18){
+            P = Pacific_nextDay
+            PCount = PCount_nextDay
+            M = Mountain_nextDay
+            MCount = MCount_nextDay
+            C = Central_nextDay
+            CCount = CCount_nextDay
+            E = Eastern_curDay
+            ECount = ECount_curDay
+          } else {
+            P = Pacific_curDay
+            PCount = PCount_curDay
+            M = Mountain_curDay
+            MCount = MCount_curDay
+            C = Central_curDay
+            CCount = CCount_curDay
+            E = Eastern_curDay
+            ECount = ECount_curDay
+          }
+        }
       }
     }
     # If hour is 18 put together and write current day's 24hr file - if number of hours doesn't total 24, don't write and instead write to missing days accounting file
     if (hour == 18){
-      
+      # Check if directory exists for this year in Aqua folder, if not create one
+      MakeDir = ifelse(!dir.exists(sprintf("%sAqua/%d", OutputFolder, Year)), dir.create(sprintf("%sAqua/%d", OutputFolder, Year)), FALSE)
+      # Check if directory exists for this year in Terra folder
+      MakeDir = ifelse(!dir.exists(sprintf("%sTerra/%d", OutputFolder, Year)), dir.create(sprintf("%sAqua/%d", OutputFolder, Year)), FALSE)
       # Switch next/current days and overwrite next days with empty datasets
-    } 
+    } else if (hour == 21){
+      # If hour is 21, write previous days T/A files - if no counts in cell, convert to NA
+      # Check if directory exists for this year in Daily folder
+      MakeDir = ifelse(!dir.exists(sprintf("%sDaily/%d", OutputFolder, Year)), dir.create(sprintf("%sAqua/%d", OutputFolder, Year)), FALSE)
+
+    }
   }
-  # At end of day write Terra/Aqua files if they exist for this day, after dividing values by counts
+  # Roll over APhrs and TPhrs at/near 24 from previous day to next
+  hour = 24
+  APhrs_prevDay <- subset(AGM, AGM$StartDateTime >= strptime(paste(as.character(day, "%Y/%m/%d"), hour), "%Y/%m/%d %H") - 15*60 & AGM$StartDateTime <= strptime(paste(as.character(day, "%Y/%m/%d"), hour), "%Y/%m/%d %H") + 45*60)
+  # Check for Terra passes associated with this hour (H-15min <= t < H+45 min)
+  TPhrs_prevDay <- subset(TGM, TGM$StartDateTime >= strptime(paste(as.character(day, "%Y/%m/%d"), hour), "%Y/%m/%d %H") - 15*60 & TGM$StartDateTime <= strptime(paste(as.character(day, "%Y/%m/%d"), hour), "%Y/%m/%d %H") + 45*60)
 }
+
