@@ -44,7 +44,7 @@ ECount_curDay = makeEmptyDat(Eastern, SubVarList)
 # -------------
 
 # Iterate over dates from 2007 - 2015
-Days = seq(as.Date("2007/04/01", "%Y/%m/%d"), as.Date("2016/01/01", "%Y/%m/%d"), "days")
+Days = seq(as.Date("2007/05/19", "%Y/%m/%d"), as.Date("2016/01/01", "%Y/%m/%d"), "days")
 for (i in seq(1, length(Days))){
   # Create year variable
   day = Days[i]
@@ -112,24 +112,21 @@ for (i in seq(1, length(Days))){
     }
     # If hour is 19 put together and write current day's 24hr file - if number of hours doesn't total 24, don't write and instead write to missing days accounting file
     if (hour == 19){
-      # Check if 24 hours exist in day
-      if (min(ECount_curDay[,3:ncol(ECount_curDay)]) >=24){
-        # Check if directory exists for this year in Daily folder
-        MakeDir = ifelse(!dir.exists(sprintf("%sDaily/%d", OutputFolder, Year)), dir.create(sprintf("%sDaily/%d", OutputFolder, Year)), FALSE)
-        # Combine current day files into single file
-        DayOut = rbind.data.frame(Pacific_curDay, Mountain_curDay, Central_curDay, Eastern_curDay)
-        DayOut = merge(GridDat, DayOut, by=c("Longitude", "Latitude."), all.x=T)
-        DayCount = rbind.data.frame(PCount_curDay, MCount_curDay, CCount_curDay, ECount_curDay)
-        DayCount = merge(GridDat, DayCount, by=c("Longitude", "Latitude."), all.x=T)
-        # Divide summed values by counts
-        DayOut[,3:ncol(DayOut)] = DayOut[,3:ncol(DayOut)]/DayCount[,3:ncol(DayCount)]
-        # Add count field for prate_surface (needed to calcualate total precipitation over day = 60*count*prate)
-        DayOut$Prate_Count = DayCount$prate_surface
-        # Write HDF file
-        writeHDF(DayOut, sprintf("%sDaily/%d/RUCRAP_130_%s.h5", OutputFolder, Year, as.character(day, "%Y%m%d")))
-        # Clean up
-        rm(DayOut, DayCount)
-      }
+      # Check if directory exists for this year in Daily folder
+      MakeDir = ifelse(!dir.exists(sprintf("%sDaily/%d", OutputFolder, Year)), dir.create(sprintf("%sDaily/%d", OutputFolder, Year)), FALSE)
+      # Combine current day files into single file
+      DayOut = rbind.data.frame(Pacific_curDay, Mountain_curDay, Central_curDay, Eastern_curDay)
+      DayOut = merge(GridDat, DayOut, by=c("Longitude", "Latitude."), all.x=T)
+      DayCount = rbind.data.frame(PCount_curDay, MCount_curDay, CCount_curDay, ECount_curDay)
+      DayCount = merge(GridDat, DayCount, by=c("Longitude", "Latitude."), all.x=T)
+      # Divide summed values by counts
+      DayOut[,3:ncol(DayOut)] = DayOut[,3:ncol(DayOut)]/DayCount[,3:ncol(DayCount)]
+      # Add count field for prate_surface (needed to calcualate total precipitation over day = 60*count*prate)
+      DayOut$Prate_Count = DayCount$prate_surface
+      # Write HDF file
+      writeHDF(DayOut, sprintf("%sDaily/%d/RUCRAP_130_%s.h5", OutputFolder, Year, as.character(day, "%Y%m%d")))
+      # Clean up
+      rm(DayOut, DayCount)
       # Switch next/current days
       Pacific_curDay = Pacific_nextDay
       PCount_curDay = PCount_nextDay
