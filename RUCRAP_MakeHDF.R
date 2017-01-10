@@ -44,7 +44,7 @@ ECount_curDay = makeEmptyDat(Eastern, SubVarList)
 # -------------
 
 # Iterate over dates from 2007 - 2015
-Days = seq(as.Date("2007/05/19", "%Y/%m/%d"), as.Date("2016/01/01", "%Y/%m/%d"), "days")
+Days = seq(as.Date("2007/05/20", "%Y/%m/%d"), as.Date("2016/01/01", "%Y/%m/%d"), "days")
 for (i in seq(1, length(Days))){
   # Create year variable
   day = Days[i]
