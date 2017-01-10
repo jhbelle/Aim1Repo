@@ -2,17 +2,13 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
   ; Extracts MAIAC values within pre-calculated radii from station locations using index values
   ; Takes as input 
   ; - nearFile: string: The result of near table operation in arcGIS, followed by table joins using the results of extrlatlonmaiac.pro. Ex. "/aqua/Jess/Data/Near40kmh08v05_2.csv"
-  ; - collocFile: string: The full filename and path of the output dataset. Ex. "/aqua/Jess/Data/CalifCollocs_h08v04.csv"
+  ; - collocFile: string: The path of the output dataset. Ex. "/aqua/Jess/Data/"
   ; - siteDat: string: The site data containing the EPA station records with dates - currently expected that all sites are in same state. Ex: "/aqua/Jess/Data/CalifG24hr.csv"
   ; - fPath: string: the file path of the MAIAC files, with a folder for each year. Ex: "/terra/MAIAC_Jess/h08v04/"
   ; - maiacString: string: The regex expression for the first part of the maiac files. Ex. "MAIAC[AT]AOT.h08v04."
   ; - LocTAFlag: integer: The location in the filepath/name string where the Terra/Aqua Flag is
   ; - LocTStamp: integer: The location in the filepath/name string where the timestamp starts
   ; NOTE: Some fields are expected to exist in certain files and have been named below; The date field is expected to be formatted YYYY-MM-DD
-  ; Open and create text file for data, then close so can reopen as append later when actually needed
-  OPENW, 1, collocFile
-  PRINTF, 1, "State, County, Site, Juldate, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA"
-  CLOSE, 1
   ; Read in CalifG24hr.csv
   G24hr = READ_CSV(siteDat, HEADER=G24hrHead)
   ; Get number of rows in file
@@ -28,6 +24,11 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
     ; Identify records in the near table results that are for this station
     Int = cgSetIntersection(WHERE(Near.(WHERE(NearHead EQ "Site")) EQ G24hr.(WHERE(G24hrHead EQ "Site"))[I], countsites), WHERE(Near.(WHERE(NearHead EQ "County")) EQ G24hr.(WHERE(G24hrHead EQ "County"))[I], countcounties), count=Any)
     IF (Any NE 0) AND (countsites NE 0) AND (countcounties NE 0) THEN BEGIN
+      ; Open and create text file for data, then close so can reopen as append later when actually needed
+      DaysCollocs = STRCOMPRESS(STRING(collocFile, "C", G24hr.(WHERE(G24hrHead EQ "County"))[I], "S", G24hr.(WHERE(G24hrHead EQ "Site"))[I], "_", CurDate[0], "_", Juldate, ".csv"), /REMOVE_ALL)
+      OPENW, 1, DaysCollocs
+      PRINTF, 1, "State, County, Site, Juldate, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA"
+      CLOSE, 1
       ; Get the indexes for the MAIAC file that are within 40 km of this station
       Index = Near.(WHERE(NearHead EQ "index"))[Int]
       ; Get a list of MAIAC files for this day and loop over
@@ -49,7 +50,7 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
           TerraAquaFlag = STRMID(file, LocTAFlag, 1)
           TStamp = STRMID(file, LocTStamp, 4)
           ; Write data to a text file
-          OPENU, 2, collocFile, /APPEND
+          OPENU, 2, DaysCollocs, /APPEND
           FOR J = 0, N_ELEMENTS(AODQA)-1 DO BEGIN
             PRINTF, 2, 6, G24hr.(WHERE(G24hrHead EQ "County"))[I], G24hr.(WHERE(G24hrHead EQ "Site"))[I], JulDate, G24hr.(WHERE(G24hrHead EQ "Date"))[I], TStamp, TerraAquaFlag, G24hr.(WHERE(G24hrHead EQ "X24hrPM"))[I], AOD47[J], AOD55[J], AODQA[J], FORMAT='(4(I5, ", "), 3(A15, ", "), D, 3(", ", I5))'
           ENDFOR
