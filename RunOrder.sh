@@ -9,7 +9,7 @@
 ## ----------------------
 
 ## ----------
-## Diagram - Function files are left out of this list and may be called from within the cited scripts; qsub****.sh cluster submission files are also ignored with the contents listed in the Bash section
+## Diagram - Function files are left out of this list and may be called from within the cited scripts; qsub****.sh cluster submission files are also ignored with the contents listed in the Bash section missing download scripts imply manual download of data via web download or sftp transfer
 ## Note: Open file in full screen to view diagram
 ## ----------
 
@@ -19,12 +19,12 @@
 #  | 	- EPA_Anal.R   |	|   - RadialMatch_ExtractCloud.m |	|  - Retr_RUC.sh 	      |	|  - extrmaiac.pro	 |	|__________________|
 #  | 	- EPA_Colloc.R |	|   - Cloud_Proc.R		 |	|  - Retr_RAP.sh	      |	|  - MAIAC_Collocs.R	 |		/
 #  |	- EPA_Rep.R    |	|   - Cloud_Anal.R		 |      |  - RUCRAP_MakeHDF.R	      |	|________________________|	       /
-#  |___________________|	|________________________________|	|  - RUCRAP_MakeAHDF.R	      |		|			      /
-#                    \			|				|  - RUCRAP_MakeTHDF.R	      |		|			     /
-#		      \			|				|  - CDO_ProcRUCRAPCollocs.sh |		|			    /
-#		       \		|				|_____________________________|		|			   /
-#			\		|					|				|			  /	
-#			 \______________|_______________________________________|_______________________________|________________________/
+#  |___________________|	|________________________________|	|  - RUCRAP_MakeAHDF.R	      |		/			      /
+#                    \			\				|  - RUCRAP_MakeTHDF.R	      |	       /			     /
+#		      \			 \				|  - CDO_ProcRUCRAPCollocs.sh |	      /				    /
+#		       \		  \				|_____________________________|	     /				   /
+#			\		   \					|			    /				  /	
+#			 \__________________\___________________________________|__________________________/_____________________________/
 
 
 
@@ -56,7 +56,7 @@ sh CDO_ProcRUCRAPCollocs.sh # Processes collocations with EPA stations from h5 f
 # MAIAC
 # NOTE: next two commands are intended to be run from IDL command line
 ExtrLatLonMAIAC, "MAIACLatlon.h01v04.hdf", "MAIACLatlonon.h01v04.csv" # Extracts the lat lon information from the MODIS MAIAC lat lon files and outputs to a text file with the IDL-specific referencing indexes
-extrmaiac, "T:/eohprojs/CDC_climatechange/MAIACdat/Near40kmh01v04_2.csv", "T:/eohprojs/CDC_climatechange/MAIACdat/CalifCollocs_h01v04.csv", "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr.csv", "T:/eohprojs/CDC_climatechange/MAIACdat/", "MAIAC[AT]AOT.h01v04.", 49, 68 # Processes collocations with MAIAC data; Near40kmh01v04 is a text file created from running a nearest neighbor table in ArcGIS off of the station locations from EPA_Colloc.R and the lat/lon indexing information from ExtrLatLonMAIAC, and then table joining the information from both tables back into the result
+extrmaiac, "T:/eohprojs/CDC_climatechange/MAIACdat/Near40kmh01v04_2.csv", "T:/eohprojs/CDC_climatechange/MAIACdat/CalifCollocs/", "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr.csv", "T:/eohprojs/CDC_climatechange/MAIACdat/", "MAIAC[AT]AOT.h01v04.", 49, 68 # Processes collocations with MAIAC data; Near40kmh01v04 is a text file created from running a nearest neighbor table in ArcGIS off of the station locations from EPA_Colloc.R and the lat/lon indexing information from ExtrLatLonMAIAC, and then table joining the information from both tables back into the result
 Rscript MAIAC_Collocs.R # Processes collocated MAIAC observations to get aggregate statistics within radii of each station
 
 # NED

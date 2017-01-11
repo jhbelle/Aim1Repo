@@ -25,7 +25,7 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
     Int = cgSetIntersection(WHERE(Near.(WHERE(NearHead EQ "Site")) EQ G24hr.(WHERE(G24hrHead EQ "Site"))[I], countsites), WHERE(Near.(WHERE(NearHead EQ "County")) EQ G24hr.(WHERE(G24hrHead EQ "County"))[I], countcounties), count=Any)
     IF (Any NE 0) AND (countsites NE 0) AND (countcounties NE 0) THEN BEGIN
       ; Open and create text file for data, then close so can reopen as append later when actually needed
-      DaysCollocs = STRCOMPRESS(STRING(collocFile, "C", G24hr.(WHERE(G24hrHead EQ "County"))[I], "S", G24hr.(WHERE(G24hrHead EQ "Site"))[I], "_", CurDate[0], "_", Juldate, ".csv"), /REMOVE_ALL)
+      DaysCollocs = STRCOMPRESS(STRING(collocFile + "C" + STRING(G24hr.(WHERE(G24hrHead EQ "County"))[I]) + "S" + STRING(G24hr.(WHERE(G24hrHead EQ "Site"))[I]) + "_" + STRING(CurDate[0]) + "_" + STRING(FORMAT='(I03)', Juldate) + ".csv"), /REMOVE_ALL)
       OPENW, 1, DaysCollocs
       PRINTF, 1, "State, County, Site, Juldate, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA"
       CLOSE, 1
