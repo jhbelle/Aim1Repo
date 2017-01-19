@@ -40,4 +40,12 @@
 ## -----------
 # Add in RUC/RAP observations - run on cluster
 ## -----------
+G24 <- read.csv("/aqua/Jess/Data/CalifG24_MAIACCldAgg_2009.csv", stringsAsFactors=F)
+G24$Date <- as.Date(G24$Date, "%Y-%m-%d")
+NearTab <- read.csv("/aqua/Jess/Data/Nearest_RUCRAP.csv", stringsAsFactors=F)
 
+library(plyr)
+source("/home/jhbelle/Aim1Repo/Functions_CombEPA_MAIAC_Cloud_RUC.R")
+
+G24_MAIACCldRUC <- ddply(G24, .(State, County, Site, Date, AquaTerraFlag), AggRUC, NearTable=NearTab)
+write.csv(G24_MAIACCldRUC, "/aqua/Jess/Data/CalifG24_MAIACCldRUC_2009.csv", row.names=F)

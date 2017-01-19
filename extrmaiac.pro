@@ -27,10 +27,11 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
       ; Open and create text file for data, then close so can reopen as append later when actually needed
       DaysCollocs = STRCOMPRESS(STRING(collocFile + "C" + STRING(G24hr.(WHERE(G24hrHead EQ "County"))[I]) + "S" + STRING(G24hr.(WHERE(G24hrHead EQ "Site"))[I]) + "_" + STRING(CurDate[0]) + "_" + STRING(FORMAT='(I03)', Juldate) + ".csv"), /REMOVE_ALL)
       OPENW, 1, DaysCollocs
-      PRINTF, 1, "State, County, Site, Juldate, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA"
+      PRINTF, 1, "State, County, Site, Juldate, Date, Time, AquaTerraFlag, X24hrPM, AOD47, AOD55, AODQA, Dist"
       CLOSE, 1
       ; Get the indexes for the MAIAC file that are within 40 km of this station
       Index = Near.(WHERE(NearHead EQ "index"))[Int]
+      Dists = Near.(WHERE(NearHead EQ "NEAR_DIST"))[Int]
       ; Get a list of MAIAC files for this day and loop over
       f = FILE_SEARCH(STRING(fPath + CurDate[0] + "/"), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
       ;f = FILE_SEARCH(STRING(fPath), STRING(maiacString + CurDate[0] + STRING(FORMAT='(I03)', Juldate) + "*.hdf"))
@@ -52,7 +53,7 @@ pro ExtrMAIAC, nearFile, collocFile, siteDat, fpath, maiacString, LocTAFlag, Loc
           ; Write data to a text file
           OPENU, 2, DaysCollocs, /APPEND
           FOR J = 0, N_ELEMENTS(AODQA)-1 DO BEGIN
-            PRINTF, 2, 6, G24hr.(WHERE(G24hrHead EQ "County"))[I], G24hr.(WHERE(G24hrHead EQ "Site"))[I], JulDate, G24hr.(WHERE(G24hrHead EQ "Date"))[I], TStamp, TerraAquaFlag, G24hr.(WHERE(G24hrHead EQ "X24hrPM"))[I], AOD47[J], AOD55[J], AODQA[J], FORMAT='(4(I5, ", "), 3(A15, ", "), D, 3(", ", I5))'
+            PRINTF, 2, 6, G24hr.(WHERE(G24hrHead EQ "County"))[I], G24hr.(WHERE(G24hrHead EQ "Site"))[I], JulDate, G24hr.(WHERE(G24hrHead EQ "Date"))[I], TStamp, TerraAquaFlag, G24hr.(WHERE(G24hrHead EQ "X24hrPM"))[I], AOD47[J], AOD55[J], AODQA[J], Dists[J], FORMAT='(4(I5, ", "), 3(A15, ", "), D, 4(", ", I15))'
           ENDFOR
           CLOSE, 2
         ENDIF

@@ -19,8 +19,7 @@ source("/home/jhbelle/Aim1Repo/Functions_RUCRAP_MakeHDF.R")
 
 # Define file paths 
 AquaGeoMeta = "/aqua/MODIS_GeoMeta/TERRA/"
-RUCRAP_2007_2012 = "/aqua/RUC_RAP/OutputTexts/"
-RUCRAP_2012_2015 = "/terra/RUCRAP_2012_2016/"
+RUCRAPloc = "/gc_runs/RUCRAP_130_RapIntermediate/"
 OutputFolder = "/gc_runs/RUCRAP_FinalOutputs/"
 # Open grid data
 GridDat = read.csv("/aqua/Jess/Data/RUCRAP_SubGrid.csv")
@@ -34,13 +33,11 @@ AquaCounts = makeEmptyDat(GridDat, FullVarList)
 # -------------
 
 # Iterate over dates from 2007 - 2015
-Days = seq(as.Date("2009/11/14", "%Y/%m/%d"), as.Date("2016/01/01", "%Y/%m/%d"), "days")
+Days = seq(as.Date("2012/01/01", "%Y/%m/%d"), as.Date("2016/01/01", "%Y/%m/%d"), "days")
 for (i in seq(1, length(Days))){
   # Create year variable
   day = Days[i]
   Year = as.integer(as.character(day, "%Y"))
-  # Assign correct RUCRAP text file location for this year
-  if (Year <= 2011) { RUCRAPloc = RUCRAP_2007_2012 } else { RUCRAPloc = RUCRAP_2012_2015}
   # Read in T/A GeoMeta data files, filter to day observations taken over the US, and convert StartDateTime to POSIX format; Also need to bind in the previous days observations that were within 15 min of midnight to current days data
   AGM <- read.csv(sprintf("%s%d/MOD03_%s.txt", AquaGeoMeta, Year, as.character(day, "%Y-%m-%d")), skip=2, stringsAsFactors=F)
   AGM <- subset(AGM, AGM$DayNightFlag == "D" & AGM$EastBoundingCoord >= -130 & AGM$WestBoundingCoord <=-75 & AGM$SouthBoundingCoord <= 45 & AGM$NorthBoundingCoord >= 20)

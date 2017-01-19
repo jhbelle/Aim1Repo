@@ -121,3 +121,21 @@ AggPass <- function(x){
   return(Outp)
 }
 
+## --------------
+## Function 6: AggRUC - A function to bring in the correct RUC/RAP file for each row and aggregate the data from it
+## --------------
+
+AggRUC <- function(datline, NearTable, RUCRAPloc="/gc_runs/RUCRAP_FinalOutputs/"){
+  require(rhdf5)
+  NearLine <- which(NearTable$State == datline$State & NearTable$County == datline$County & NearTable$Site == datline$Site)
+  # For each line in the data, need to read in the correct hdf5 file, and pull correct values for this station
+  hdfdat <- sprintf("%s%s/%s/RUCRAP_130_%s.h5", RUCRAPloc, ifelse(datline$AquaTerraFlag == "A", "Aqua", "Terra"), as.character(datline$Date, "%Y"), as.character(datline$Date, "%Y%m%d"))
+  if (file.exists(hdfdat)){
+    # Pull lat/lon info from hdf file - technically can assume that   
+    LatLon <- as.data.frame(h5read(hdfdat, "Geolocation"))
+    CorIndex <- which(LatLon$Latitude. == NearTable$Latitude_[NearLine] & LatLon$Longitude == NearTable$Longitude_1[NearLine])
+    Outp <- cbind.data.frame(datline, as.data.frame(h5read(hdfdat, "Data"))[CorIndex,])
+    return(Outp)
+  }
+}
+
