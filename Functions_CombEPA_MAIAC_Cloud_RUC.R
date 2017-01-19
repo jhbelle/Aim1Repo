@@ -10,21 +10,23 @@ CombMAIAC <- function(datline, radius=10, dataloc="T://eohprojs/CDC_climatechang
   # A function to read in the MAIAC data file corresponding to the line, aggregate statistics within a radius, and output the resulting datalines
   require(plyr)
   # Read in MAIAC file
-  MAIACdat <- read.csv(sprintf("%sC%dS%d_%s_%03d.csv", dataloc, datline$County, datline$Site, as.character(datline$Date, "%Y"), as.integer(as.character(datline$Date, "%j"))), stringsAsFactors = F)[,c(6,7,9:11)]
-  # Subset to values with QA > 0 - these are missing due to overpass geometry and don't matter?
-  MAIACdat <- subset(MAIACdat, MAIACdat$AODQA > 0)
-  # Scale and convert AOD values
-  MAIACdat$AOD47 <- as.numeric(MAIACdat$AOD47)*0.001
-  MAIACdat$AOD55 <- as.numeric(MAIACdat$AOD55)*0.001
-  # Strip any extra white space from AquaTerraFlag
-  MAIACdat$AquaTerraFlag <- trimws(MAIACdat$AquaTerraFlag)
-  # Create flags from QA codes
-  MAIACdat <- adply(MAIACdat, 1, DefQA, qafield="AODQA")
-  # Remove old QA field
-  MAIACdat$AODQA <- NULL
-  # Aggregate values by timestep and T/A flag - need to retain counts
-  Outp <- ddply(MAIACdat, .(Time, AquaTerraFlag), AggMAIAC)
-  return(Outp)
+  MAIACdat <- try(read.csv(sprintf("%sC%dS%d_%s_%03d.csv", dataloc, datline$County, datline$Site, as.character(datline$Date, "%Y"), as.integer(as.character(datline$Date, "%j"))), stringsAsFactors = F)[,c(6,7,9:11)])
+  if (is.data.frame(MAIACdat)){
+    # Subset to values with QA > 0 - these are missing due to overpass geometry and don't matter?
+    MAIACdat <- subset(MAIACdat, MAIACdat$AODQA > 0)
+    # Scale and convert AOD values
+    MAIACdat$AOD47 <- as.numeric(MAIACdat$AOD47)*0.001
+    MAIACdat$AOD55 <- as.numeric(MAIACdat$AOD55)*0.001
+    # Strip any extra white space from AquaTerraFlag
+    MAIACdat$AquaTerraFlag <- trimws(MAIACdat$AquaTerraFlag)
+    # Create flags from QA codes
+    MAIACdat <- adply(MAIACdat, 1, DefQA, qafield="AODQA")
+    # Remove old QA field
+    MAIACdat$AODQA <- NULL
+    # Aggregate values by timestep and T/A flag - need to retain counts
+    Outp <- ddply(MAIACdat, .(Time, AquaTerraFlag), AggMAIAC)
+    return(Outp)
+  }
 }
 
 ## ------------
@@ -85,3 +87,37 @@ AggMAIAC <- function(dat){
   Outp$Nobs <- nrow(dat)
   return(Outp)
 }
+
+## --------------
+## Function 5: AggPass - A function to aggregate a variable, taking a weighted average - intended to be used with apply
+## --------------
+
+AggPass <- function(x){
+  Time = weighted.mean(x$Time, x$Nobs, na.rm=T)
+  AOD47 = weighted.mean(x$AOD47, x$Nobs, na.rm=T)
+  AOD55 = weighted.mean(x$AOD55, x$Nobs, na.rm=T)
+  PartCloud = weighted.mean(x$Partcloud, x$Nobs, na.rm=T)
+  Cloud = weighted.mean(x$Cloud, x$Nobs, na.rm=T)
+  CloudShadow = weighted.mean(x$CloudShadow, x$Nobs, na.rm=T)
+  Fire = weighted.mean(x$Fire, x$Nobs, na.rm=T)
+  Sediment = weighted.mean(x$Sediment, x$Nobs, na.rm=T)
+  Clear = weighted.mean(x$Clear, x$Nobs, na.rm=T)
+  Water = weighted.mean(x$Water, x$Nobs, na.rm=T)
+  Snow = weighted.mean(x$Snow, x$Nobs, na.rm=T)
+  Ice = weighted.mean(x$Ice, x$Nobs, na.rm=T)
+  Glint = weighted.mean(x$Glint, x$Nobs, na.rm=T)
+  AdjCloud = weighted.mean(x$AdjCloud, x$Nobs, na.rm=T)
+  SurCloud = weighted.mean(x$SurCloud, x$Nobs, na.rm=T)
+  OneCloud = weighted.mean(x$OneCloud, x$Nobs, na.rm=T)
+  AdjSnow = weighted.mean(x$AdjSnow, x$Nobs, na.rm=T)
+  PrevSnow = weighted.mean(x$PrevSnow, x$Nobs, na.rm=T)
+  CloudAOD = weighted.mean(x$CloudAOD, x$Nobs, na.rm=T)
+  PCloudAOD = weighted.mean(x$PCloudAOD, x$Nobs, na.rm=T)
+  CloudTopHgt = weighted.mean(x$CloudTopHgt, x$Nobs, na.rm=T)
+  PAnyCld = weighted.mean(x$PAnyCld, x$Nobs, na.rm=T)
+  PSingleCld = weighted.mean(x$PSingleCld, x$Nobs, na.rm=T)
+  PMultiCld = weighted.mean(x$PMultiCld, x$Nobs, na.rm=T)
+  Outp <- cbind.data.frame(Time, AOD47, AOD55, PartCloud, Cloud, CloudShadow, Fire, Sediment, Clear, Water, Snow, Ice, Glint, AdjCloud, SurCloud, OneCloud, AdjSnow, PrevSnow, CloudAOD, PCloudAOD, CloudTopHgt, PAnyCld, PSingleCld, PMultiCld)
+  return(Outp)
+}
+
