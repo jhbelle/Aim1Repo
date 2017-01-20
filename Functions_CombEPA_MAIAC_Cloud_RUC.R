@@ -13,7 +13,7 @@ CombMAIAC <- function(datline, radius=10, dataloc="T://eohprojs/CDC_climatechang
   MAIACdat <- try(read.csv(sprintf("%sC%dS%d_%s_%03d.csv", dataloc, datline$County, datline$Site, as.character(datline$Date, "%Y"), as.integer(as.character(datline$Date, "%j"))), stringsAsFactors = F)[,c(6,7,9:11)])
   if (is.data.frame(MAIACdat)){
     # Subset to values with QA > 0 - these are missing due to overpass geometry and don't matter?
-    MAIACdat <- subset(MAIACdat, MAIACdat$AODQA > 0)
+    MAIACdat <- subset(MAIACdat, MAIACdat$AODQA > 0 & MAIACdat$Dist <= radius*1000)
     # Scale and convert AOD values
     MAIACdat$AOD47 <- as.numeric(MAIACdat$AOD47)*0.001
     MAIACdat$AOD55 <- as.numeric(MAIACdat$AOD55)*0.001
