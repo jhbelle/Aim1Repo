@@ -24,21 +24,25 @@ write.csv(G24, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/Cali
 #G24 <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACinc_2009.csv", stringsAsFactors = F)
 
 # Read in cloud data
-#Cld40km = read.csv("E://CloudAgg_40km.csv", stringsAsFactors = F)
+Cld40km = read.csv("E://CloudAgg_40km.csv", stringsAsFactors = F)
 
 # Merge cloud data
-#G24_MAIAC_Cld <- merge(G24, Cld40km, by=c("State", "County", "Site", "Date", "Time", "X24hrPM"), all.x=T)
-#G24_MAIAC_Cld$X.x <- NULL
+G24_MAIAC_Cld <- merge(G24, Cld40km, by=c("State", "County", "Site", "Date", "Time", "X24hrPM"), all.x=T)
+G24_MAIAC_Cld$X <- NULL
 #G24_MAIAC_Cld$X.y <- NULL
 # Save a copy of this dataset
 #write.csv(G24_MAIAC_Cld, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldinc_2009.csv")
-
+write.csv(G24_MAIAC_Cld, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldinc_20102011.csv")
 # Aggregate to T/A passes in each day/station
-#G24PassAgg <- ddply(G24_MAIAC_Cld, .(State, County, Site, Date, AquaTerraFlag), AggPass)
-
+G24PassAgg <- ddply(G24_MAIAC_Cld, .(State, County, Site, Date, AquaTerraFlag), AggPass)
+G242009 <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldAgg_2009.csv", stringsAsFactors = F)
 # Save dataset
 #write.csv(G24PassAgg, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldAgg_2009.csv")
+G242009$X <- NULL
+G242009$Date <- as.Date(G242009$Date, "%Y-%m-%d")
 
+G24 <- rbind.data.frame(G242009, G24PassAgg)
+write.csv(G24, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldAgg_20091011.csv", row.names=F)
 ## -----------
 # Add in RUC/RAP observations - run on cluster
 ## -----------
