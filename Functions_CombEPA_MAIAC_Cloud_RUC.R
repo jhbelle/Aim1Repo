@@ -131,7 +131,7 @@ AggRUC <- function(datline, NearTable, RUCRAPloc="/gc_runs/RUCRAP_FinalOutputs/"
   # For each line in the data, need to read in the correct hdf5 file, and pull correct values for this station
   hdfdat <- sprintf("%s%s/%s/RUCRAP_130_%s.h5", RUCRAPloc, ifelse(datline$AquaTerraFlag == "A", "Aqua", "Terra"), as.character(datline$Date, "%Y"), as.character(datline$Date, "%Y%m%d"))
   if (file.exists(hdfdat)){
-    # Pull lat/lon info from hdf file - technically can assume that   
+    # Pull lat/lon info from hdf file - technically can assume that
     LatLon <- as.data.frame(h5read(hdfdat, "Geolocation"))
     CorIndex <- which(LatLon$Latitude. == NearTable$Latitude_[NearLine] & LatLon$Longitude == NearTable$Longitude_1[NearLine])
     Outp <- cbind.data.frame(datline, as.data.frame(h5read(hdfdat, "Data"))[CorIndex,])

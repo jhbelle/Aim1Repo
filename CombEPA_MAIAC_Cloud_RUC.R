@@ -14,11 +14,13 @@
 
 # Read in EPA observations
 #G24 <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr.csv", stringsAsFactors = F)
-#G24$Date <- as.Date(G24$Date, "%Y-%m-%d")
+G24 <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr_2010_2011.csv", stringsAsFactors = F)
+G24$Date <- as.Date(G24$Date, "%Y-%m-%d")
 
 # Add in MAIAC data - takes around 6 hours to run for 1 year - No RAM issues
-#G24 <- ddply(G24, .(State, County, Site, Date, X24hrPM), CombMAIAC)
+G24 <- ddply(G24, .(State, County, Site, Date, X24hrPM), CombMAIAC, dataloc="E://MAIAC_Extracted/")
 #write.csv(G24, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACinc_2009.csv")
+write.csv(G24, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACinc_20102011.csv", row.names=F)
 #G24 <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACinc_2009.csv", stringsAsFactors = F)
 
 # Read in cloud data
