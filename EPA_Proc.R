@@ -12,7 +12,7 @@
 
 # Read in libraries
 library(plyr)
-source("Functions_EPA_Proc.R")
+source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_EPA_Proc.R")
 
 # Define study areas. Order of coordinates: Longitude west/left side, Longitude east/right side, latitude south/bottom side, latitude north/top side
 CalifDef <- c(-122.7, -119.9, 37.0, 40.1) # Larger than final study area - uncertain if lower part of central valley and SanFran itself should be included
@@ -164,3 +164,19 @@ for (year in seq(2007,2015)){
 #  rm(Dat)
 #  gc()
 #}
+
+## ---------------
+## 24-hr temperature
+## ---------------
+
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "Units", "Temperature"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlTemps.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Date", "Units", "Temperature"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifTemps.csv", row.names=F, col.names = F, sep=",")
+
+# Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
+for (year in seq(2007,2015)){
+  Dat <- read.csv(sprintf("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAarchives/EPA_GroundMonitors/Temp/daily_TEMP_%d.csv", year, year), stringsAsFactors = F)[,c(1:7,12,13,17)]
+  write.table(SiteSort(Dat, AtlDef), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlTemps.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, CalifDef), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifTemps.csv", append=T, row.names=F, col.name=F, sep=",")
+  rm(Dat)
+  gc()
+}
