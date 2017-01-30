@@ -79,3 +79,20 @@ writeHDF <- function(writeDat, fileName, geoLocFields=c("Latitude.", "Longitude"
   # Close file
   H5close()
 }
+
+# ----------
+# Function 5: WriteHDF2 - A function to overwrite a field in an existing hdf5 file with new information
+# ---------
+
+writeHDF2 <- function(writeDat, fileName, geoLocFields=c("Latitude.", "Longitude")){
+  require(rhdf5)
+  # Get list of variables in writeDat that are not in geoLocFields
+  varlist = subset(colnames(writeDat), !('%in%'(colnames(writeDat), geoLocFields)))
+  # Write variables
+  for (var in varlist){
+    vals = h5write(writeDat[,var], fileName, sprintf("/Data/%s", var), write.attributes=T)
+    #H5Dclose(vals)
+  }
+  # Close file
+  H5close()
+}

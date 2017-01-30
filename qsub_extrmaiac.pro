@@ -6,5 +6,8 @@
 ;extrmaiac, "T:/eohprojs/CDC_climatechange/MAIACdat/Near40kmh01v04_2.csv", "C:/Jess_output/", "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr_2010_2011.csv", "T:/eohprojs/CDC_climatechange/MAIACdat/", "MAIAC[AT]AOT.h01v04.", 49, 68
 
 ; New submission - all years processing on cluster
-cd, "/home/jhbelle/Aim1Repo/"
-extrmaiac, "/aqua/Jess/Data/Near40kmh01v04_2.csv", "/terra/CalifCollocs_MAIACJess/", "/aqua/Jess/Data/CalifG24hr.csv", "/terra/MAIACdat/", "MAIAC[AT]AOT.h01v04.", 26, 45
+;cd, "/home/jhbelle/Aim1Repo/"
+;extrmaiac, "/aqua/Jess/Data/Near40kmh01v04_2.csv", "/terra/CalifCollocs_MAIACJess/", "/aqua/Jess/Data/CalifG24hr.csv", "/terra/MAIACdat/", "MAIAC[AT]AOT.h01v04.", 26, 45
+
+; New submission - Atlanta
+extrmaiac, "/aqua/Jess/Data/Near40kmh04v04.csv", "", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIACdat_h04v04/", "MAIAC[AT]AOT.h04v04.",  

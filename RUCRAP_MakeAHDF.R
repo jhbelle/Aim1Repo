@@ -19,12 +19,13 @@ source("/home/jhbelle/Aim1Repo/Functions_RUCRAP_MakeHDF.R")
 
 # Define file paths 
 AquaGeoMeta = "/aqua/MODIS_GeoMeta/AQUA/"
-RUCRAPloc = "/gc_runs/RUCRAP_130_RapIntermediate/"
+RUCRAPloc = "/aqua/RUC_RAP/Prates/"
 OutputFolder = "/gc_runs/RUCRAP_FinalOutputs/"
 # Open grid data
 GridDat = read.csv("/aqua/Jess/Data/RUCRAP_SubGrid.csv")
 # Define variable lists for T/A vs. Daily files
-FullVarList = c("10u_heightAboveGround", "10v_heightAboveGround", "cape_pressureFromGroundLayer", "cape_surface", "cin_pressureFromGroundLayer", "cin_surface", "h_cloudBase", "h_cloudTop", "hpbl_surface", "prate_surface", "r_heightAboveGround", "sd_surface", "sp_surface", "vis_surface")
+#FullVarList = c("10u_heightAboveGround", "10v_heightAboveGround", "cape_pressureFromGroundLayer", "cape_surface", "cin_pressureFromGroundLayer", "cin_surface", "h_cloudBase", "h_cloudTop", "hpbl_surface", "prate_surface", "r_heightAboveGround", "sd_surface", "sp_surface", "vis_surface")
+FullVarList = c("prate_surface")
 # Create empty T/A datasets to start
 AquaGridDat = makeEmptyDat(GridDat, FullVarList)
 AquaCounts = makeEmptyDat(GridDat, FullVarList)
@@ -33,7 +34,7 @@ AquaCounts = makeEmptyDat(GridDat, FullVarList)
 # -------------
 
 # Iterate over dates from 2007 - 2015
-Days = seq(as.Date("2012/01/01", "%Y/%m/%d"), as.Date("2016/01/01", "%Y/%m/%d"), "days")
+Days = seq(as.Date("2010/12/30", "%Y/%m/%d"), as.Date("2016/01/01", "%Y/%m/%d"), "days")
 for (i in seq(1, length(Days))){
   # Create year variable
   day = Days[i]
@@ -78,11 +79,11 @@ for (i in seq(1, length(Days))){
       # If hour is 21, write previous days T/A files - if no counts in cell, convert to NA
       if (max(AquaCounts[,3:ncol(AquaCounts)]) > 0){
         # Check if directory exists for this year in Aqua folder, if not create one
-        MakeDir = ifelse(!dir.exists(sprintf("%sAqua/%d", OutputFolder, Year)), dir.create(sprintf("%sAqua/%d", OutputFolder, Year)), FALSE)  
+        #MakeDir = ifelse(!dir.exists(sprintf("%sAqua/%d", OutputFolder, Year)), dir.create(sprintf("%sAqua/%d", OutputFolder, Year)), FALSE)  
         # Divide values by counts
         AquaGridDat[,3:ncol(AquaGridDat)] = AquaGridDat[,3:ncol(AquaGridDat)]/AquaCounts[,3:ncol(AquaCounts)]
         # Write HDF file
-        writeHDF(AquaGridDat, sprintf("%sAqua/%d/RUCRAP_130_%s.h5", OutputFolder, Year, as.character(day-1, "%Y%m%d")))
+        writeHDF2(AquaGridDat, sprintf("%sAqua/%d/RUCRAP_130_%s.h5", OutputFolder, Year, as.character(day-1, "%Y%m%d")))
       } 
       # Create empty T/A datasets to restart
       AquaGridDat = makeEmptyDat(GridDat, FullVarList)
