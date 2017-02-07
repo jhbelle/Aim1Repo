@@ -21,7 +21,6 @@
 #  |	- EPA_Rep.R    |	|   - Cloud_Anal.R		 |      |  - RUCRAP_MakeHDF.R	      |	|________________________|	       /
 #  |___________________|	|________________________________|	|  - RUCRAP_MakeAHDF.R	      |		/			      /
 #                    \			\				|  - RUCRAP_MakeTHDF.R	      |	       /			     /
-#		      \			 \				|  - CDO_ProcRUCRAPCollocs.sh |	      /				    /
 #		       \		  \				|_____________________________|	     /				   /
 #			\		   \					|			    /				  /	
 #			 \__________________\___________________________________|__________________________/_____________________________/
@@ -51,7 +50,7 @@ sh Retr_RAP.sh # Same as Retr_RUC but for files with prefix rap instead of ruc2a
 Rscript RUCRAP_MakeHDF.R # Processes RUC/RAP text files into 24-hour RUC RAP statistics, packed as hdf5; 2D with 2 groups: geolocation: Data - rough accounting of time zones
 Rscript RUCRAP_MakeAHDF.R # Processes RUC/RAP text files into spatio-temporally Aqua overpass-matched averages at each location on the CONUS grid
 Rscript RUCRAP_MakeTHDF.R # Processes RUC/RAP text files into spatio-temporally Terra overpass-matched averages at each location on the CONUS grid
-sh CDO_ProcRUCRAPCollocs.sh # Processes collocations with EPA stations from h5 files created from RUCRAP_Make*HDF.R
+
 
 # MAIAC
 # NOTE: next two commands are intended to be run from IDL command line

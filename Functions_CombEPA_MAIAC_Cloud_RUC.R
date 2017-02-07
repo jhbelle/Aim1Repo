@@ -6,11 +6,11 @@
 ## Function 1: CombMAIAC - For each EPA observation reads in MAIAC dataset and converts to rows in a dataframe with aggregate statistics over Terra and Aqua passes
 ## -----------
 
-CombMAIAC <- function(datline, radius=10, dataloc="T://eohprojs/CDC_climatechange/MAIACdat/CalifCollocs/"){
+CombMAIAC <- function(datline, radius=5, dataloc="T://eohprojs/CDC_climatechange/MAIACdat/CalifCollocs/"){
   # A function to read in the MAIAC data file corresponding to the line, aggregate statistics within a radius, and output the resulting datalines
   require(plyr)
   # Read in MAIAC file
-  MAIACdat <- try(read.csv(sprintf("%sC%dS%d_%s_%03d.csv", dataloc, datline$County, datline$Site, as.character(datline$Date, "%Y"), as.integer(as.character(datline$Date, "%j"))), stringsAsFactors = F)[,c(6,7,9:11)])
+  MAIACdat <- try(read.csv(sprintf("%sC%dS%d_%s_%03d.csv", dataloc, datline$County, datline$Site, as.character(datline$Date, "%Y"), as.integer(as.character(datline$Date, "%j"))), stringsAsFactors = F)[,c(6,7,9:12)])
   if (is.data.frame(MAIACdat)){
     # Subset to values with QA > 0 - these are missing due to overpass geometry and don't matter?
     MAIACdat <- subset(MAIACdat, MAIACdat$AODQA > 0 & MAIACdat$Dist <= radius*1000)
@@ -24,7 +24,7 @@ CombMAIAC <- function(datline, radius=10, dataloc="T://eohprojs/CDC_climatechang
     # Remove old QA field
     MAIACdat$AODQA <- NULL
     # Aggregate values by timestep and T/A flag - need to retain counts
-    Outp <- ddply(MAIACdat, .(Time, AquaTerraFlag), AggMAIAC)
+    Outp <- ddply(MAIACdat, .(Time, AquaTerraFlag), MinMAIAC)
     return(Outp)
   }
 }
@@ -139,3 +139,11 @@ AggRUC <- function(datline, NearTable, RUCRAPloc="/gc_runs/RUCRAP_FinalOutputs/"
   }
 }
 
+## -------------
+## Function 7: MinMAIAC - A function to pull the closest MAIAC observation for each station/time
+## -------------
+
+MinMAIAC <- function(dat){
+  dat <- as.data.frame(dat[which.min(dat$Dist),])
+  return(dat)
+}
