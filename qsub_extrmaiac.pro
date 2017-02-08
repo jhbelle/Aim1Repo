@@ -10,7 +10,6 @@
 ;extrmaiac, "/aqua/Jess/Data/Near40kmh01v04_2.csv", "/terra/CalifCollocs_MAIACJess/", "/aqua/Jess/Data/CalifG24hr.csv", "/terra/MAIACdat/", "MAIAC[AT]AOT.h01v04.", 26, 45
 
 ; New submission - Atlanta
-;extrmaiac, "/aqua/Jess/Data/Near40kmh04v04.csv", "/gc_runs/AtlCollocs_MAIAC/", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIAC_h04v04/", "MAIAC[AT]AOT.h04v04.", 30, 49 
+;extrmaiac, "/aqua/Jess/Data/Near40kmh04v04.csv", "/gc_runs/AtlCollocs_MAIACh04v04/", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIAC_h04v04/", "MAIAC[AT]AOT.h04v04.", 30, 49 
 
-extrmaiac, "/aqua/Jess/Data/Near40kmh04v05.csv", "/gc_runs/AtlCollocs_MAIAC/", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIAC_h04v05/", "MAIAC[AT]AOT.h04v05.", 30, 49 
-;/terra/MAIAC_h04v04/2009/MAIACAAOT.h04v04.20080011820
+extrmaiac, "/aqua/Jess/Data/Near40kmh04v05.csv", "/gc_runs/AtlCollocs_MAIACh04v05/", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIAC_h04v05/", "MAIAC[AT]AOT.h04v05.", 30, 49 

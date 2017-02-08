@@ -7,14 +7,19 @@
 ## -------------
 
 # Read in 24-hour observations
-CalifG24hr <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr.csv", stringsAsFactors = F)
-CalifG24hr$Date2 <- as.Date(CalifG24hr$Date, "%Y-%m-%d")
-CalifG24hr$Year <- as.numeric(as.character(CalifG24hr$Date2, "%Y"))
-CalifG24hr$Jday <- as.numeric(as.character(CalifG24hr$Date2, "%j"))
+#CalifG24hr <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr.csv", stringsAsFactors = F)
+#CalifG24hr$Date2 <- as.Date(CalifG24hr$Date, "%Y-%m-%d")
+#CalifG24hr$Year <- as.numeric(as.character(CalifG24hr$Date2, "%Y"))
+#CalifG24hr$Jday <- as.numeric(as.character(CalifG24hr$Date2, "%j"))
+
+AtlG24hr <- read.csv("/aqua/Jess/Data/AtlG24hr.csv", stringsAsFactors=F)
+AtlG24hr$Date2 <- as.Date(AtlG24hr$Date, "%Y-%m-%d")
+AtlG24hr$Year <- as.numeric(as.character(AtlG24hr$Date2, "%Y"))
+AtlG24hr$Jday <- as.numeric(as.character(AtlG24hr$Date2, "%j"))
 
 # Define function to process cloud observations for each county, site, date, time (Assumes these variables exist in both sets of data)
 # Note - cloud top height unscaled; Decided to use 1 km Multi for cloud fractions instead of the 5km cloud fraction
-ReadClouds <- function(datline, loc1km="E://CalifCloudCollocs1km/", loc5km="E://CalifCloudCollocs5km/", Scale=0.009999999776482582, AODfill=-9999, CloudHeightFill=-32767, FracFill=127, Radius){
+ReadClouds <- function(datline, loc1km="/aqua/Jess/Data/Cld1km/", loc5km="/aqua/Jess/Data/Cld5km/", Scale=0.009999999776482582, AODfill=-9999, CloudHeightFill=-32767, FracFill=127, Radius){
   dat1km <- read.csv(paste(loc1km, "C", datline$County, "S", datline$Site, "Y", datline$Year, "D", datline$Jday, sep = ""), stringsAsFactors = F)
   # Subset to observations within the radius of interest
   dat1km = subset(dat1km, dat1km$DistStation <= Radius)
@@ -82,17 +87,32 @@ ReadClouds <- function(datline, loc1km="E://CalifCloudCollocs1km/", loc5km="E://
 
 
 library(plyr)
-Out5km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=5)
-write.csv(Out5km, "E://CloudAgg_5km.csv")
+#Out5km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=5)
+#write.csv(Out5km, "E://CloudAgg_5km.csv")
 
-Out10km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=10)
-write.csv(Out10km, "E://CloudAgg_10km.csv")
+#Out10km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=10)
+#write.csv(Out10km, "E://CloudAgg_10km.csv")
 
-Out20km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=20)
-write.csv(Out20km, "E://CloudAgg_20km.csv")
+#Out20km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=20)
+#write.csv(Out20km, "E://CloudAgg_20km.csv")
 
-Out30km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=30)
-write.csv(Out30km, "E://CloudAgg_30km.csv")
+#Out30km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=30)
+#write.csv(Out30km, "E://CloudAgg_30km.csv")
 
-Out40km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=40)
-write.csv(Out40km, "E://CloudAgg_40km.csv")
+#Out40km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=40)
+#write.csv(Out40km, "E://CloudAgg_40km.csv")
+
+Out5km = ddply(AtlG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=5)
+write.csv(Out5km, "/aqua/Jess/Data/CloudAgg_Atl5km.csv")
+
+Out10km = ddply(AtlG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=10)
+write.csv(Out10km, "/aqua/Jess/Data/CloudAgg_Atl10km.csv")
+
+Out20km = ddply(AtlG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=20)
+write.csv(Out20km, "/aqua/Jess/Data/CloudAgg_Atl20km.csv")
+
+Out30km = ddply(AtlG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=30)
+write.csv(Out30km, "/aqua/Jess/Data/CloudAgg_Atl30km.csv")
+
+Out40km = ddply(AtlG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=40)
+write.csv(Out40km, "/aqua/Jess/Data/CloudAgg_Atl40km.csv")
