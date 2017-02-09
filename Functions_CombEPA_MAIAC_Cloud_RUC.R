@@ -6,12 +6,20 @@
 ## Function 1: CombMAIAC - For each EPA observation reads in MAIAC dataset and converts to rows in a dataframe with aggregate statistics over Terra and Aqua passes
 ## -----------
 
-CombMAIAC <- function(datline, radius=5, dataloc="T://eohprojs/CDC_climatechange/MAIACdat/CalifCollocs/"){
+CombMAIAC <- function(datline, radius=5, dataloc1="/gc_runs/AtlCollocs_MAIACh04v04/", dataloc2="/gc_runs/AtlCollocs_MAIACh04v05/"){
   # A function to read in the MAIAC data file corresponding to the line, aggregate statistics within a radius, and output the resulting datalines
   require(plyr)
   # Read in MAIAC file
-  MAIACdat <- try(read.csv(sprintf("%sC%dS%d_%s_%03d.csv", dataloc, datline$County, datline$Site, as.character(datline$Date, "%Y"), as.integer(as.character(datline$Date, "%j"))), stringsAsFactors = F)[,c(6,7,9:12)])
-  if (is.data.frame(MAIACdat)){
+  MAIACdat1 <- try(read.csv(sprintf("%sC%dS%d_%s_%03d.csv", dataloc1, datline$County, datline$Site, as.character(datline$Date, "%Y"), as.integer(as.character(datline$Date, "%j"))), stringsAsFactors = F)[,c(6,7,9:12)])
+  MAIACdat2 <- try(read.csv(sprintf("%sC%dS%d_%s_%03d.csv", dataloc2, datline$County, datline$Site, as.character(datline$Date, "%Y"), as.integer(as.character(datline$Date, "%j"))), stringsAsFactors = F)[,c(6,7,9:12)])
+  if (is.data.frame(MAIACdat1) & is.data.frame(MAIACdat2)){
+    MAIACdat <- rbind.data.frame(MAIACdat1, MAIACdat2)
+  } else if (is.data.frame(MAIACdat1)){
+    MAIACdat <- MAIACdat1
+  } else if (is.data.frame(MAIACdat2)){
+    MAIACdat <- MAIACdat2
+  }
+  if (exists("MAIACdat")){
     # Subset to values with QA > 0 - these are missing due to overpass geometry and don't matter?
     MAIACdat <- subset(MAIACdat, MAIACdat$AODQA > 0 & MAIACdat$Dist <= radius*1000)
     # Scale and convert AOD values
