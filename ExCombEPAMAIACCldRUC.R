@@ -75,7 +75,7 @@ library(flexmix)
 # Full model
 TerraMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + hpbl_surface + r_heightAboveGround*CloudAOD | as.factor(CloudCat), Terra[!is.na(Terra$sd_surface) & !is.na(Terra$CloudCat),], k=3)
 
-TerraMod = flexmix(LogPM ~ as.factor(Month) + cape_surface + r_heightAboveGround + prate_surface + sd_surface | as.factor(CloudCat), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface),], k=3, control=list(classify="weighted"))
+TerraMod = flexmix(LogPM ~ as.factor(Month) + cape_surface + r_heightAboveGround + prate_surface + sd_surface + CloudAOD | as.factor(CloudCat) + as.factor(Multi), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface) & Terra$CloudCat != "None",], k=3, control=list(classify="weighted"))
 TerraMod
 summary(TerraMod)
 plot(TerraMod)

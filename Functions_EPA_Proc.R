@@ -113,7 +113,7 @@ MassRecon <- function(DatSpec, Dat24hr, DatBlanks){
   DatSpec <- DatSpecWide[,c(2:5,20:23,29,30)]
   rm(DatSpecWide, DatBlanks)
   DatSpec$ReconMass <- DatSpec$Sulfate + DatSpec$Nitrate + DatSpec$Salt + DatSpec$Soil + DatSpec$EC + DatSpec$OC # 3,504 speciated observations, of which 334 were missing data for at least one species
-  DatSpec <- merge(Dat24hr[,c(1:3,6:10)], DatSpec[!is.na(DatSpec$ReconMass),], by=c("State", "County", "Site", "Date")) # Only 2,586 could be matched to a gravimetric observation? Remaining gravimetric observations are missing
+  DatSpec <- merge(Dat24hr[,c(1:3,6:10)], DatSpec[!is.na(DatSpec$ReconMass),], by=c("State", "County", "Site", "Date"), all.y=T) # Only 2,586 could be matched to a gravimetric observation? Remaining gravimetric observations are missing
   DatSpec$Other <- DatSpec$X24hrPM - DatSpec$ReconMass
   Fracs <- DatSpec[,c(9:14,16)]/DatSpec$X24hrPM
   colnames(Fracs) <- c("SulfateFrac", "NitrateFrac", "SaltFrac", "SoilFrac", "ECFrac", "OCFrac", "OtherFrac")
