@@ -8,7 +8,8 @@
 ## --------------
 
 # Read in data
-Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
+#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
+Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
 Dat$Date <- as.Date(Dat$Date, "%Y-%m-%d")
 G24 <- Dat
 
@@ -17,10 +18,10 @@ G24$AOD47 <- ifelse(G24$AOD47 < 0, NA, G24$AOD47)
 G24$AOD55 <- ifelse(G24$AOD55 < 0, NA, G24$AOD55)
 
 # Add in surface temperature
-Temps <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifTemps.csv", stringsAsFactors = F)[,c(1:3,8,10)]
-Temps$Date <- as.Date(Temps$Date, "%Y-%m-%d")
-Temps <- aggregate(Temperature ~ State + County + Site + Date, Temps, median)
-G24 <- merge(G24, Temps, all.x=T)
+#Temps <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifTemps.csv", stringsAsFactors = F)[,c(1:3,8,10)]
+#Temps$Date <- as.Date(Temps$Date, "%Y-%m-%d")
+#Temps <- aggregate(Temperature ~ State + County + Site + Date, Temps, median)
+#G24 <- merge(G24, Temps, all.x=T)
 
 # ---------
 # Manual classification
@@ -39,9 +40,10 @@ summary(MissingMAIAC)
 MissingMAIAC <- subset(MissingMAIAC, MissingMAIAC$Dist < 1000)
 # Filter 2: Cloud product - characterize clouds as high, low or none
 # Was missing cloud product?
-Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_10km.csv", stringsAsFactors = F)
+#Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_10km.csv", stringsAsFactors = F)
+Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
 Clouds$Date <- as.Date(Clouds$Date, "%Y-%m-%d")
-Clouds$X <- NULL
+#Clouds$X <- NULL
 MissingMAIAC <- merge(MissingMAIAC, Clouds, all.x=T)
 MissingMAIAC$CloudCat <- ifelse(MissingMAIAC$PAnyCld == 0 | is.na(MissingMAIAC$PAnyCld), "None", ifelse(MissingMAIAC$CloudTopHgt < 5000, "Low", ifelse(MissingMAIAC$CloudTopHgt >=5000, "High", "Missing")))
 # Filter 3: RUC -
@@ -49,9 +51,15 @@ MissingMAIAC$Raining <- ifelse(MissingMAIAC$prate_surface == 0, 0, 1)
 MissingMAIAC$Snow <- ifelse(MissingMAIAC$sd_surface == 0, 0, 1)
 MissingMAIAC$Multi <- ifelse(MissingMAIAC$PMultiCld == 0, 0, 1)
 # Toss MAIAC variables
-MissingMAIAC <- MissingMAIAC[,c(1:7,18,26:52)]
+MissingMAIAC <- MissingMAIAC[,c(1:7,18,26:57)]
 MissingMAIAC$CloudAOD <- ifelse(is.na(MissingMAIAC$CloudAOD), 0, MissingMAIAC$CloudAOD)
-
+MissingMAIAC$hpbl_surface <- ifelse(MissingMAIAC$hpbl_surface < 0, 0, MissingMAIAC$hpbl_surface)
+MissingMAIAC$WindSpeed <- sqrt(MissingMAIAC$X10u_heightAboveGround^2 + MissingMAIAC$X10v_heightAboveGround^2)
+MissingMAIAC$CloudPhase <- ifelse(is.na(MissingMAIAC$CloudPhase), 0, MissingMAIAC$CloudPhase)
+MissingMAIAC$CloudEmmisivity <- ifelse(is.na(MissingMAIAC$CloudEmmisivity), 0, MissingMAIAC$CloudEmmisivity)
+MissingMAIAC$CloudTopTemp <- ifelse(MissingMAIAC$CloudTopTemp < 0, NA, MissingMAIAC$CloudTopTemp - 15000)
+MissingMAIAC$CloudWaterPath <- ifelse(is.na(MissingMAIAC$CloudWaterPath), 0, MissingMAIAC$CloudWaterPath)
+MissingMAIAC$CloudRadius <- ifelse(is.na(MissingMAIAC$CloudRadius), 0, MissingMAIAC$CloudRadius)
 # Make separate Terra and Aqua datasets
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T")
 Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
@@ -75,14 +83,13 @@ library(flexmix)
 # Full model
 TerraMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + hpbl_surface + r_heightAboveGround*CloudAOD | as.factor(CloudCat), Terra[!is.na(Terra$sd_surface) & !is.na(Terra$CloudCat),], k=3)
 
-TerraMod = flexmix(LogPM ~ as.factor(Month) + cape_surface + r_heightAboveGround + prate_surface + sd_surface + CloudAOD | as.factor(CloudCat) + as.factor(Multi), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface) & Terra$CloudCat != "None",], k=3, control=list(classify="weighted"))
+TerraMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + WindSpeed + sd_surface + prate_surface + CloudAOD + CloudRadius + CloudEmmisivity | as.factor(CloudPhase), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface),], k=3)
 TerraMod
 summary(TerraMod)
-plot(TerraMod)
 TMrf <- refit(TerraMod)
 summary(TMrf)
 
-AquaMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + hpbl_surface + r_heightAboveGround*CloudAOD | as.factor(CloudCat), Aqua[!is.na(Aqua$sd_surface) & !is.na(Aqua$CloudCat),], k=3)
+AquaMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + WindSpeed + sd_surface + CloudAOD + prate_surface + hpbl_surface + r_heightAboveGround*CloudAOD | as.factor(CloudCat), Aqua[!is.na(Aqua$sd_surface) & !is.na(Aqua$CloudCat),], k=3)
 AquaMod
 summary(AquaMod)
 plot(AquaMod)
