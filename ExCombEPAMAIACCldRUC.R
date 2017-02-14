@@ -50,6 +50,7 @@ MissingMAIAC$Snow <- ifelse(MissingMAIAC$sd_surface == 0, 0, 1)
 MissingMAIAC$Multi <- ifelse(MissingMAIAC$PMultiCld == 0, 0, 1)
 # Toss MAIAC variables
 MissingMAIAC <- MissingMAIAC[,c(1:7,18,26:52)]
+MissingMAIAC$CloudAOD <- ifelse(is.na(MissingMAIAC$CloudAOD), 0, MissingMAIAC$CloudAOD)
 
 # Make separate Terra and Aqua datasets
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T")
@@ -59,12 +60,30 @@ xtabs(~ Raining + CloudCat + Multi, Aqua)
 
 # Fit manual models
 # Glint/no Cloud
-summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + prate_surface + hpbl_surface, subset(Terra, Terra$CloudCat == "None")))
+AIC(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + prate_surface + hpbl_surface, subset(Terra, Terra$CloudCat == "None")))
 summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + prate_surface + hpbl_surface , subset(Aqua, Aqua$CloudCat == "None")))
 
 # Clouds
-summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface, subset(Terra, Terra$CloudCat == "High")))
-summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface, subset(Terra, Terra$CloudCat == "Low")))
+AIC(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface, subset(Terra, Terra$CloudCat == "High")))
+AIC(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface, subset(Terra, Terra$CloudCat == "Low")))
 summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface, subset(Aqua, Aqua$CloudCat == "High")))
 summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + r_heightAboveGround*CloudAOD, subset(Aqua, Aqua$CloudCat == "Low")))
 
+# Mixture modeling
+
+library(flexmix)
+# Full model
+TerraMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + hpbl_surface + r_heightAboveGround*CloudAOD | as.factor(CloudCat), Terra[!is.na(Terra$sd_surface) & !is.na(Terra$CloudCat),], k=3)
+
+TerraMod = flexmix(LogPM ~ as.factor(Month) + cape_surface + r_heightAboveGround + prate_surface + sd_surface + CloudAOD | as.factor(CloudCat) + as.factor(Multi), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface) & Terra$CloudCat != "None",], k=3, control=list(classify="weighted"))
+TerraMod
+summary(TerraMod)
+plot(TerraMod)
+TMrf <- refit(TerraMod)
+summary(TMrf)
+
+AquaMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + hpbl_surface + r_heightAboveGround*CloudAOD | as.factor(CloudCat), Aqua[!is.na(Aqua$sd_surface) & !is.na(Aqua$CloudCat),], k=3)
+AquaMod
+summary(AquaMod)
+plot(AquaMod)
+test2 <- refit(AquaMod)

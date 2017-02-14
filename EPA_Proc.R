@@ -51,20 +51,42 @@ AtlDef <- c(-85.6, -83.1, 32.2, 34.5)
 ## --------------
 
 # Create empty files to write lines to
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "/home/jhbelle/EPAdata/CalifObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "/home/jhbelle/EPAdata/MdwstObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "/home/jhbelle/EPAdata/ColoradoObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/MdwstObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "24hrPM", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/ColoradoObs24hrFRM.csv", row.names=F, col.names = F, sep=",")
 
 # Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
 for (year in seq(2007,2015)){
-  Dat <- read.csv(sprintf("/home/jhbelle/EPAdata/USEPA24hr/daily_88101_%d.csv", year), stringsAsFactors = F)[,c(1:8,12,15,17,21)]
+  Dat <- read.csv(sprintf("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAarchives/EPA_GroundMonitors/PM25_FRM/daily_88101_%d.csv", year), stringsAsFactors = F)[,c(1:8,12,15,17,21)]
   print(nrow(Dat))
   Dat <- subset(Dat, Dat$Observation.Count == 1)[,c(1:9,11,12)]
-  write.table(SiteSort(Dat, AtlDef), file="/home/jhbelle/EPAdata/AtlObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, CalifDef), file="/home/jhbelle/EPAdata/CalifObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, ColoradoDef), file="/home/jhbelle/EPAdata/ColoradoObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, MidwestDef), file="/home/jhbelle/EPAdata/MdwstObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, AtlDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, CalifDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, ColoradoDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/ColoradoObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, MidwestDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/MdwstObs24hrFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  rm(Dat)
+  gc()
+}
+
+## --------------
+# 24 hour Non-FRM PM_2.5 observations
+## --------------
+
+# Create empty files to write lines to
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "ObsCount", "24hrPM", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlObs24hrnonFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "ObsCount", "24hrPM", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifObs24hrnonFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "ObsCount", "24hrPM", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/MdwstObs24hrnonFRM.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "Date", "ObsCount", "24hrPM", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/ColoradoObs24hrnonFRM.csv", row.names=F, col.names = F, sep=",")
+
+# Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
+for (year in seq(2007,2015)){
+  Dat <- read.csv(sprintf("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAarchives/EPA_GroundMonitors/PM25_nonFRM/daily_88502_%d.csv", year), stringsAsFactors = F)[,c(1:8,12,15,17,21)]
+  print(nrow(Dat))
+  write.table(SiteSort(Dat, AtlDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlObs24hrnonFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, CalifDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifObs24hrnonFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, ColoradoDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/ColoradoObs24hrnonFRM.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, MidwestDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/MdwstObs24hrnonFRM.csv", append=T, row.names=F, col.name=F, sep=",")
   rm(Dat)
   gc()
 }
@@ -98,20 +120,20 @@ for (year in seq(2008,2015)){
 ## --------------
 
 # Create empty files to write lines to
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "/home/jhbelle/EPAdata/AtlObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "/home/jhbelle/EPAdata/CalifObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "/home/jhbelle/EPAdata/MdwstObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
-write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "/home/jhbelle/EPAdata/ColoradoObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/MdwstObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
+write.table(cbind("State", "County", "Site", "ParameterCode", "POC", "Latitude", "Longitude", "Datum", "ParameterName", "Date", "24hrPMSpec", "MethodCode"), "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/ColoradoObs24hrFRMSpec.csv", row.names=F, col.names = F, sep=",")
 
 # Loop over years, read in data, pull values of interest, and write those lines to the appropriate text file
 for (year in seq(2007,2015)){
-  Dat <- read.csv(sprintf("/home/jhbelle/EPAdata/USEPASpec/daily_SPEC_%d.csv", year, year), stringsAsFactors = F)[,c(1:9,12,15,17,21)]
+  Dat <- read.csv(sprintf("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAarchives/EPA_GroundMonitors/PM25_SPEC/daily_SPEC_%d.csv", year, year), stringsAsFactors = F)[,c(1:9,12,15,17,21)]
   print(nrow(Dat))
   Dat <- subset(Dat, Dat$Observation.Count == 1)[,c(1:10,12,13)]
-  write.table(SiteSort(Dat, AtlDef), file="/home/jhbelle/EPAdata/AtlObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, CalifDef), file="/home/jhbelle/EPAdata/CalifObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, ColoradoDef), file="/home/jhbelle/EPAdata/ColoradoObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
-  write.table(SiteSort(Dat, MidwestDef), file="/home/jhbelle/EPAdata/MdwstObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, AtlDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, CalifDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, ColoradoDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/ColoradoObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
+  write.table(SiteSort(Dat, MidwestDef), file="T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/MdwstObs24hrFRMSpec.csv", append=T, row.names=F, col.name=F, sep=",")
   rm(Dat)
   gc()
 }
