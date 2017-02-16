@@ -9,10 +9,10 @@
 % -----------------------
 % Change these parameters!!!!
 % -----------------------
-Collocsfile = '/aqua/Jess/Data/AtlG24hr.csv';
-FPath = '/aqua/MODIS_Cld_Jess/';
-OutpFile1km = '/aqua/Jess/Data/Cld1km/';
-OutpFile5km = '/aqua/Jess/Data/Cld5km/';
+Collocsfile = '/aqua/Jess/Data/ColG24hr.csv';
+FPath = '/terra/MODISCld_Colorado/';
+OutpFile1km = '/gc_runs/ColCld1km/';
+OutpFile5km = '/gc_runs/ColCld5km/';
 % -----------------------
 
 % Open collocation file

@@ -141,7 +141,7 @@ AggRUC <- function(datline, NearTable, RUCRAPloc="/gc_runs/RUCRAP_FinalOutputs/"
   if (file.exists(hdfdat)){
     # Pull lat/lon info from hdf file - technically can assume that
     LatLon <- as.data.frame(h5read(hdfdat, "Geolocation"))
-    CorIndex <- which(LatLon$Latitude. == NearTable$Latitude_[NearLine] & LatLon$Longitude == NearTable$Longitude_1[NearLine])
+    CorIndex <- which(LatLon$Latitude. == NearTable$Latitude_[NearLine] & LatLon$Longitude == NearTable$Longitude[NearLine])
     Outp <- cbind.data.frame(datline, as.data.frame(h5read(hdfdat, "Data"))[CorIndex,])
     return(Outp)
   }
