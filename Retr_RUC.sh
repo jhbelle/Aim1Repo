@@ -16,8 +16,8 @@ source /home/jhbelle/.profile
 #lev=( surface )
 var=( 2t )
 lev=( heightAboveGround )
-day=2007-04-01
-while [ "$day" != 2012-01-01 ]; do
+day=2012-04-01
+while [ "$day" != 2012-05-01 ]; do
     #echo $day
     year=$(date +%Y -d "$day")
     month=$(date +%m -d "$day")
