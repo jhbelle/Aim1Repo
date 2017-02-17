@@ -29,6 +29,7 @@ G24$AOD55 <- ifelse(G24$AOD55 < 0, NA, G24$AOD55)
 
 # Classify observations into clear, glint, high cloud, medium cloud, low cloud, and thundercloud using MAIAC and RUC
 G24$Month <- as.integer(as.character(G24$Date, "%m"))
+G24$Year <- as.integer(as.character(G24$Date, "%Y"))
 G24$Season <- ifelse(G24$Month == 3 | G24$Month == 4 | G24$Month == 5, "Spring", ifelse(G24$Month == 6 | G24$Month == 7 | G24$Month == 8, "Summer", ifelse(G24$Month == 9 | G24$Month == 10 | G24$Month == 11, "Fall", "Winter")))
 G24$X24hrPM <- ifelse(G24$X24hrPM <= 0, 0.01, G24$X24hrPM)
 G24$LogPM <- log(G24$X24hrPM)
@@ -50,8 +51,10 @@ MissingMAIAC$CloudCat <- ifelse(MissingMAIAC$PAnyCld == 0 | is.na(MissingMAIAC$P
 MissingMAIAC$Raining <- ifelse(MissingMAIAC$prate_surface == 0, 0, 1)
 MissingMAIAC$Snow <- ifelse(MissingMAIAC$sd_surface == 0, 0, 1)
 MissingMAIAC$Multi <- ifelse(MissingMAIAC$PMultiCld == 0, 0, 1)
+# Will need to double-check this categorization for each dataset
+MissingMAIAC$MAIACcat <- ifelse(MissingMAIAC$Cloud == 1 | MissingMAIAC$Partcloud == 1 | MissingMAIAC$CloudShadow == 1, "Cloud", ifelse(MissingMAIAC$Glint == 1 | MissingMAIAC$Clear == 1 | MissingMAIAC$Snow == 1, "Glint", NA))
 # Toss MAIAC variables
-MissingMAIAC <- MissingMAIAC[,c(1:7,18,26:57)]
+MissingMAIAC <- MissingMAIAC[!is.na(MissingMAIAC$MAIACcat),c(1:7,18,26:59)]
 MissingMAIAC$CloudAOD <- ifelse(is.na(MissingMAIAC$CloudAOD), 0, MissingMAIAC$CloudAOD)
 MissingMAIAC$hpbl_surface <- ifelse(MissingMAIAC$hpbl_surface < 0, 0, MissingMAIAC$hpbl_surface)
 MissingMAIAC$WindSpeed <- sqrt(MissingMAIAC$X10u_heightAboveGround^2 + MissingMAIAC$X10v_heightAboveGround^2)
@@ -60,6 +63,9 @@ MissingMAIAC$CloudEmmisivity <- ifelse(is.na(MissingMAIAC$CloudEmmisivity), 0, M
 MissingMAIAC$CloudTopTemp <- ifelse(MissingMAIAC$CloudTopTemp < 0, NA, MissingMAIAC$CloudTopTemp - 15000)
 MissingMAIAC$CloudWaterPath <- ifelse(is.na(MissingMAIAC$CloudWaterPath), 0, MissingMAIAC$CloudWaterPath)
 MissingMAIAC$CloudRadius <- ifelse(is.na(MissingMAIAC$CloudRadius), 0, MissingMAIAC$CloudRadius)
+MissingMAIAC$h_cloudTop <- ifelse(MissingMAIAC$h_cloudTop < 0, NA, MissingMAIAC$h_cloudTop)
+MissingMAIAC$h_cloudBase <- ifelse(MissingMAIAC$h_cloudBase < 0, NA, MissingMAIAC$h_cloudBase)
+MissingMAIAC$CatCloudBase <- ifelse(is.na(MissingMAIAC$h_cloudBase), "None", ifelse(MissingMAIAC$h_cloudBase < 5000, "Low", ifelse(MissingMAIAC$h_cloudBase >= 5000, "High", NA)))
 # Make separate Terra and Aqua datasets
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T")
 Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
@@ -81,16 +87,15 @@ summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_
 
 library(flexmix)
 # Full model
-TerraMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + hpbl_surface + r_heightAboveGround*CloudAOD | as.factor(CloudCat), Terra[!is.na(Terra$sd_surface) & !is.na(Terra$CloudCat),], k=3)
-
-TerraMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + WindSpeed + sd_surface + prate_surface + CloudAOD + CloudRadius + CloudEmmisivity | as.factor(CloudPhase), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface),], k=3)
+TerraMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + as.factor(CatCloudBase) + r_heightAboveGround + WindSpeed + prate_surface + sd_surface + CloudRadius + CloudAOD + CloudEmmisivity | as.factor(CloudPhase), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface),], k=4)
 TerraMod
 summary(TerraMod)
 TMrf <- refit(TerraMod)
 summary(TMrf)
 
-AquaMod = flexmix(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + WindSpeed + sd_surface + CloudAOD + prate_surface + hpbl_surface + r_heightAboveGround*CloudAOD | as.factor(CloudCat), Aqua[!is.na(Aqua$sd_surface) & !is.na(Aqua$CloudCat),], k=3)
+AquaMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + as.factor(CatCloudBase) + r_heightAboveGround + WindSpeed + prate_surface + sd_surface + CloudRadius + CloudAOD + CloudEmmisivity | as.factor(CloudPhase), Aqua[!is.na(Aqua$sd_surface) & !is.na(Aqua$CloudCat),], k=4)
 AquaMod
 summary(AquaMod)
-plot(AquaMod)
-test2 <- refit(AquaMod)
+AMrf <- refit(AquaMod)
+summary(AMrf)
+

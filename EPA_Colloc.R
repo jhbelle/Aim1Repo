@@ -28,6 +28,8 @@ Calif20102011 <- subset(G24hr, G24hr$StudyArea == "Calif" & (substr(as.character
 write.csv(Calif20102011, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr_2010_2011.csv", row.names = F)
 Atl <- subset(G24hr, G24hr$StudyArea == "Atl")[,c("State", "County", "Site", "Latitude", "Longitude", "Date", "X24hrPM")]
 write.csv(Atl, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24hr.csv", row.names=F)
+Col <- subset(G24hr, G24hr$StudyArea == "Col")[,c("State", "County", "Site", "Latitude", "Longitude", "Date", "X24hrPM")]
+write.csv(Col, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/ColG24hr.csv", row.names=F)
 H1hr <-- read.csv("/home/jhbelle/EPAdata/CleanedData/H1hr.csv")
 S24hr <- read.csv("/home/jhbelle/EPAdata/CleanedData/S24hr.csv")
 
