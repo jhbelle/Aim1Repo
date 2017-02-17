@@ -71,14 +71,14 @@ source("/home/jhbelle/Aim1Repo/Functions_CombEPA_MAIAC_Cloud_RUC.R")
 ## -----------
 # Add in RUC/RAP observations - run on cluster
 ## -----------
-G24 <- read.csv("/aqua/Jess/Data/AtlG24_MAIACinc_5km.csv", stringsAsFactors=F)
-#G24 <- read.csv("/aqua/Jess/Data/CalifG24_MAIACinc_10km.csv", stringsAsFactors=F)
+#G24 <- read.csv("/aqua/Jess/Data/AtlG24_MAIACinc_5km.csv", stringsAsFactors=F)
+G24 <- read.csv("/aqua/Jess/Data/CalifG24_MAIACinc_10km.csv", stringsAsFactors=F)
 #G24 <- G24PassAgg
 G24$Date <- as.Date(G24$Date, "%Y-%m-%d")
-NearTab <- read.csv("/aqua/Jess/Data/Nearest_AtlRUC.csv", stringsAsFactors=F)
-#NearTab <- read.csv("/aqua/Jess/Data/Nearest_RUCRAP.csv", stringsAsFactors=F)
+#NearTab <- read.csv("/aqua/Jess/Data/Nearest_AtlRUC.csv", stringsAsFactors=F)
+NearTab <- read.csv("/aqua/Jess/Data/Nearest_RUCRAP.csv", stringsAsFactors=F)
 
 G24_MAIACCldRUC <- ddply(G24, .(State, County, Site, Date, AquaTerraFlag, Time, X24hrPM), AggRUC, NearTable=NearTab)
 #write.csv(G24_MAIACCldRUC, "/aqua/Jess/Data/CalifG24_MAIACCldRUC_2009.csv", row.names=F)
-#write.csv(G24_MAIACCldRUC, "/aqua/Jess/Data/CalifG24_MAIACCldRUC_10km.csv", row.names=F)
-write.csv(G24_MAIACCldRUC, "/aqua/Jess/Data/AtlG24_MAIACCldRUC.csv", row.names=F)
+write.csv(G24_MAIACCldRUC, "/aqua/Jess/Data/CalifG24_MAIACCldRUC_10km.csv", row.names=F)
+#write.csv(G24_MAIACCldRUC, "/aqua/Jess/Data/AtlG24_MAIACCldRUC.csv", row.names=F)
