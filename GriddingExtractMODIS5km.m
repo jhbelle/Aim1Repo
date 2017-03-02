@@ -16,7 +16,7 @@
 % -----------------------
 yr = 2014
 IPath = '/aqua/MODIS_Cld_Jess/';
-Opath ='/aqua/MODIS_Cld_Jess/Extractions_5km/';
+Opath ='/aqua/MODIS_Cld_Jess/Extractions_5km_Aqua/';
 
 %yr = 2011; %- pass in through command line for each submission
 % -----------------------
@@ -26,8 +26,8 @@ Opath ='/aqua/MODIS_Cld_Jess/Extractions_5km/';
 SectionCoors = {[34.5, -85.6, -83.1, 32.2]};
 
 % Cycle through each day in year, and get list of files for each
-for day=347:365
-    filelist = dir(sprintf('%sMOD06_L2.A%u%03d.*.hdf', IPath, yr, day))
+for day=1:365
+    filelist = dir(sprintf('%sMYD06_L2.A%u%03d.*.hdf', IPath, yr, day))
     % Initialize output structure for section data
     Varnames = {'Lat', 'Long', 'CloudTopHgt', 'CloudFrac', 'CloudPhase', 'CloudTopTemp', 'CloudEmiss', 'hr', 'min'};
     SectionCell = cell(1,1);
