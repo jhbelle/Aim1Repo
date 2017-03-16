@@ -27,11 +27,11 @@ data.year = 2014
 MAIACGrid = "/aqua/Jess/Data/FinalCopy_AtlPolys/Atl_MAIACGrid.shp"
 MAIAClayer = "Atl_MAIACGrid"
 ## Folder containing section-specific csv files with raw data in them -  GriddingExtractMODIS10km.m needs to be run first to pull the raw data from the hdf into section-specific csvs
-aquaDir <-  "/aqua/MODIS_Cld_Jess/Extractions_5km/"
+aquaDir <-  "/aqua/MODIS_Cld_Jess/Extractions_5km_Aqua/"
 ## Directory to put output in
-OutDir <- "/aqua/MODIS_Cld_Jess/Gridded_5km/" 
+OutDir <- "/aqua/MODIS_Cld_Jess/Gridded_5km_Aqua/" 
 ## Directory with GeoMetadata files downloaded from NASA ftp site
-GeoMetaDir <- "/aqua/MODIS_GeoMeta/TERRA/2014/"
+GeoMetaDir <- "/aqua/MODIS_GeoMeta/AQUA/2014/"
 ## ---------------
 # Load function file
 ## ---------------
@@ -64,7 +64,7 @@ for(day in Startday:Ndays){
   rm(aquaRaw)
   listtimes <- names(summary(as.factor(aquaProj@data$timestamp)))
   ## Read in geometa data file containing bounding polygons for each granule
-  GeoMeta <- read.table(paste(GeoMetaDir, "MOD03_", strftime(strptime(paste(day, data.year, sep="_"), "%j_%Y"), "%Y-%m-%d"), ".txt", sep=""), header=F, skip=3, sep=",")[,c(2,10:17)]
+  GeoMeta <- read.table(paste(GeoMetaDir, "MYD03_", strftime(strptime(paste(day, data.year, sep="_"), "%j_%Y"), "%Y-%m-%d"), ".txt", sep=""), header=F, skip=3, sep=",")[,c(2,10:17)]
   GeoMeta$Timepass <- substr(GeoMeta[,1], 12, 17)
   ## Cycle through each MODIS granule in section
   for (time in listtimes){
