@@ -8,8 +8,8 @@
 ## --------------
 
 # Read in data
-#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
-Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
+Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
+#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
 Dat$Date <- as.Date(Dat$Date, "%Y-%m-%d")
 G24 <- Dat
 
@@ -52,8 +52,8 @@ MissingMAIAC <- subset(MissingMAIAC, MissingMAIAC$Dist < 1000)
 # Filter 2: Cloud product - characterize clouds as high, low or none
 # Was missing cloud product?
 #Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_10km.csv", stringsAsFactors = F)
-Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
-#Clouds <- read.csv("E://CloudAgg_10km.csv")
+#Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
+Clouds <- read.csv("E://CloudAgg_10km.csv")
 Clouds$Date <- as.Date(Clouds$Date, "%Y-%m-%d")
 #Clouds$X <- NULL
 MissingMAIAC <- merge(MissingMAIAC, Clouds, all.x=T)
@@ -65,7 +65,7 @@ MissingMAIAC$Multi <- ifelse(MissingMAIAC$PMultiCld == 0, 0, 1)
 # Will need to double-check this categorization for each dataset
 MissingMAIAC$MAIACcat <- ifelse(MissingMAIAC$Cloud == 1 | MissingMAIAC$Partcloud == 1 | MissingMAIAC$CloudShadow == 1, "Cloud", ifelse(MissingMAIAC$Glint == 1 | MissingMAIAC$Clear == 1 | MissingMAIAC$Snow == 1, "Glint", NA))
 # Toss MAIAC variables
-MissingMAIAC <- MissingMAIAC[!is.na(MissingMAIAC$MAIACcat),c(1:7,18,26:59)]
+MissingMAIAC <- MissingMAIAC[!is.na(MissingMAIAC$MAIACcat),c(1:7,18,26:60)]
 MissingMAIAC$CloudAOD <- ifelse(is.na(MissingMAIAC$CloudAOD), 0, MissingMAIAC$CloudAOD)
 MissingMAIAC$hpbl_surface <- ifelse(MissingMAIAC$hpbl_surface < 0, 0, MissingMAIAC$hpbl_surface)
 MissingMAIAC$WindSpeed <- sqrt(MissingMAIAC$X10u_heightAboveGround^2 + MissingMAIAC$X10v_heightAboveGround^2)
@@ -83,6 +83,28 @@ MissingMAIAC$CatCloudBase <- factor(MissingMAIAC$CatCloudBase, levels=c("None", 
 #aggregate(CloudEmmisivity~CloudPhase+AquaTerraFlag, MissingMAIAC, mean, rm.na=T)
 #aggregate(CloudRadius~CloudPhase+AquaTerraFlag, MissingMAIAC, mean, rm.na=T)
 #aggregate(CloudAOD~CloudPhase+AquaTerraFlag, MissingMAIAC, mean, rm.na=T)
+# Need to do tabulations on mismatches in definitions
+MissingMAIAC$HasCldEmis <- ifelse(MissingMAIAC$CloudEmmisivity == 0, "NoCld", "YesCld")
+MissingMAIAC$HasCldRad <- ifelse(MissingMAIAC$CloudRadius == 0, "NoCld", "YesCld")
+MissingMAIAC$HasCldAOD <- ifelse(MissingMAIAC$CloudAOD == 0, "NoCld", "YesCld")
+MissingMAIAC$HasCldMODHgt <- ifelse(is.na(MissingMAIAC$CloudTopHgt), "NoCld", "YesCld")
+xtabs(~CatCloudBase + Raining, MissingMAIAC) # Cloud base is unreliable as indicator of cloud?
+xtabs(~ HasCldEmis + HasCldRad + HasCldAOD + HasCldMODHgt, MissingMAIAC)
+MissingMAIAC$MODCld <- ifelse(MissingMAIAC$HasCldEmis == "YesCld" & MissingMAIAC$HasCldRad == "YesCld" & MissingMAIAC$HasCldAOD == "YesCld" & MissingMAIAC$HasCldMODHgt == "YesCld", "YesCld", ifelse(MissingMAIAC$HasCldEmis == "NoCld" & MissingMAIAC$HasCldRad == "NoCld" & MissingMAIAC$HasCldAOD == "NoCld" & MissingMAIAC$HasCldMODHgt == "NoCld", "NoCld", "MaybeCld"))
+xtabs(~ MODCld + CloudPhase, MissingMAIAC)
+MissingMAIAC$MODCld2 <- ifelse(MissingMAIAC$CloudPhase == 0 & MissingMAIAC$MODCld == "YesCld", "MaybeCld", MissingMAIAC$MODCld)
+xtabs(~ MODCld2 + Raining, MissingMAIAC)
+MissingMAIAC$MODRUCCld <- ifelse(MissingMAIAC$MODCld2 == "NoCld" & MissingMAIAC$Raining == 1, "MaybeCld", MissingMAIAC$MODCld2)
+xtabs(~ MODRUCCld + MAIACcat, MissingMAIAC)
+MissingMAIAC$MODMAIACRUCCld <- ifelse((MissingMAIAC$MODRUCCld == "NoCld" & MissingMAIAC$MAIACcat == "Cloud") | (MissingMAIAC$MODRUCCld == "YesCld" & MissingMAIAC$MAIACcat == "Glint"), "MaybeCld", MissingMAIAC$MODRUCCld)
+summary(as.factor(MissingMAIAC$MODMAIACRUCCld))
+# NA's in MODMAIACRUCCld variable are missing RUC information - remove
+MissingMAIAC <- subset(MissingMAIAC, !is.na(MissingMAIAC$MODMAIACRUCCld))
+# Make a categorical variable that combines the Yes Clouds in MODMAIACRUCCld with Cloud Phase
+MissingMAIAC$CloudCatFin <- ifelse(MissingMAIAC$MODMAIACRUCCld == "MaybeCld", "MaybeCld", ifelse(MissingMAIAC$MODMAIACRUCCld == "NoCld", "NoCld", ifelse(MissingMAIAC$CloudPhase == 1, "WaterCld", ifelse(MissingMAIAC$CloudPhase == 2, "IceCld", "UndetCld"))))
+xtabs(~CloudCatFin + AquaTerraFlag, MissingMAIAC)
+# Do Cloud top height categories - "None", "Low", "High"
+MissingMAIAC$CldHgtCat <- ifelse(is.na(MissingMAIAC$CloudTopHgt), "None", ifelse(MissingMAIAC$CloudTopHgt < 5000, "Low", "High"))
 # Make separate Terra and Aqua datasets
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T")
 Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
@@ -101,12 +123,14 @@ Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
 #summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + r_heightAboveGround*CloudAOD, subset(Aqua, Aqua$CloudCat == "Low")))
 
 # Mixture modeling
-
+#Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$hpbl_surface))
+Terra2 <- subset(Terra, !is.na(Terra$hpbl_surface))
 library(flexmix)
 # Full model
-TerraMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + CatCloudBase + r_heightAboveGround + WindSpeed + prate_surface + Snow + CloudRadius + CloudAOD + CloudEmmisivity + CatCloudBase*CloudRadius + CatCloudBase*CloudAOD + CatCloudBase*CloudEmmisivity | as.factor(CloudPhase), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface),], k=seq(1,10))
+TerraMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + hpbl_surface + prate_surface + CloudRadius + CloudAOD + CloudEmmisivity | as.factor(CloudCatFin), Terra2, k=seq(1,10))
+TerraMod
 # Need to separate out all 4 components to get the best performance
-TerraMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + CatCloudBase + r_heightAboveGround + WindSpeed + prate_surface + Snow + CloudRadius + CloudAOD + CloudEmmisivity + CatCloudBase*CloudRadius + CatCloudBase*CloudAOD + CatCloudBase*CloudEmmisivity | as.factor(CloudPhase), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface),], k=4)
+TerraMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + CatCloudBase + r_heightAboveGround + WindSpeed + prate_surface + CloudRadius + CloudAOD + CloudEmmisivity + CatCloudBase*CloudRadius + CatCloudBase*CloudAOD + CatCloudBase*CloudEmmisivity | as.factor(CloudPhase), Terra[!is.na(Terra$CloudCat) & !is.na(Terra$sd_surface),], k=4)
 TerraMod
 summary(as.factor(TerraMod@group[which(TerraMod@cluster==1)]))
 summary(as.factor(TerraMod@group[which(TerraMod@cluster==2)]))
