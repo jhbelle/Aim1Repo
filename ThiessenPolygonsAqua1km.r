@@ -27,12 +27,12 @@ data.year = 2014
 MAIACGrid = "/aqua/Jess/Data/FinalCopy_AtlPolys/Atl_MAIACGrid.shp"
 MAIAClayer = "Atl_MAIACGrid"
 ## Folder containing section-specific csv files with raw data in them -  GriddingExtractMODIS10km.m needs to be run first to pull the raw data from the hdf into section-specific csvs
-aquaDir <-  "/gc_runs/MOD03_Atl/Extractions_Terra/"
+aquaDir <-  "/gc_runs/MOD03_Atl/Extractions_Aqua/"
 ## Directory to put output in
-OutDir <- "/gc_runs/MOD03_Atl/Gridded_Terra/" 
+OutDir <- "/gc_runs/MOD03_Atl/Gridded_Aqua/" 
 ## Directory with GeoMetadata files downloaded from NASA ftp site
-GeoMetaDir <- "/aqua/MODIS_GeoMeta/TERRA/2014/"
-GeoMetaPrefix <- "MOD03_"
+GeoMetaDir <- "/aqua/MODIS_GeoMeta/AQUA/2014/"
+GeoMetaPrefix <- "MYD03_"
 ## ---------------
 # Load function file
 ## ---------------

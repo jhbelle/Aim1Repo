@@ -1,3 +1,3 @@
 #!/bin/bash
 #$ -N ACldMAIACAtl
-Rscript ThiessenPolygons.r 1 1 365
+Rscript ThiessenPolygons.r 1 347 365

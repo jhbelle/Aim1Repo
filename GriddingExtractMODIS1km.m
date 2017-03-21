@@ -16,7 +16,7 @@
 % -----------------------
 yr = 2014
 IPath = '/gc_runs/MOD03_Atl/';
-Opath ='/gc_runs/MOD03_Atl/Extractions_Terra/';
+Opath ='/gc_runs/MOD03_Atl/Extractions_Aqua/';
 
 %yr = 2011; %- pass in through command line for each submission
 % -----------------------
@@ -26,8 +26,8 @@ Opath ='/gc_runs/MOD03_Atl/Extractions_Terra/';
 SectionCoors = {[34.5, -85.6, -83.1, 32.2]};
 
 % Cycle through each day in year, and get list of files for each
-for day=32:365
-    filelist = dir(sprintf('%sMOD03.A%u%03d.*.hdf', IPath, yr, day))
+for day=1:365
+    filelist = dir(sprintf('%sMYD03.A%u%03d.*.hdf', IPath, yr, day))
     % Initialize output structure for section data
     Varnames = {'Lat', 'Long', 'SensorZenith', 'SolarZenith', 'Index', 'hr', 'min'};
     SectionCell = cell(1,1);
