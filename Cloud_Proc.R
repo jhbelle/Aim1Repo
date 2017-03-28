@@ -7,15 +7,15 @@
 ## -------------
 
 # Read in 24-hour observations
-CalifG24hr <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr.csv", stringsAsFactors = F)
-CalifG24hr$Date2 <- as.Date(CalifG24hr$Date, "%Y-%m-%d")
-CalifG24hr$Year <- as.numeric(as.character(CalifG24hr$Date2, "%Y"))
-CalifG24hr$Jday <- as.numeric(as.character(CalifG24hr$Date2, "%j"))
+#CalifG24hr <- read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24hr.csv", stringsAsFactors = F)
+#CalifG24hr$Date2 <- as.Date(CalifG24hr$Date, "%Y-%m-%d")
+#CalifG24hr$Year <- as.numeric(as.character(CalifG24hr$Date2, "%Y"))
+#CalifG24hr$Jday <- as.numeric(as.character(CalifG24hr$Date2, "%j"))
 
-#AtlG24hr <- read.csv("/aqua/Jess/Data/AtlG24hr.csv", stringsAsFactors=F)
-#AtlG24hr$Date2 <- as.Date(AtlG24hr$Date, "%Y-%m-%d")
-#AtlG24hr$Year <- as.numeric(as.character(AtlG24hr$Date2, "%Y"))
-#AtlG24hr$Jday <- as.numeric(as.character(AtlG24hr$Date2, "%j"))
+AtlG24hr <- read.csv("/aqua/Jess/Data/AtlG24hr.csv", stringsAsFactors=F)
+AtlG24hr$Date2 <- as.Date(AtlG24hr$Date, "%Y-%m-%d")
+AtlG24hr$Year <- as.numeric(as.character(AtlG24hr$Date2, "%Y"))
+AtlG24hr$Jday <- as.numeric(as.character(AtlG24hr$Date2, "%j"))
 
 # Define mode function
 Mode <- function(x) {
@@ -145,20 +145,20 @@ ReadClouds <- function(datline, loc1km="/aqua/Jess/Data/Cld1km/", loc5km="/aqua/
 library(plyr)
 
 # California
-Out5km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=5, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
-write.csv(Out5km, "E://CloudAgg_5km.csv")
+#Out5km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=5, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
+#write.csv(Out5km, "E://CloudAgg_5km.csv")
 
-Out10km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=10, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
-write.csv(Out10km, "E://CloudAgg_10km.csv")
+#Out10km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=10, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
+#write.csv(Out10km, "E://CloudAgg_10km.csv")
 
-Out20km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=20, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
-write.csv(Out20km, "E://CloudAgg_20km.csv")
+#Out20km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=20, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
+#write.csv(Out20km, "E://CloudAgg_20km.csv")
 
-Out30km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=30, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
-write.csv(Out30km, "E://CloudAgg_30km.csv")
+#Out30km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=30, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
+#write.csv(Out30km, "E://CloudAgg_30km.csv")
 
-Out40km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=40, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
-write.csv(Out40km, "E://CloudAgg_40km.csv")
+#Out40km = ddply(CalifG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=40, loc1km="E://CalifCloudColloc1km_2/", loc5km="E://CalifCloudColloc5km_2/")
+#write.csv(Out40km, "E://CloudAgg_40km.csv")
 
 
 
@@ -170,6 +170,9 @@ write.csv(Out5km, "/aqua/Jess/Data/CloudAgg_Atl5km.csv", row.names=F)
 
 Out10km = ddply(AtlG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=10)
 write.csv(Out10km, "/aqua/Jess/Data/CloudAgg_Atl10km.csv", row.names=F)
+
+Out10km = ddply(AtlG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=15)
+write.csv(Out10km, "/aqua/Jess/Data/CloudAgg_Atl15km.csv", row.names=F)
 
 Out20km = ddply(AtlG24hr, .(State, County, Site, Date, X24hrPM), ReadClouds, Radius=20)
 write.csv(Out20km, "/aqua/Jess/Data/CloudAgg_Atl20km.csv", row.names=F)
