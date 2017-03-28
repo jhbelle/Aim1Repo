@@ -20,8 +20,8 @@ aggregate(X24hrPM~Season, OrigDat, mean)
 aggregate(X24hrPM~Season, OrigDat, median)
 
 # Read in data
-Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
-#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
+#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
+Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
 Dat$Date <- as.Date(Dat$Date, "%Y-%m-%d")
 G24 <- Dat
 
@@ -55,27 +55,27 @@ FirstCollocOnly <- ddply(G24, .(State, County, Site, Date, AquaTerraFlag), takef
 #G24$MissingMAIAC <- ifelse(is.na(G24$AOD47) & is.na(G24$AOD55), 1, 0)
 # Get tabulations of MAIAC by missing status and T/A pass
 #xtabs(~ MissingMAIAC + AquaTerraFlag, G24)
-xtabs(~AquaTerraFlag, FirstCollocOnly)
-aggregate(OrigPM ~ AquaTerraFlag, FirstCollocOnly, mean)
-aggregate(OrigPM ~ AquaTerraFlag, FirstCollocOnly, median)
+#xtabs(~AquaTerraFlag, FirstCollocOnly)
+#aggregate(OrigPM ~ AquaTerraFlag, FirstCollocOnly, mean)
+#aggregate(OrigPM ~ AquaTerraFlag, FirstCollocOnly, median)
 
 MissingMAIAC <- subset(FirstCollocOnly, is.na(FirstCollocOnly$AOD47) & is.na(FirstCollocOnly$AOD55))
-xtabs(~AquaTerraFlag, MissingMAIAC)
-xtabs(~AquaTerraFlag + Glint + Cloud, MissingMAIAC)
-aggregate(OrigPM ~ AquaTerraFlag, MissingMAIAC, mean)
-aggregate(OrigPM ~ AquaTerraFlag + Cloud + Glint, MissingMAIAC, mean)
-aggregate(OrigPM ~ AquaTerraFlag, MissingMAIAC, median)
+#xtabs(~AquaTerraFlag, MissingMAIAC)
+#xtabs(~AquaTerraFlag + Glint + Cloud, MissingMAIAC)
+#aggregate(OrigPM ~ AquaTerraFlag, MissingMAIAC, mean)
+#aggregate(OrigPM ~ AquaTerraFlag + Cloud + Glint, MissingMAIAC, mean)
+#aggregate(OrigPM ~ AquaTerraFlag, MissingMAIAC, median)
 #hist(MissingMAIAC$Dist)
 #summary(MissingMAIAC)
-aggregate(Cloud ~ AquaTerraFlag, MissingMAIAC, mean)
-aggregate(Glint ~ AquaTerraFlag, MissingMAIAC, mean)
+#aggregate(Cloud ~ AquaTerraFlag, MissingMAIAC, mean)
+#aggregate(Glint ~ AquaTerraFlag, MissingMAIAC, mean)
 # Remove anything with a distance greater than 1 km - not a true collocation and small in number
-MissingMAIAC <- subset(MissingMAIAC, MissingMAIAC$Dist < 1000)
+#MissingMAIAC <- subset(MissingMAIAC, MissingMAIAC$Dist < 1000)
 # Filter 2: Cloud product - characterize clouds as high, low or none
 # Was missing cloud product?
 #Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_10km.csv", stringsAsFactors = F)
-#Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
-Clouds <- read.csv("E://CloudAgg_10km.csv")
+Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl40km.csv", stringsAsFactors = F)
+#Clouds <- read.csv("E://CloudAgg_40km.csv")
 Clouds$Date <- as.Date(Clouds$Date, "%Y-%m-%d")
 #Clouds$X <- NULL
 MissingMAIAC <- merge(MissingMAIAC, Clouds, all.x=T)
@@ -86,11 +86,11 @@ MissingMAIAC$Snow <- ifelse(MissingMAIAC$sd_surface == 0, 0, 1)
 MissingMAIAC$Multi <- ifelse(MissingMAIAC$PMultiCld == 0, 0, 1)
 # Will need to double-check this categorization for each dataset
 MissingMAIAC$MAIACcat <- ifelse(MissingMAIAC$Cloud == 1 | MissingMAIAC$Partcloud == 1 | MissingMAIAC$CloudShadow == 1, "Cloud", ifelse(MissingMAIAC$Glint == 1 | MissingMAIAC$Clear == 1 | MissingMAIAC$Snow == 1, "Glint", NA))
-xtabs(~MAIACcat + AquaTerraFlag, MissingMAIAC)
-aggregate(OrigPM ~ MAIACcat + AquaTerraFlag, MissingMAIAC, mean)
-aggregate(OrigPM ~ MAIACcat + AquaTerraFlag, MissingMAIAC, median)
+#xtabs(~MAIACcat + AquaTerraFlag, MissingMAIAC)
+#aggregate(OrigPM ~ MAIACcat + AquaTerraFlag, MissingMAIAC, mean)
+#aggregate(OrigPM ~ MAIACcat + AquaTerraFlag, MissingMAIAC, median)
 # Toss MAIAC variables
-MissingMAIAC <- MissingMAIAC[!is.na(MissingMAIAC$MAIACcat),c(1:7,18,26:61)]
+MissingMAIAC <- MissingMAIAC[!is.na(MissingMAIAC$MAIACcat),c(1:7,18,26:60)]
 MissingMAIAC$CloudAOD <- ifelse(is.na(MissingMAIAC$CloudAOD), 0, MissingMAIAC$CloudAOD)
 MissingMAIAC$hpbl_surface <- ifelse(MissingMAIAC$hpbl_surface < 0, 0, MissingMAIAC$hpbl_surface)
 MissingMAIAC$WindSpeed <- sqrt(MissingMAIAC$X10u_heightAboveGround^2 + MissingMAIAC$X10v_heightAboveGround^2)
@@ -113,32 +113,32 @@ MissingMAIAC$HasCldEmis <- ifelse(MissingMAIAC$CloudEmmisivity == 0, "NoCld", "Y
 MissingMAIAC$HasCldRad <- ifelse(MissingMAIAC$CloudRadius == 0, "NoCld", "YesCld")
 MissingMAIAC$HasCldAOD <- ifelse(MissingMAIAC$CloudAOD == 0, "NoCld", "YesCld")
 MissingMAIAC$HasCldMODHgt <- ifelse(is.na(MissingMAIAC$CloudTopHgt), "NoCld", "YesCld")
-xtabs(~CatCloudBase + Raining, MissingMAIAC) # Cloud base is unreliable as indicator of cloud?
-xtabs(~ HasCldEmis + HasCldRad + HasCldAOD + HasCldMODHgt, MissingMAIAC)
+#xtabs(~CatCloudBase + Raining, MissingMAIAC) # Cloud base is unreliable as indicator of cloud?
+#xtabs(~ HasCldEmis + HasCldRad + HasCldAOD + HasCldMODHgt, MissingMAIAC)
 MissingMAIAC$MODCld <- ifelse(MissingMAIAC$HasCldEmis == "YesCld" & MissingMAIAC$HasCldRad == "YesCld" & MissingMAIAC$HasCldAOD == "YesCld" & MissingMAIAC$HasCldMODHgt == "YesCld", "YesCld", ifelse(MissingMAIAC$HasCldEmis == "NoCld" & MissingMAIAC$HasCldRad == "NoCld" & MissingMAIAC$HasCldAOD == "NoCld" & MissingMAIAC$HasCldMODHgt == "NoCld", "NoCld", "MaybeCld"))
-xtabs(~ MODCld + CloudPhase, MissingMAIAC)
+#xtabs(~ MODCld + CloudPhase, MissingMAIAC)
 MissingMAIAC$MODCld2 <- ifelse(MissingMAIAC$CloudPhase == 0 & MissingMAIAC$MODCld == "YesCld", "MaybeCld", MissingMAIAC$MODCld)
-xtabs(~ MODCld2 + Raining, MissingMAIAC)
+#xtabs(~ MODCld2 + Raining, MissingMAIAC)
 MissingMAIAC$MODRUCCld <- ifelse(MissingMAIAC$MODCld2 == "NoCld" & MissingMAIAC$Raining == 1, "MaybeCld", MissingMAIAC$MODCld2)
-xtabs(~ MODRUCCld + MAIACcat, MissingMAIAC)
+#xtabs(~ MODRUCCld + MAIACcat, MissingMAIAC)
 MissingMAIAC$MODMAIACRUCCld <- ifelse((MissingMAIAC$MODRUCCld == "NoCld" & MissingMAIAC$MAIACcat == "Cloud") | (MissingMAIAC$MODRUCCld == "YesCld" & MissingMAIAC$MAIACcat == "Glint"), "MaybeCld", MissingMAIAC$MODRUCCld)
-summary(as.factor(MissingMAIAC$MODMAIACRUCCld))
+#summary(as.factor(MissingMAIAC$MODMAIACRUCCld))
 # NA's in MODMAIACRUCCld variable are missing RUC information - remove
 MissingMAIAC <- subset(MissingMAIAC, !is.na(MissingMAIAC$MODMAIACRUCCld))
 # Make a categorical variable that combines the Yes Clouds in MODMAIACRUCCld with Cloud Phase
 MissingMAIAC$CloudCatFin <- ifelse(MissingMAIAC$MODMAIACRUCCld == "MaybeCld", "MaybeCld", ifelse(MissingMAIAC$MODMAIACRUCCld == "NoCld", "NoCld", ifelse(MissingMAIAC$CloudPhase == 1, "WaterCld", ifelse(MissingMAIAC$CloudPhase == 2, "IceCld", "UndetCld"))))
 xtabs(~CloudCatFin + AquaTerraFlag, MissingMAIAC)
-aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, mean)
-aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, median)
-aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, summary)
-ggplot(MissingMAIAC, aes(OrigPM)) + geom_histogram() + facet_grid(CloudCatFin ~ AquaTerraFlag)
+#aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, mean)
+#aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, median)
+#aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, summary)
+#ggplot(MissingMAIAC, aes(OrigPM)) + geom_histogram() + facet_grid(CloudCatFin ~ AquaTerraFlag)
 # Do Cloud top height categories - "None", "Low", "High"
 MissingMAIAC$CldHgtCat <- ifelse(is.na(MissingMAIAC$CloudTopHgt), "None", ifelse(MissingMAIAC$CloudTopHgt < 5000, "Low", "High"))
 MissingMAIAC$CloudCatFin2 <- ifelse(MissingMAIAC$MODMAIACRUCCld == "MaybeCld", "MaybeCld", ifelse(MissingMAIAC$MODMAIACRUCCld == "NoCld", "NoCld", MissingMAIAC$CldHgtCat))
 # Make separate Terra and Aqua datasets
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T")
 Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
-rm(Clouds, Dat, FirstCollocOnly, G24, MissingMAIAC, OrigDat)
+#rm(Clouds, Dat, FirstCollocOnly, G24, MissingMAIAC, OrigDat)
 
 #xtabs(~ Raining + CloudCat + Multi, Aqua)
 
@@ -157,23 +157,25 @@ rm(Clouds, Dat, FirstCollocOnly, G24, MissingMAIAC, OrigDat)
 Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$hpbl_surface))
 #Terra2 <- subset(Terra, !is.na(Terra$hpbl_surface))
 Terra2$prate <- Terra2$prate_surface*1000
-library(flexmix)
+#library(flexmix)
 # Full model
 TerraMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Terra2, k=seq(1,10))
 TerraMod
-# Need to separate out all 4 components to get the best performance
-TerraMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Terra2, k=4)
+TerraMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudAOD | as.factor(CloudCatFin), Terra2, k=seq(1,10))
 TerraMod
-summary(TerraMod)
+# Need to separate out all 4 components to get the best performance
+#TerraMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Terra2, k=4)
+#TerraMod
+#summary(TerraMod)
 
-summary(as.factor(TerraMod@group[which(TerraMod@cluster==1)]))
-summary(as.factor(TerraMod@group[which(TerraMod@cluster==2)]))
-summary(as.factor(TerraMod@group[which(TerraMod@cluster==3)]))
-summary(as.factor(TerraMod@group[which(TerraMod@cluster==4)]))
-summary(as.factor(TerraMod@group[which(TerraMod@cluster==5)]))
+#summary(as.factor(TerraMod@group[which(TerraMod@cluster==1)]))
+#summary(as.factor(TerraMod@group[which(TerraMod@cluster==2)]))
+#summary(as.factor(TerraMod@group[which(TerraMod@cluster==3)]))
+#summary(as.factor(TerraMod@group[which(TerraMod@cluster==4)]))
+#summary(as.factor(TerraMod@group[which(TerraMod@cluster==5)]))
 
-TMrf <- refit(TerraMod)
-summary(TMrf)
+#TMrf <- refit(TerraMod)
+#summary(TMrf)
 #TModFin = TMrf # Saved a copy of the 5 component model refit w/ mstep including the no cloud category
 
 # Order of components below may differ
@@ -187,19 +189,21 @@ Aqua2$prate <- Aqua2$prate_surface*1000
 #Aqua2 <- subset(Aqua, !is.na(Aqua$hpbl_surface))
 AquaMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + Raining + WindSpeed + r_heightAboveGround + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Aqua2[!is.na(Aqua2$X2t_heightAboveGround),], k=seq(1,10))
 AquaMod
-# There's 3 component that would work better than the 4 component, but the 4 component is ok
-AquaMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Aqua2, k=4)
+AquaMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + Raining + WindSpeed + r_heightAboveGround + CloudAOD | as.factor(CloudCatFin), Aqua2[!is.na(Aqua2$X2t_heightAboveGround),], k=seq(1,10))
 AquaMod
-summary(AquaMod)
+# There's 3 component that would work better than the 4 component, but the 4 component is ok
+#AquaMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Aqua2, k=4)
+#AquaMod
+#summary(AquaMod)
 
-summary(as.factor(AquaMod@group[which(AquaMod@cluster==1)]))
-summary(as.factor(AquaMod@group[which(AquaMod@cluster==2)]))
-summary(as.factor(AquaMod@group[which(AquaMod@cluster==3)]))
-summary(as.factor(AquaMod@group[which(AquaMod@cluster==4)]))
-summary(as.factor(AquaMod@group[which(AquaMod@cluster==5)]))
+#summary(as.factor(AquaMod@group[which(AquaMod@cluster==1)]))
+#summary(as.factor(AquaMod@group[which(AquaMod@cluster==2)]))
+#summary(as.factor(AquaMod@group[which(AquaMod@cluster==3)]))
+#summary(as.factor(AquaMod@group[which(AquaMod@cluster==4)]))
+#summary(as.factor(AquaMod@group[which(AquaMod@cluster==5)]))
 
-AMrf <- refit(AquaMod)
-summary(AMrf)
+#AMrf <- refit(AquaMod)
+#summary(AMrf)
 
 # Order of components below may differ
 #ResOut <- cbind.data.frame(unname(AMrf@components[[1]]$Comp.3[,1]), unname(AMrf@components[[1]]$Comp.4[,1]), unname(AMrf@components[[1]]$Comp.2[,1]), unname(AMrf@components[[1]]$Comp.1[,1]), exp(unname(AMrf@components[[1]]$Comp.3[,1])), exp(unname(AMrf@components[[1]]$Comp.4[,1])), exp(unname(AMrf@components[[1]]$Comp.2[,1])), exp(unname(AMrf@components[[1]]$Comp.1[,1])), unname(AMrf@components[[1]]$Comp.3[,2]), unname(AMrf@components[[1]]$Comp.4[,2]), unname(AMrf@components[[1]]$Comp.2[,2]), unname(AMrf@components[[1]]$Comp.1[,2]), unname(AMrf@components[[1]]$Comp.3[,4]), unname(AMrf@components[[1]]$Comp.4[,4]), unname(AMrf@components[[1]]$Comp.2[,4]), unname(AMrf@components[[1]]$Comp.1[,4]))
