@@ -74,10 +74,10 @@ MissingMAIAC <- subset(FirstCollocOnly, is.na(FirstCollocOnly$AOD47) & is.na(Fir
 # Filter 2: Cloud product - characterize clouds as high, low or none
 # Was missing cloud product?
 #Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_10km.csv", stringsAsFactors = F)
-Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl40km.csv", stringsAsFactors = F)
-#Clouds <- read.csv("E://CloudAgg_40km.csv")
+Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
+#Clouds <- read.csv("E://CloudAgg_10km.csv")
 Clouds$Date <- as.Date(Clouds$Date, "%Y-%m-%d")
-#Clouds$X <- NULL
+Clouds$X <- NULL
 MissingMAIAC <- merge(MissingMAIAC, Clouds, all.x=T)
 MissingMAIAC$CloudCat <- ifelse(MissingMAIAC$PAnyCld == 0 | is.na(MissingMAIAC$PAnyCld), "None", ifelse(MissingMAIAC$CloudTopHgt < 5000, "Low", ifelse(MissingMAIAC$CloudTopHgt >=5000, "High", "Missing")))
 # Filter 3: RUC -
@@ -116,18 +116,20 @@ MissingMAIAC$HasCldMODHgt <- ifelse(is.na(MissingMAIAC$CloudTopHgt), "NoCld", "Y
 #xtabs(~CatCloudBase + Raining, MissingMAIAC) # Cloud base is unreliable as indicator of cloud?
 #xtabs(~ HasCldEmis + HasCldRad + HasCldAOD + HasCldMODHgt, MissingMAIAC)
 MissingMAIAC$MODCld <- ifelse(MissingMAIAC$HasCldEmis == "YesCld" & MissingMAIAC$HasCldRad == "YesCld" & MissingMAIAC$HasCldAOD == "YesCld" & MissingMAIAC$HasCldMODHgt == "YesCld", "YesCld", ifelse(MissingMAIAC$HasCldEmis == "NoCld" & MissingMAIAC$HasCldRad == "NoCld" & MissingMAIAC$HasCldAOD == "NoCld" & MissingMAIAC$HasCldMODHgt == "NoCld", "NoCld", "MaybeCld"))
-#xtabs(~ MODCld + CloudPhase, MissingMAIAC)
+xtabs(~ MODCld + CloudPhase, MissingMAIAC)
 MissingMAIAC$MODCld2 <- ifelse(MissingMAIAC$CloudPhase == 0 & MissingMAIAC$MODCld == "YesCld", "MaybeCld", MissingMAIAC$MODCld)
 #xtabs(~ MODCld2 + Raining, MissingMAIAC)
 MissingMAIAC$MODRUCCld <- ifelse(MissingMAIAC$MODCld2 == "NoCld" & MissingMAIAC$Raining == 1, "MaybeCld", MissingMAIAC$MODCld2)
 #xtabs(~ MODRUCCld + MAIACcat, MissingMAIAC)
 MissingMAIAC$MODMAIACRUCCld <- ifelse((MissingMAIAC$MODRUCCld == "NoCld" & MissingMAIAC$MAIACcat == "Cloud") | (MissingMAIAC$MODRUCCld == "YesCld" & MissingMAIAC$MAIACcat == "Glint"), "MaybeCld", MissingMAIAC$MODRUCCld)
+MissingMAIAC$MODMAIACRUCCld <- ifelse((MissingMAIAC$MODRUCCld == "NoCld" & MissingMAIAC$MAIACcat == "Cloud"), "MaybeCld", MissingMAIAC$MODRUCCld)
 #summary(as.factor(MissingMAIAC$MODMAIACRUCCld))
 # NA's in MODMAIACRUCCld variable are missing RUC information - remove
 MissingMAIAC <- subset(MissingMAIAC, !is.na(MissingMAIAC$MODMAIACRUCCld))
 # Make a categorical variable that combines the Yes Clouds in MODMAIACRUCCld with Cloud Phase
 MissingMAIAC$CloudCatFin <- ifelse(MissingMAIAC$MODMAIACRUCCld == "MaybeCld", "MaybeCld", ifelse(MissingMAIAC$MODMAIACRUCCld == "NoCld", "NoCld", ifelse(MissingMAIAC$CloudPhase == 1, "WaterCld", ifelse(MissingMAIAC$CloudPhase == 2, "IceCld", "UndetCld"))))
-xtabs(~CloudCatFin + AquaTerraFlag, MissingMAIAC)
+#xtabs(~CloudCatFin + AquaTerraFlag, MissingMAIAC)
+#xtabs(~CloudCatFin + AquaTerraFlag + Raining + Season, MissingMAIAC)
 #aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, mean)
 #aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, median)
 #aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, summary)
@@ -135,6 +137,21 @@ xtabs(~CloudCatFin + AquaTerraFlag, MissingMAIAC)
 # Do Cloud top height categories - "None", "Low", "High"
 MissingMAIAC$CldHgtCat <- ifelse(is.na(MissingMAIAC$CloudTopHgt), "None", ifelse(MissingMAIAC$CloudTopHgt < 5000, "Low", "High"))
 MissingMAIAC$CloudCatFin2 <- ifelse(MissingMAIAC$MODMAIACRUCCld == "MaybeCld", "MaybeCld", ifelse(MissingMAIAC$MODMAIACRUCCld == "NoCld", "NoCld", MissingMAIAC$CldHgtCat))
+MissingMAIAC$pblh = MissingMAIAC$hpbl_surface/1000
+MissingMAIAC$prate <- MissingMAIAC$prate_surface*1000
+MissingMAIAC$CenteredTemp = MissingMAIAC$X2t_heightAboveGround - 273.15
+MissingMAIAC$cape2 = MissingMAIAC$cape_surface/1000
+# Add station XY information
+Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlStationLocs_XY.csv", stringsAsFactors = F)
+CentroidX = 1076436.4 #Atl
+CentroidY = -544307.2 #Atl
+#Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifStationLocs_XY.csv", stringsAsFactors = F)
+#CentroidX = -2179644.1 #Atl
+#CentroidY = 258174.0 #Atl
+StationLocs = Stationlocs[,c("State", "County", "Site", "POINT_X", "POINT_Y")]
+MissingMAIAC <- merge(MissingMAIAC, StationLocs)
+MissingMAIAC$CenteredX = MissingMAIAC$POINT_X - CentroidX
+MissingMAIAC$CenteredY = MissingMAIAC$POINT_Y - CentroidY
 # Make separate Terra and Aqua datasets
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T")
 Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
@@ -153,18 +170,52 @@ Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
 #summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface, subset(Aqua, Aqua$CloudCat == "High")))
 #summary(lm(LogPM ~ as.factor(Month) + r_heightAboveGround + cape_surface + X10u_heightAboveGround + X10v_heightAboveGround + sd_surface + CloudAOD + prate_surface + r_heightAboveGround*CloudAOD, subset(Aqua, Aqua$CloudCat == "Low")))
 
+#summary(lm(LogPM ~ as.factor(Month) + as.factor(Year) + CenteredTemp + r_heightAboveGround + WindSpeed + pblh + cape2, Terra))
+#confint(lm(LogPM ~ as.factor(Month) + as.factor(Year) + CenteredTemp + r_heightAboveGround + WindSpeed + pblh + cape2, Terra))
+#summary(lm(LogPM ~ as.factor(Month) + as.factor(Year) + CenteredTemp + r_heightAboveGround + WindSpeed + pblh + cape2, Aqua))
+
 # Mixture modeling
-Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$hpbl_surface))
+Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAboveGround))
+#Terra2 <- subset(Terra, (Terra$CloudCatFin == "IceCld" | Terra$CloudCatFin == "WaterCld") & !is.na(Terra$X2t_heightAboveGround))
 #Terra2 <- subset(Terra, !is.na(Terra$hpbl_surface))
-Terra2$prate <- Terra2$prate_surface*1000
+
 #library(flexmix)
 # Full model
-TerraMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Terra2, k=seq(1,10))
-TerraMod
-TerraMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudAOD | as.factor(CloudCatFin), Terra2, k=seq(1,10))
-TerraMod
+#TerraMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + as.factor(CloudCatFin), Terra2, k=seq(1,6))
+#TerraMod
+#TerraMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + CenteredTemp + pblh + WindSpeed + Raining + CloudAOD + CloudRadius | as.factor(CloudCatFin), Terra2, k=seq(1,10))
+#TerraMod
 # Need to separate out all 4 components to get the best performance
-#TerraMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Terra2, k=4)
+#TerraMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD, Terra2, k=4)
+#TerraMod
+#summary(TerraMod)
+
+
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + CenteredX + CenteredY + CenteredX^2 + CenteredY^2 + CenteredX*CenteredY + (1+CenteredTemp|Date), data=Terra2[Terra2$CloudCatFin == "IceCld",])
+summary(TestMod)
+rsquared(list(TestMod))
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + CenteredX + CenteredY + CenteredX^2 + CenteredY^2 + CenteredX*CenteredY + (1+CenteredTemp|Date), data=Terra2[Terra2$CloudCatFin == "WaterCld",])
+summary(TestMod)
+rsquared(list(TestMod))
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + CenteredX + CenteredY + CenteredX^2 + CenteredY^2 + CenteredX*CenteredY + (1+CenteredTemp|Date), data=Terra2[Terra2$CloudCatFin == "MaybeCld" | Terra2$CloudCatFin == "UndetCld",])
+summary(TestMod)
+rsquared(list(TestMod))
+
+#Terra3 <- Terra[Terra$CloudCatFin != "NoCld",]
+#Terra3$CloudCat3 <- ifelse(Terra3$CloudCatFin == "UndetCld", "MaybeCld", Terra3$CloudCatFin)
+
+#TerraMod = flexmix(.~.|as.factor(CloudCat3), k=3, model=FLXMRlmm(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD, random=~Year/Month), data=Terra3[!is.na(Terra3$X2t_heightAboveGround),])
+
+
+#summary(as.factor(Terra2$CloudCatFin[which(TerraMod@cluster==1)]))
+#summary(as.factor(Terra2$CloudCatFin[which(TerraMod@cluster==2)]))
+#summary(as.factor(TerraMod@group[which(TerraMod@cluster==3)]))
+#summary(as.factor(TerraMod@group[which(TerraMod@cluster==4)]))
+
+#TMrf <- refit(TerraMod)
+#summary(TMrf)
+
+#TerraMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + CenteredTemp + pblh + cape2 + WindSpeed + Raining + CloudAOD + CloudRadius | as.factor(CloudCatFin), Terra2, k=4)
 #TerraMod
 #summary(TerraMod)
 
@@ -172,27 +223,33 @@ TerraMod
 #summary(as.factor(TerraMod@group[which(TerraMod@cluster==2)]))
 #summary(as.factor(TerraMod@group[which(TerraMod@cluster==3)]))
 #summary(as.factor(TerraMod@group[which(TerraMod@cluster==4)]))
-#summary(as.factor(TerraMod@group[which(TerraMod@cluster==5)]))
 
 #TMrf <- refit(TerraMod)
 #summary(TMrf)
-#TModFin = TMrf # Saved a copy of the 5 component model refit w/ mstep including the no cloud category
 
-# Order of components below may differ
-#ResOut <- cbind.data.frame(unname(TMrf@components[[1]]$Comp.2[,1]), unname(TMrf@components[[1]]$Comp.4[,1]), unname(TMrf@components[[1]]$Comp.3[,1]), unname(TMrf@components[[1]]$Comp.1[,1]), exp(unname(TMrf@components[[1]]$Comp.2[,1])), exp(unname(TMrf@components[[1]]$Comp.4[,1])), exp(unname(TMrf@components[[1]]$Comp.3[,1])), exp(unname(TMrf@components[[1]]$Comp.1[,1])), unname(TMrf@components[[1]]$Comp.2[,2]), unname(TMrf@components[[1]]$Comp.4[,2]), unname(TMrf@components[[1]]$Comp.3[,2]), unname(TMrf@components[[1]]$Comp.1[,2]), unname(TMrf@components[[1]]$Comp.2[,4]), unname(TMrf@components[[1]]$Comp.4[,4]), unname(TMrf@components[[1]]$Comp.3[,4]), unname(TMrf@components[[1]]$Comp.1[,4]))
 
-#write.table(ResOut, "T://eohprojs/CDC_climatechange/Jess/Dissertation/TerraOutCalif.txt", row.names=F, col.names=F)
-#write.table(ResOut, "T://eohprojs/CDC_climatechange/Jess/Dissertation/TerraOutAtl.txt", row.names=F, col.names=F)
+Aqua2 <- subset(Aqua, Aqua$CloudCatFin != "NoCld" & !is.na(Aqua$X2t_heightAboveGround))
+#Aqua2 <- subset(Aqua, (Aqua$CloudCatFin == "IceCld" | Aqua$CloudCatFin == "WaterCld") & !is.na(Aqua$X2t_heightAboveGround))
 
-Aqua2 <- subset(Aqua, Aqua$CloudCatFin != "NoCld" & !is.na(Aqua$hpbl_surface))
-Aqua2$prate <- Aqua2$prate_surface*1000
-#Aqua2 <- subset(Aqua, !is.na(Aqua$hpbl_surface))
-AquaMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + Raining + WindSpeed + r_heightAboveGround + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Aqua2[!is.na(Aqua2$X2t_heightAboveGround),], k=seq(1,10))
-AquaMod
-AquaMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + Raining + WindSpeed + r_heightAboveGround + CloudAOD | as.factor(CloudCatFin), Aqua2[!is.na(Aqua2$X2t_heightAboveGround),], k=seq(1,10))
-AquaMod
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + CenteredX + CenteredY + CenteredX^2 + CenteredY^2 + CenteredX*CenteredY + (1+CenteredTemp|Date), data=Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",])
+summary(TestMod)
+rsquared(list(TestMod))
+
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + CenteredX + CenteredY + CenteredX^2 + CenteredY^2 + CenteredX*CenteredY + (1+CenteredTemp|Date), data=Aqua2[Aqua2$CloudCatFin == "IceCld",])
+summary(TestMod)
+rsquared(list(TestMod))
+
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + CenteredX + CenteredY + CenteredX^2 + CenteredY^2 + CenteredX*CenteredY + (1+CenteredTemp|Date), data=Aqua2[Aqua2$CloudCatFin == "WaterCld",])
+summary(TestMod)
+rsquared(list(TestMod))
+
+#AquaMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + Raining + WindSpeed + r_heightAboveGround + CenteredTemp + CloudEmmisivity + CloudRadius + CloudAOD | as.factor(CloudCatFin), Aqua2, k=seq(1,10))
+#AquaMod
+#AquaMod = stepFlexmix(LogPM ~ as.factor(Month) + as.factor(Year) + Raining + WindSpeed + r_heightAboveGround + CenteredTemp + cape2 + CloudAOD + CloudRadius | as.factor(CloudCatFin), Aqua2, k=seq(1,10))
+#AquaMod
 # There's 3 component that would work better than the 4 component, but the 4 component is ok
-#AquaMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + r_heightAboveGround + WindSpeed + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Aqua2, k=4)
+#AquaMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius | as.factor(CloudCatFin), Aqua2, k=4)
+#AquaMod = flexmix(LogPM ~ as.factor(Month) + as.factor(Year) + CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudAOD + CloudRadius + CloudEmmisivity | as.factor(CloudCatFin), Aqua2, k=4)
 #AquaMod
 #summary(AquaMod)
 
@@ -210,4 +267,41 @@ AquaMod
 
 #write.table(ResOut, "T://eohprojs/CDC_climatechange/Jess/Dissertation/AquaOutCalif.txt", row.names=F, colnames=F)
 #write.table(ResOut, "T://eohprojs/CDC_climatechange/Jess/Dissertation/AquaOutAtl.txt", row.names=F, col.names=F)
+
+ConvDat <- function(data, AQ, Mod, PMSpec="TotMass", site){
+  TerraIceMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Year/Month) + (1|County/Site), data=data)
+  TerraIceCoefs = as.data.frame(summary(TerraIceMod)$coefficients)
+  TerraIceCoefs$Vars = as.vector(dimnames(summary(TerraIceMod)$coefficients)[[1]])
+  TerraIceCIs = as.data.frame(confint(TerraIceMod))
+  TerraIceCIs$Vars = as.vector(dimnames(confint(TerraIceMod))[[1]])
+  TerraIce = merge(TerraIceCoefs, TerraIceCIs, by="Vars")
+  TerraIce$AQ <- rep(AQ, nrow(TerraIce))
+  TerraIce$Mod <- rep(Mod, nrow(TerraIce))
+  TerraIce$PMSpec <- rep(PMSpec, nrow(TerraIce))
+  TerraIce$Site <- rep(site, nrow(TerraIce))
+  return(TerraIce)
+}
+
+Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAboveGround))
+
+#TIceAtl = ConvDat(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
+#TWaterAtl = ConvDat(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
+#TPossAtl = ConvDat(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
+
+TIceSF = ConvDat(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
+TWaterSF = ConvDat(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
+TPossSF = ConvDat(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
+
+Aqua2 <- subset(Aqua, Aqua$CloudCatFin != "NoCld" & !is.na(Aqua$X2t_heightAboveGround))
+
+#AIceAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
+#AWaterAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
+#APossAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
+
+AIceSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
+AWaterSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
+APossSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
+
+#TotMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
+TotMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
 
