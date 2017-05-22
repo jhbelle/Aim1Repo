@@ -14,20 +14,20 @@
 % -----------------------
 % Change these parameters!!!!
 % -----------------------
-yr = 2014
-IPath = '/aqua/MODIS_Cld_Jess/';
-Opath ='/aqua/MODIS_Cld_Jess/Extractions_5km_Aqua/';
+yr = 2014;
+IPath = 'E://MODIScloud_Jess/';
+Opath ='E://MODIScloud_extr/';
 
 %yr = 2011; %- pass in through command line for each submission
 % -----------------------
 % Create cell array containing bounding coordinates for each section -
 % arraged w/ one cell per section, each cell a list of (N, W, E, S)
 % bounding coordinates in lat/long
-SectionCoors = {[34.5, -85.6, -83.1, 32.2]};
+SectionCoors = {[40.1, -122.6, -119.9, 37.0]};
 
 % Cycle through each day in year, and get list of files for each
-for day=1:365
-    filelist = dir(sprintf('%sMYD06_L2.A%u%03d.*.hdf', IPath, yr, day))
+for day=1:100
+    filelist = dir(sprintf('%sMOD06_L2.A%u%03d.*.hdf', IPath, yr, day));
     % Initialize output structure for section data
     Varnames = {'Lat', 'Long', 'CloudTopHgt', 'CloudFrac', 'CloudPhase', 'CloudTopTemp', 'CloudEmiss', 'hr', 'min'};
     SectionCell = cell(1,1);
@@ -68,7 +68,7 @@ for day=1:365
         end;  
     end;
     for section=1:1
-        writetable(SectionCell{1,section}, sprintf('%sExtr_%i_%03d_S%i.csv', Opath, yr, day, section))
+        writetable(SectionCell{1,section}, sprintf('%sExtr_%i_%03d_S%i_T.csv', Opath, yr, day, section))
     end;  
 end;
 

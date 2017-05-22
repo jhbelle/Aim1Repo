@@ -16,27 +16,33 @@ library(plyr)
 ## Change these parameters
 ## ---------------
 ## Section, Startday, and Ndays are included in the script submission line - see SubThiessen_Sx.sh files. commandArgs returns a vector of the arguments passed down from submission
-args = commandArgs(trailingOnly=TRUE)
-Section = as.numeric(args[1])
-Startday = as.numeric(args[2])
-Ndays = as.numeric(args[3])
+#args = commandArgs(trailingOnly=TRUE)
+#Section = as.numeric(args[1])
+#Startday = as.numeric(args[2])
+#Ndays = as.numeric(args[3])
+Section = 1
+Startday=1
+Ndays=366
+AT="A"
 #Section = 8 #Ndays =365
 #Startday=1 ## Year to grid
-data.year = 2014
+data.year = 2012
 ## Location of grid polygon layer
-MAIACGrid = "/aqua/Jess/Data/FinalCopy_AtlPolys/Atl_MAIACGrid.shp"
-MAIAClayer = "Atl_MAIACGrid"
+MAIACGrid = "T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/SFGrid.shp"
+MAIAClayer = "SFGrid"
 ## Folder containing section-specific csv files with raw data in them -  GriddingExtractMODIS10km.m needs to be run first to pull the raw data from the hdf into section-specific csvs
-aquaDir <-  "/gc_runs/MOD03_Atl/Extractions_Terra/"
+aquaDir <-  "E://MODIScloud_extr/"
 ## Directory to put output in
-OutDir <- "/gc_runs/MOD03_Atl/Gridded_Terra/" 
+OutDir <- "E://GriddedSF5x5/"
 ## Directory with GeoMetadata files downloaded from NASA ftp site
-GeoMetaDir <- "/aqua/MODIS_GeoMeta/TERRA/2014/"
-GeoMetaPrefix <- "MOD03_"
+GeoMetaDir <- "T://eohprojs/CDC_climatechange/Jess/MODIS_GeoMeta/AQUA/2012/"
+GeoMetaPrefix <- "MYD03_"
 ## ---------------
 # Load function file
 ## ---------------
-source("/home/jhbelle/Aim1Repo/Functions_ThiessenPolygons.R")
+
+#source("/home/jhbelle/Aim1Repo/Functions_ThiessenPolygons.R")
+source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_ThiessenPolygons.R")
 
 ## --------------
 ## Procedural code
@@ -46,7 +52,7 @@ US.grid <- readOGR(dsn=MAIACGrid, layer=MAIAClayer)
 #day=1
 for(day in Startday:Ndays){
   ## read in data from MYD04_L2 files
-  aquaRaw <- data.frame(read.csv(sprintf("%sExtr_%i_%03d_S%i.csv", aquaDir, data.year, day, Section),header=T,as.is=T))
+  aquaRaw <- data.frame(read.csv(sprintf("%sExtr_%i_%03d_S%i_%s.csv", aquaDir, data.year, day, Section, AT),header=T,as.is=T))
   colnames(aquaRaw)[1:2] <- c("aqua_lat","aqua_lon")
   ## Convert aquaRaw into spatial points data frame and reattach data needed later
   ## Define point coordinate locations
@@ -79,7 +85,7 @@ for(day in Startday:Ndays){
       voronoi_sub@data <- cbind(voronoi_sub@data, MODsub@data[,c("aqua_lat", "aqua_lon", "timestamp")])
       ## Projection information is lost in output - reassign
       proj4string(voronoi_sub) <- CRS(proj4string(US.grid))
-      ## Create unique identfier each pixel in original 
+      ## Create unique identfier each pixel in original
       voronoi_sub@data$UID <-sprintf("G%i_%03d_%s_P%f_%f", data.year, day, voronoi_sub@data$timestamp, voronoi_sub@data$aqua_lat, voronoi_sub@data$aqua_lon)
       ## Create polygon of granule boundaries from information in GeoMetatdata, and project polygon to grid projection
       coords <- cbind.data.frame(as.numeric(GeoMeta[GeoMeta$Timepass==time,c(2:5,2)]), as.numeric(GeoMeta[GeoMeta$Timepass==time,c(6:9,6)]))
@@ -97,8 +103,8 @@ for(day in Startday:Ndays){
       ## Spatial join the voronoi polygons to the CMAQ grid section - occasionally get granules that weren't actually over grid layer (over ocean). Function returns a list of MODIS pixels that fall at least partially within each grid polygon
       OV.CMAQgrid <- try(over(US.grid, voronoi_clipped, returnList=TRUE))
       ## Append lists of granule pixel UID's to grid polygon UIDs. LinkMODIS function definition is in function file - see source statement above
-      print(str(OV.CMAQgrid))
-      if (is.list(OV.CMAQgrid)) {  
+      #print(str(OV.CMAQgrid))
+      if (is.list(OV.CMAQgrid)) {
         UIDs <- llply(OV.CMAQgrid, LinkMODIS2)
         if (exists("Outlist")) {
           Outlist <- mapply(c, Outlist, UIDs)
@@ -116,7 +122,7 @@ for(day in Startday:Ndays){
     US.id <- US.grid@data$Input_FID
     PixelUIDs <- as.character(Outlist)
     modis.dat <- cbind.data.frame(US.id, PixelUIDs)
-    write.csv(modis.dat,file=sprintf("%sOutp_%i_%03d_S%i.csv", OutDir, data.year, day, Section))
+    write.csv(modis.dat,file=sprintf("%sOutp_%i_%03d_S%i_%s.csv", OutDir, data.year, day, Section, AT))
   }
   rm(modis.dat, Outlist, PixelUIDs)
   gc()
