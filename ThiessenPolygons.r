@@ -9,6 +9,7 @@
 # Note: This script must be run after GriddingExtractMODIS10km.m and before LinkMODdat_Grid.r
 ##################################################################################
 rm(list = ls(all=TRUE))  #start clean
+gc()
 library(rgdal) #Also loads sp
 library(rgeos)
 library(plyr)
@@ -21,12 +22,12 @@ library(plyr)
 #Startday = as.numeric(args[2])
 #Ndays = as.numeric(args[3])
 Section = 1
-Startday=1
-Ndays=366
-AT="A"
+Startday=74
+Ndays=365
+AT="T"
 #Section = 8 #Ndays =365
 #Startday=1 ## Year to grid
-data.year = 2012
+data.year = 2014
 ## Location of grid polygon layer
 MAIACGrid = "T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/SFGrid.shp"
 MAIAClayer = "SFGrid"
@@ -35,8 +36,8 @@ aquaDir <-  "E://MODIScloud_extr/"
 ## Directory to put output in
 OutDir <- "E://GriddedSF5x5/"
 ## Directory with GeoMetadata files downloaded from NASA ftp site
-GeoMetaDir <- "T://eohprojs/CDC_climatechange/Jess/MODIS_GeoMeta/AQUA/2012/"
-GeoMetaPrefix <- "MYD03_"
+GeoMetaDir <- "T://eohprojs/CDC_climatechange/Jess/MODIS_GeoMeta/TERRA/2014/"
+GeoMetaPrefix <- "MOD03_"
 ## ---------------
 # Load function file
 ## ---------------

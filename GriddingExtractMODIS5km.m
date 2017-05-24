@@ -26,7 +26,7 @@ Opath ='E://MODIScloud_extr/';
 SectionCoors = {[40.1, -122.6, -119.9, 37.0]};
 
 % Cycle through each day in year, and get list of files for each
-for day=1:100
+for day=74:100
     filelist = dir(sprintf('%sMOD06_L2.A%u%03d.*.hdf', IPath, yr, day));
     % Initialize output structure for section data
     Varnames = {'Lat', 'Long', 'CloudTopHgt', 'CloudFrac', 'CloudPhase', 'CloudTopTemp', 'CloudEmiss', 'hr', 'min'};
