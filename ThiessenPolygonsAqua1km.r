@@ -22,7 +22,7 @@ Startday = as.numeric(args[2])
 Ndays = as.numeric(args[3])
 #Section = 8 #Ndays =365
 #Startday=1 ## Year to grid
-data.year = 2014
+data.year = 2012
 ## Location of grid polygon layer
 MAIACGrid = "/aqua/Jess/Data/FinalCopy_AtlPolys/Atl_MAIACGrid.shp"
 MAIAClayer = "Atl_MAIACGrid"
