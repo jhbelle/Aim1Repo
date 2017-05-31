@@ -27,12 +27,12 @@ data.year = 2012
 MAIACGrid = "/home/jhbelle/Data/SFGridFin/SFGrid.shp"
 MAIAClayer = "SFGrid"
 ## Folder containing section-specific csv files with raw data in them -  GriddingExtractMODIS10km.m needs to be run first to pull the raw data from the hdf into section-specific csvs
-aquaDir <-  "/gc_runs/MYD03_Calif/Extractions_Aqua/"
+aquaDir <-  "/gc_runs/MYD03_Calif/Extractions_Terra/"
 ## Directory to put output in
-OutDir <- "/gc_runs/MYD03_Calif/Gridded_Aqua/" 
+OutDir <- "/gc_runs/MYD03_Calif/Gridded_Terra/" 
 ## Directory with GeoMetadata files downloaded from NASA ftp site
-GeoMetaDir <- "/gc_runs/MODIS_GeoMeta/AQUA/2012/"
-GeoMetaPrefix <- "MYD03_"
+GeoMetaDir <- "/gc_runs/MODIS_GeoMeta/TERRA/2012/"
+GeoMetaPrefix <- "MOD03_"
 ## ---------------
 # Load function file
 ## ---------------

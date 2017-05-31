@@ -12,4 +12,6 @@
 ; New submission - Atlanta
 ;extrmaiac, "/aqua/Jess/Data/Near40kmh04v04.csv", "/gc_runs/AtlCollocs_MAIACh04v04/", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIAC_h04v04/", "MAIAC[AT]AOT.h04v04.", 30, 49 
 
-extrmaiac, "/aqua/Jess/Data/Near40kmh04v05.csv", "/gc_runs/AtlCollocs_MAIACh04v05/", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIAC_h04v05/", "MAIAC[AT]AOT.h04v05.", 30, 49 
+;extrmaiac, "/aqua/Jess/Data/Near40kmh04v05.csv", "/gc_runs/AtlCollocs_MAIACh04v05/", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIAC_h04v05/", "MAIAC[AT]AOT.h04v05.", 30, 49 
+
+procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2012, 1, 366, '/terra/MAIACdat/2012/', '/home/jhbelle/Data/MAIACout_SF_Aqua_2012.csv', 'MAIACAAOT.h01v04.', 26, 45
