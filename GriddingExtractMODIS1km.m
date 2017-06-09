@@ -14,19 +14,19 @@
 % -----------------------
 % Change these parameters!!!!
 % -----------------------
-yr = 2012
+yr = 2014
 IPath = '/gc_runs/MYD03_Calif/';
-Opath ='/gc_runs/MYD03_Calif/Extractions_Aqua/';
+Opath ='/gc_runs/MYD03_Calif/Extractions_Aqua_STop2/';
 
 %yr = 2011; %- pass in through command line for each submission
 % -----------------------
 % Create cell array containing bounding coordinates for each section -
 % arraged w/ one cell per section, each cell a list of (N, W, E, S)
 % bounding coordinates in lat/long
-SectionCoors = {[40.1, -122.6, -119.0, 37.0]};
+SectionCoors = {[40.1, -121.4, -119.8, 38.5]};
 
 % Cycle through each day in year, and get list of files for each
-for day=365:366
+for day=100:365
     filelist = dir(sprintf('%sMYD03.A%u%03d.*.hdf', IPath, yr, day))
     % Initialize output structure for section data
     Varnames = {'Lat', 'Long', 'SensorZenith', 'SolarZenith', 'Index', 'hr', 'min'};

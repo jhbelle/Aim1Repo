@@ -14,4 +14,15 @@
 
 ;extrmaiac, "/aqua/Jess/Data/Near40kmh04v05.csv", "/gc_runs/AtlCollocs_MAIACh04v05/", "/aqua/Jess/Data/AtlG24hr.csv", "/terra/MAIAC_h04v05/", "MAIAC[AT]AOT.h04v05.", 30, 49 
 
-procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2012, 1, 366, '/terra/MAIACdat/2012/', '/home/jhbelle/Data/MAIACout_SF_Aqua_2012.csv', 'MAIACAAOT.h01v04.', 26, 45
+;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2012, 1, 366, '/terra/MAIACdat/2012/', '/home/jhbelle/Data/MAIACout_SF_Aqua_2012.csv', 'MAIACAAOT.h01v04.', 26, 45
+
+;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2013, 1, 365, '/terra/MAIACdat/2013/', '/home/jhbelle/Data/MAIACout_SF_Aqua_2013.csv', 'MAIACAAOT.h01v04.', 26, 45
+
+;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2014, 1, 365, '/terra/MAIACdat/2014/', '/home/jhbelle/Data/MAIACout_SF_Aqua_2013.csv', 'MAIACAAOT.h01v04.', 26, 45
+
+procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2012, 1, 366, '/terra/MAIACdat/2012/', '/home/jhbelle/Data/MAIACout_SF_Terra_2012.csv', 'MAIACTAOT.h01v04.', 26, 45
+
+procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2013, 1, 365, '/terra/MAIACdat/2013/', '/home/jhbelle/Data/MAIACout_SF_Terra_2013.csv', 'MAIACTAOT.h01v04.', 26, 45
+
+procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2014, 1, 365, '/terra/MAIACdat/2014/', '/home/jhbelle/Data/MAIACout_SF_Terra_2013.csv', 'MAIACTAOT.h01v04.', 26, 45
+

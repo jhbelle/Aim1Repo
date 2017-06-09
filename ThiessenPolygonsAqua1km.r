@@ -24,12 +24,12 @@ Ndays = as.numeric(args[3])
 #Startday=1 ## Year to grid
 data.year = 2012
 ## Location of grid polygon layer
-MAIACGrid = "/home/jhbelle/Data/SFGridFin/SFGrid.shp"
-MAIAClayer = "SFGrid"
+MAIACGrid = "/home/jhbelle/Data/SFGridFin/SFGrid_STop.shp"
+MAIAClayer = "SFGrid_STop"
 ## Folder containing section-specific csv files with raw data in them -  GriddingExtractMODIS10km.m needs to be run first to pull the raw data from the hdf into section-specific csvs
-aquaDir <-  "/gc_runs/MYD03_Calif/Extractions_Aqua/"
+aquaDir <-  "/gc_runs/MYD03_Calif/Extractions_Aqua_STop/"
 ## Directory to put output in
-OutDir <- "/gc_runs/MYD03_Calif/Gridded_Aqua/" 
+OutDir <- "/gc_runs/MYD03_Calif/Gridded_Aqua_STop/" 
 ## Directory with GeoMetadata files downloaded from NASA ftp site
 GeoMetaDir <- "/gc_runs/MODIS_GeoMeta/AQUA/2012/"
 GeoMetaPrefix <- "MYD03_"
