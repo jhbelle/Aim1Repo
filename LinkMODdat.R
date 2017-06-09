@@ -18,17 +18,17 @@ source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_Link
 #Endday = as.numeric(args[2])
 #Startday = as.numeric(args[1])
 Endday=366
-Startday=1
+Startday=133
 ## Year
 Year = 2012
-TAflag="A"
+TAflag="T"
 ListBroken = c()
 ## Location of MODIS files - extracted from hdf section-specific csvs using GriddingExtractMODIS10km.m
 MODpath = "E://MODIScloud_extr/"
 ## Location of grid
 GridPath = "E://GriddedSF5x5/"
 ## Location of output files
-OutPath = "E://LinkedValsCloudCalif/"
+OutPath = "E://LinkedValsCloudCalifT/"
 ## Scale value for AOD - from MODIS hdf files
 Emisscale = 0.009999999776482582
 # --------

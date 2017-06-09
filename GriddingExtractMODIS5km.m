@@ -16,20 +16,20 @@
 % -----------------------
 yr = 2014;
 IPath = 'E://MODIScloud_Jess/';
-Opath ='E://MODIScloud_extr/';
+Opath ='E://MODIScloud_extr_1km/';
 
 %yr = 2011; %- pass in through command line for each submission
 % -----------------------
 % Create cell array containing bounding coordinates for each section -
 % arraged w/ one cell per section, each cell a list of (N, W, E, S)
 % bounding coordinates in lat/long
-SectionCoors = {[40.1, -122.6, -119.9, 37.0]};
+
 
 % Cycle through each day in year, and get list of files for each
-for day=74:100
-    filelist = dir(sprintf('%sMOD06_L2.A%u%03d.*.hdf', IPath, yr, day));
+for day=100:365
+    filelist = dir(sprintf('%sMYD06_L2.A%u%03d.*.hdf', IPath, yr, day));
     % Initialize output structure for section data
-    Varnames = {'Lat', 'Long', 'CloudTopHgt', 'CloudFrac', 'CloudPhase', 'CloudTopTemp', 'CloudEmiss', 'hr', 'min'};
+    Varnames = {'MaskVal', 'CloudEffRad', 'CloudAOD', 'CloudWaterPath', 'hr', 'min'};
     SectionCell = cell(1,1);
     for f=1:length(filelist)
         % Open each file in list and read in data
@@ -38,37 +38,22 @@ for day=74:100
         Min = str2num(filelist(f).name(21:22));
         fileinfo=hdfinfo(filen, 'eos');
         swathname = fileinfo.Swath.Name();
-        Lat=hdfread(filen, swathname, 'Fields', 'Latitude');
-        Long=hdfread(filen, swathname, 'Fields', 'Longitude');
-        CldTopHgt = hdfread(filen, swathname, 'Fields', 'Cloud_Top_Height');
-        CldFrac = hdfread(filen, swathname, 'Fields', 'Cloud_Fraction');
-        CldPhase = hdfread(filen, swathname, 'Fields', 'Cloud_Phase_Infrared');
-        CldTopTemp = hdfread(filen, swathname, 'Fields', 'Cloud_Top_Temperature');
-        CldEmis = hdfread(filen, swathname, 'Fields', 'Cloud_Effective_Emissivity');
+        CldEffRad = hdfread(filen, swathname, 'Fields', 'Cloud_Effective_Radius');
+        CldAOD = hdfread(filen, swathname, 'Fields', 'Cloud_Optical_Thickness');
+        CldWatPath = hdfread(filen, swathname, 'Fields', 'Cloud_Water_Path');
         for section=1:1
-            Coords = SectionCoors{section};
-            Long1 = Long>=Coords(2);
-            Long2 = Long<=Coords(3);
-            LongMask = Long1.*Long2;
-            Lat1 = Lat>=Coords(4);
-            Lat2 = Lat<=Coords(1);
-            LatMask = Lat1.*Lat2;
-            Mask = find(int16(LongMask.*LatMask));
-	    CTH = CldTopHgt(Mask);
-	    CF = CldFrac(Mask);
-	    CP = CldPhase(Mask);
-	    CTT = CldTopTemp(Mask);
-	    CE = CldEmis(Mask); 
-            LatPt = Lat(Mask);
-            LongPt = Long(Mask);
+            Mask = transpose(1:length(CldEffRad));
+            CER = CldEffRad(Mask);
+            CA = CldAOD(Mask);
+            CWP = CldWatPath(Mask);
             HrS = ones(length(Mask),1).*Hr;
             MinS = ones(length(Mask),1).*Min;
-            Sectiontable = table(LatPt, LongPt, CTH, CF, CP, CTT, CE, HrS, MinS, 'VariableNames', Varnames);
+            Sectiontable = table(Mask, CER, CA, CWP, HrS, MinS, 'VariableNames', Varnames);
             SectionCell{1,section} = [SectionCell{1,section};Sectiontable];
         end;  
     end;
     for section=1:1
-        writetable(SectionCell{1,section}, sprintf('%sExtr_%i_%03d_S%i_T.csv', Opath, yr, day, section))
+        writetable(SectionCell{1,section}, sprintf('%sExtr_%i_%03d_S%i_A.csv', Opath, yr, day, section))
     end;  
 end;
 
