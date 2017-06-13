@@ -22,7 +22,7 @@ Startday = as.numeric(args[2])
 Ndays = as.numeric(args[3])
 #Section = 8 #Ndays =365
 #Startday=1 ## Year to grid
-data.year = 2013
+data.year = 2012
 ## Location of grid polygon layer
 MAIACGrid = "/home/jhbelle/Data/SFGridFin/SFGrid_STop1.shp"
 MAIAClayer = "SFGrid_STop1"
@@ -32,7 +32,7 @@ aquaDir <-  "/gc_runs/MYD03_Calif/Extractions_Terra_STop1/"
 ## Directory to put output in
 OutDir <- "/gc_runs/MYD03_Calif/Gridded_Terra_STop1/" 
 ## Directory with GeoMetadata files downloaded from NASA ftp site
-GeoMetaDir <- "/gc_runs/MODIS_GeoMeta/TERRA/2013/"
+GeoMetaDir <- "/gc_runs/MODIS_GeoMeta/TERRA/2012/"
 GeoMetaPrefix <- "MOD03_"
 ## ---------------
 # Load function file
