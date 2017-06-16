@@ -9,7 +9,7 @@
 ## Load libraries and functions
 library(plyr)
 library(stringr)
-source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_LinkMODdat_Grid.r")
+source("/home/jhbelle/Aim1Repo/Functions_Link1kmMODdat_Grid.r")
 # ----
 # Define relevant parameters
 # ----
@@ -18,21 +18,23 @@ source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_Link
 #Endday = as.numeric(args[2])
 #Startday = as.numeric(args[1])
 Endday=366
-Startday=1
+Startday=60
 ## Year
 Year = 2012
-TAflag="T"
+TAflag="A"
 ListBroken = c()
 ## Location of MODIS files - extracted from hdf section-specific csvs using GriddingExtractMODIS10km.m
-MODpaths = c("/gc_runs/MYD03_Calif/Extractions_Terra_STop/", "/gc_runs/MYD03_Calif/Extractions_Terra_STop2/", "/gc_runs/MYD03_Calif/Extractions_Terra_SBot/", "/gc_runs/MYD03_Calif/Extractions_Terra_SBot2/")
+#MODpaths = c("/gc_runs/MYD03_Calif/Extractions_Terra_STop/", "/gc_runs/MYD03_Calif/Extractions_Terra_STop2/", "/gc_runs/MYD03_Calif/Extractions_Terra_SBot/", "/gc_runs/MYD03_Calif/Extractions_Terra_SBot2/")
+MODpaths = c("/gc_runs/MYD03_Calif/Extractions_Aqua_STop1/", "/gc_runs/MYD03_Calif/Extractions_Aqua_STop2/", "/gc_runs/MYD03_Calif/Extractions_Aqua_SBot1/", "/gc_runs/MYD03_Calif/Extractions_Aqua_SBot2/")
 ## Location of grid
-GridPaths = c("/gc_runs/MYD03_Calif/Gridded_Terra_STop/", "/gc_runs/MYD03_Calif/Gridded_Terra_STop2/", "/gc_runs/MYD03_Calif/Gridded_Terra_SBot/", "/gc_runs/MYD03_Calif/Gridded_Terra_SBot2/")
+#GridPaths = c("/gc_runs/MYD03_Calif/Gridded_Terra_STop/", "/gc_runs/MYD03_Calif/Gridded_Terra_STop2/", "/gc_runs/MYD03_Calif/Gridded_Terra_SBot/", "/gc_runs/MYD03_Calif/Gridded_Terra_SBot2/")
+GridPaths = c("/gc_runs/MYD03_Calif/Gridded_Aqua_STop1/", "/gc_runs/MYD03_Calif/Gridded_Aqua_STop2/", "/gc_runs/MYD03_Calif/Gridded_Aqua_SBot1/", "/gc_runs/MYD03_Calif/Gridded_Aqua_SBot2/")
 ## Location of data files - data from cloud product - linked by index/mask value
-DataPath = ""
+DataPath = "/aura/MODIScloud_extr_1km/"
 ## Location of output files
-OutPath = ""
+OutPath = "/aura/LinkedFilesCloud/"
 ## Scale value for AOD - from MODIS hdf files
-Emisscale = 0.009999999776482582
+AODERscale = 0.009999999776482582
 # --------
 # Load in csv files for each section - Gridding results and MODIS data, and calculate desired values
 # --------
@@ -47,10 +49,10 @@ for (Day in Startday:Endday){
       Mod$UID <- gsub("[[:punct:]]", "", Mod$UID)
       Cloud <- read.csv(sprintf("%sExtr_%i_%03d_S1_%s.csv", DataPath, Year, Day, TAflag))
       ## If the gridding output file exists (a few days/sections had no data and files for those days weren't created during gridding), read it in
-      Grid <- try(read.csv(sprintf("%sOutp_%i_%03d_S%i_%s.csv", GridPaths[s], Year, Day, section, TAflag), stringsAsFactors=FALSE))
+      Grid <- try(read.csv(sprintf("%sOutp_%i_%03d_S1.csv", GridPaths[s], Year, Day, TAflag), stringsAsFactors=FALSE))
       if (is.data.frame(Grid)) {
         ## Summarize MODIS data in each cell of the CMAQ grid - function CalcVals defined in function file
-        CombOut <- ddply(Grid, .(US.id), CalcVals, MODdat=Mod, Clouddat=Cloud, scale=Emisscale)
+        CombOut <- ddply(Grid, .(US.id), CalcVals, MODdat=Mod, Clouddat=Cloud, scale=AODERscale)
         rm(Mod, Grid)
         gc()
         ## Join output to that from previous section, if it exists
@@ -64,9 +66,6 @@ for (Day in Startday:Endday){
       }
     }
   }
-  ## Aggregate OutpDay
-
-
   ## Write output csv
   write.csv(OutpDay, sprintf("%sDailyGridAOD_%i_%03d.csv", OutPath, Year, Day))
   rm(OutpDay)

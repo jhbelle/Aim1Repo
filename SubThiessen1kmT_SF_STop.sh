@@ -1,2 +1,3 @@
 #!/bin/bash
-Rscript ThiessenPolygonsTerra1kmSTop.r 1 133 366
+#$ -N TSTop1
+Rscript ThiessenPolygonsTerra1kmSTop.r 1 209 365

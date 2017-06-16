@@ -4,10 +4,6 @@ pro procMaiac, FinGridJoined, yrint, startday, endday, fileloc, outloc, maiacStr
   ; Open FinGridJoined with information needed later
   Dat = READ_CSV(FinGridJoined, HEADER=DatHead)
   Index=Dat.(WHERE(DatHead EQ 'index'))
-  ; Open file to append to later
-  OPENW, 1, outloc
-  PRINTF, 1, "InputFID, index, lat, lon, POINT_X, POINT_Y, PercForest, PRoadLength, RUCLat, RUCLon, NEIPM, Elev, Year, Date, Timestamp, Overpass, AOD47, AOD55, QA"
-  CLOSE, 1
   ; Create list of days to loop over
   FOR day = startday, endday DO BEGIN
     f = FILE_SEARCH(STRING(fileloc + maiacString + STRING(FORMAT='(I04)', yrint) + STRING(FORMAT='(I03)', day) + "*.hdf"))
@@ -26,12 +22,13 @@ pro procMaiac, FinGridJoined, yrint, startday, endday, fileloc, outloc, maiacStr
         ; Get Time stamp and terra aqua flag fields
         TerraAquaFlag = STRMID(file, LocTAFlag, 1)
         TStamp = STRMID(file, LocTStamp, 4)
-        ; Write data to a text file
-        OPENU, 2, outloc, /APPEND
+	; Open file to append to later
+  	OPENW, 1, outloc + 'MAIACdat_' + STRING(FORMAT='(I04)', yrint) + STRING(FORMAT='(I03)', day) + '_' + TStamp + '.csv'
+  	PRINTF, 1, "InputFID, index, lat, lon, POINT_X, POINT_Y, PercForest, PRoadLength, RUCLat, RUCLon, NEIPM, Elev, Year, Date, Timestamp, Overpass, AOD47, AOD55, QA"
         FOR J = 0, N_ELEMENTS(AODQA)-1 DO BEGIN
-          PRINTF, 2, Dat.(WHERE(DatHead EQ "InputFID"))[J], Dat.(WHERE(DatHead EQ "index"))[J], Dat.(WHERE(DatHead EQ "lat"))[J], Dat.(WHERE(DatHead EQ "lon"))[J], Dat.(WHERE(DatHead EQ "POINT_X"))[J], Dat.(WHERE(DatHead EQ "POINT_Y"))[J], Dat.(WHERE(DatHead EQ "PercForest"))[J], Dat.(WHERE(DatHead EQ "PRoadLengt"))[J], Dat.(WHERE(DatHead EQ "RUCLat"))[J], Dat.(WHERE(DatHead EQ "RUCLon"))[J], Dat.(WHERE(DatHead EQ "NEIPM"))[J], Dat.(WHERE(DatHead EQ "Elev"))[J], yrint, day, TStamp, TerraAquaFlag, AOD47[J], AOD55[J], AODQA[J], FORMAT='(I10, 11(D, ", "), 2(I5, ", "), 2(A15, ", "), 3(", ", I15))'
+          PRINTF, 1, Dat.(WHERE(DatHead EQ "InputFID"))[J], Dat.(WHERE(DatHead EQ "index"))[J], Dat.(WHERE(DatHead EQ "lat"))[J], Dat.(WHERE(DatHead EQ "lon"))[J], Dat.(WHERE(DatHead EQ "POINT_X"))[J], Dat.(WHERE(DatHead EQ "POINT_Y"))[J], Dat.(WHERE(DatHead EQ "PercForest"))[J], Dat.(WHERE(DatHead EQ "PRoadLengt"))[J], Dat.(WHERE(DatHead EQ "RUCLat"))[J], Dat.(WHERE(DatHead EQ "RUCLon"))[J], Dat.(WHERE(DatHead EQ "NEIPM"))[J], Dat.(WHERE(DatHead EQ "Elev"))[J], yrint, day, TStamp, TerraAquaFlag, AOD47[J], AOD55[J], AODQA[J], FORMAT='(I10, 11(", ", D), 2(", ", I5), 2(", ", A15), 3(", ", I15))'
         ENDFOR
-        CLOSE, 2
+        CLOSE, 1
       ENDIF
       ; Close the maiac file
       stat3 = EOS_GD_DETACH(gridID)
