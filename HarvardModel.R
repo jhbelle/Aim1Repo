@@ -14,12 +14,13 @@
 library(plyr)
 library(data.table)
 library(rhdf5)
+#library(doMC)
 # Source function file
 source("/home/jhbelle/Aim1Repo/Functions_HarvardModel.R")
 # EPA data
-EPAdat = read.csv("/home/jhbelle/Data/CalifG24hr.csv", stringsAsFactors=F)
+#EPAdat = read.csv("/home/jhbelle/Data/CalifG24hr.csv", stringsAsFactors=F)
 # Near table
-NearMAIACEPA = read.csv("/home/jhbelle/Data/SFGridFin/EPAtoMAIAC.csv", stringsAsFactors=F)
+#NearMAIACEPA = read.csv("/home/jhbelle/Data/SFGridFin/EPAtoMAIAC.csv", stringsAsFactors=F)
 # MAIAC location
 MAIACloc = "/aura/MAIACoutputs_GriddedSummed/"
 # TA flag
@@ -33,6 +34,10 @@ Startdate = as.Date("2012-01-01", "%Y-%m-%d")
 Enddate = as.Date("2014-12-31", "%Y-%m-%d")
 # Location of saved aggregated outputs
 OutAgg = "/aura/AggregatedDat_NoCld.csv"
+
+# Set up threading for ddply
+#registerDoMC(8)
+#getDoParWorkers()
 
 ## -------
 # Aggregate datasets
@@ -56,7 +61,7 @@ for (day in seq(Startdate, Enddate, "day")){
       # Pull RUC lat lon      
       LatLonRUC <- as.data.frame(h5read(hdfdat, "Geolocation"))
       # Do aggregation
-      OutIncRUC <- ddply(MAIACdat, .(InputFID), AggMAIACRUC, day=Day, RUClatlon=LatLonRUC, RUCdat=hdfdat, NearMAIACEPA=NearMAIACEPA, EPAdat=EPAdat)
+      OutIncRUC <- ddply(MAIACdat, .(InputFID), AggMAIACRUC, day=Day, RUClatlon=LatLonRUC, RUCdat=hdfdat)
       # Write output to file
       if (file.exists(OutAgg)){
         fwrite(OutIncRUC, OutAgg, append=T)
@@ -66,4 +71,4 @@ for (day in seq(Startdate, Enddate, "day")){
   rm (filelist, MAIACdat, MAIACdat1, hdfdat, LatLonRUC, OutIncRUC)
 }
 
-
+warnings()

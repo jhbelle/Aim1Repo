@@ -5,7 +5,7 @@
 
 ## Function 1: AggMAIACRUC - A function that aggregates the MAIAC and RUC observations for each MAIAC pixel
 
-AggMAIACRUC <- function(datblock, day, AODmiss=-28672, AODscale=0.001, RUClatlon, RUCdat, NearMAIACEPA, EPAdat){
+AggMAIACRUC <- function(datblock, day, AODmiss=-28672, AODscale=0.001, RUClatlon, RUCdat){
   require(rhdf5)  
   # Aggregate MAIAC data
   InputFID = datblock$InputFID[1]
@@ -28,12 +28,12 @@ AggMAIACRUC <- function(datblock, day, AODmiss=-28672, AODscale=0.001, RUClatlon
   CorIndex <- which(RUClatlon$Latitude. == RUCLat & RUClatlon$Longitude == RUCLon)
   RUCvars = as.data.frame(h5read(hdfdat, "Data"))[CorIndex,]
   # Add in EPA data 
-  if (InputFID %in% NearMAIACEPA$Input_FID){
-    State = NearMAIACEPA$State[NearMAIACEPA$Input_FID == InputFID]
-    County = NearMAIACEPA$County[NearMAIACEPA$Input_FID == InputFID]
-    Site = NearMAIACEPA$Site[NearMAIACEPA$Input_FID == InputFID]
-    EPAPM = EPAdat$X24hrPM[EPAdat$State == State & EPAdat$County == County & EPAdat$Site == Site & EPAdate$Date == Day]
-  } else { EPAPM = NA }
-  Outp <- cbind.data.frame(InputFID, POINT_X, POINT_Y, PercForest, PRoadLength, RUCLat, RUCLon, NEIPM, Elev, Year, Day, Overpass, AOD, EPAPM, RUCvars)
-  return(Outp)
+  #if (InputFID %in% NearMAIACEPA$Input_FID){
+  #  State = NearMAIACEPA$State[NearMAIACEPA$Input_FID == InputFID]
+  #  County = NearMAIACEPA$County[NearMAIACEPA$Input_FID == InputFID]
+  #  Site = NearMAIACEPA$Site[NearMAIACEPA$Input_FID == InputFID]
+  #  EPAPM = EPAdat$X24hrPM[EPAdat$State == State & EPAdat$County == County & EPAdat$Site == Site & EPAdat$Date == Day]
+  #} else { EPAPM = NA }
+  Outp <- try(cbind.data.frame(InputFID, POINT_X, POINT_Y, PercForest, PRoadLength, RUCLat, RUCLon, NEIPM, Elev, Year, Day, Overpass, AOD, RUCvars))
+  if (is.data.frame(Outp)) return(Outp)
 }
