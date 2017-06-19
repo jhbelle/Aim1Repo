@@ -14,7 +14,7 @@
 % -----------------------
 % Change these parameters!!!!
 % -----------------------
-yr = 2014;
+yr = 2012;
 IPath = 'E://MODIScloud_Jess/';
 Opath ='E://MODIScloud_extr_1km/';
 
@@ -26,7 +26,7 @@ Opath ='E://MODIScloud_extr_1km/';
 
 
 % Cycle through each day in year, and get list of files for each
-for day=100:365
+for day=1:365
     filelist = dir(sprintf('%sMYD06_L2.A%u%03d.*.hdf', IPath, yr, day));
     % Initialize output structure for section data
     Varnames = {'MaskVal', 'CloudEffRad', 'CloudAOD', 'CloudWaterPath', 'hr', 'min'};
@@ -42,7 +42,8 @@ for day=100:365
         CldAOD = hdfread(filen, swathname, 'Fields', 'Cloud_Optical_Thickness');
         CldWatPath = hdfread(filen, swathname, 'Fields', 'Cloud_Water_Path');
         for section=1:1
-            Mask = transpose(1:length(CldEffRad));
+            [l,w] = size(CldEffRad);
+            Mask = transpose(1:(l*w));
             CER = CldEffRad(Mask);
             CA = CldAOD(Mask);
             CWP = CldWatPath(Mask);
