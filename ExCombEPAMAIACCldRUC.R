@@ -20,8 +20,8 @@
 #aggregate(X24hrPM~Season, OrigDat, median)
 
 # Read in data
-Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
-#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
+#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
+Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
 Dat$Date <- as.Date(Dat$Date, "%Y-%m-%d")
 G24 <- Dat
 
@@ -74,8 +74,8 @@ MissingMAIAC <- subset(FirstCollocOnly, is.na(FirstCollocOnly$AOD47) & is.na(Fir
 # Filter 2: Cloud product - characterize clouds as high, low or none
 # Was missing cloud product?
 #Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_10km.csv", stringsAsFactors = F)
-#Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
-Clouds <- read.csv("E://CloudAgg_10km.csv")
+Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
+#Clouds <- read.csv("E://CloudAgg_10km.csv")
 Clouds$Date <- as.Date(Clouds$Date, "%Y-%m-%d")
 Clouds$X <- NULL
 MissingMAIAC <- merge(MissingMAIAC, Clouds, all.x=T)
@@ -142,12 +142,12 @@ MissingMAIAC$prate <- MissingMAIAC$prate_surface*1000
 MissingMAIAC$CenteredTemp = MissingMAIAC$X2t_heightAboveGround - 273.15
 MissingMAIAC$cape2 = MissingMAIAC$cape_surface/1000
 # Add station XY information
-#Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlStationLocs_XY.csv", stringsAsFactors = F)
-#CentroidX = 1076436.4 #Atl
-#CentroidY = -544307.2 #Atl
-Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifStationLocs_XY.csv", stringsAsFactors = F)
-CentroidX = -2179644.1 #SF
-CentroidY = 258174.0 #SF
+Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlStationLocs_XY.csv", stringsAsFactors = F)
+CentroidX = 1076436.4 #Atl
+CentroidY = -544307.2 #Atl
+#Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifStationLocs_XY.csv", stringsAsFactors = F)
+#CentroidX = -2179644.1 #SF
+#CentroidY = 258174.0 #SF
 StationLocs = Stationlocs[,c("State", "County", "Site", "POINT_X", "POINT_Y", "RASTERVALU")]
 MissingMAIAC <- merge(MissingMAIAC, StationLocs)
 MissingMAIAC$CenteredX = MissingMAIAC$POINT_X - CentroidX
@@ -159,6 +159,12 @@ Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
 #rm(Clouds, Dat, FirstCollocOnly, G24, MissingMAIAC, OrigDat)
 
 ## ------
+# Histogram
+## ------
+
+ggplot(MissingMAIAC[MissingMAIAC$CloudCatFin != "NoCld" & MissingMAIAC$CloudCatFin != "UndetCld",], aes(X24hrPM)) + geom_histogram() + ylab("Count") + xlab("PM2.5 concentration") + facet_grid(CloudCatFin~AquaTerraFlag) + theme_classic()
+
+## ------
 # Mixed effects modeling
 ## ------
 
@@ -166,30 +172,48 @@ Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAb
 
 library(lme4)
 library(piecewiseSEM)
-TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + Elev + (1+CenteredTemp|Date), data=Terra2[Terra2$CloudCatFin == "IceCld",])
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Terra2[Terra2$CloudCatFin == "IceCld",])
 summary(TestMod)
 rsquared(list(TestMod))
-TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + Elev + (1+CenteredTemp|Date), data=Terra2[Terra2$CloudCatFin == "WaterCld",])
+ResIceT = cbind.data.frame(residuals(TestMod), rep("T", length(residuals(TestMod))), rep("IceCld", length(residuals(TestMod))))
+colnames(ResIceT) = c("Residuals", "ATflag", "CldFlag")
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Terra2[Terra2$CloudCatFin == "WaterCld",])
 summary(TestMod)
 rsquared(list(TestMod))
-TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + Elev + (1+CenteredTemp|Date), data=Terra2[Terra2$CloudCatFin == "MaybeCld" | Terra2$CloudCatFin == "UndetCld",])
+ResWatT = cbind.data.frame(residuals(TestMod), rep("T", length(residuals(TestMod))), rep("WaterCld", length(residuals(TestMod))))
+colnames(ResWatT) = c("Residuals", "ATflag", "CldFlag")
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Terra2[Terra2$CloudCatFin == "MaybeCld" | Terra2$CloudCatFin == "UndetCld",])
 summary(TestMod)
 rsquared(list(TestMod))
+ResMT = cbind.data.frame(residuals(TestMod), rep("T", length(residuals(TestMod))), rep("MaybeCld", length(residuals(TestMod))))
+colnames(ResMT) = c("Residuals", "ATflag", "CldFlag")
 
 Aqua2 <- subset(Aqua, Aqua$CloudCatFin != "NoCld" & !is.na(Aqua$X2t_heightAboveGround))
 #Aqua2 <- subset(Aqua, (Aqua$CloudCatFin == "IceCld" | Aqua$CloudCatFin == "WaterCld") & !is.na(Aqua$X2t_heightAboveGround))
 
-TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + Elev + (1+CenteredTemp|Date), data=Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",])
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",])
 summary(TestMod)
 rsquared(list(TestMod))
+ResMA = cbind.data.frame(residuals(TestMod), rep("A", length(residuals(TestMod))), rep("MaybeCld", length(residuals(TestMod))))
+colnames(ResMA) = c("Residuals", "ATflag", "CldFlag")
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Aqua2[Aqua2$CloudCatFin == "IceCld",])
+summary(TestMod)
+rsquared(list(TestMod))
+ResIceA = cbind.data.frame(residuals(TestMod), rep("A", length(residuals(TestMod))), rep("IceCld", length(residuals(TestMod))))
+colnames(ResIceA) = c("Residuals", "ATflag", "CldFlag")
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Aqua2[Aqua2$CloudCatFin == "WaterCld",])
+summary(TestMod)
+rsquared(list(TestMod))
+ResWatA = cbind.data.frame(residuals(TestMod), rep("A", length(residuals(TestMod))), rep("WaterCld", length(residuals(TestMod))))
+colnames(ResWatA) = c("Residuals", "ATflag", "CldFlag")
 
-TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + Elev + (1+CenteredTemp|Date), data=Aqua2[Aqua2$CloudCatFin == "IceCld",])
-summary(TestMod)
-rsquared(list(TestMod))
+## ------
+# Histogram of residuals
+## ------
 
-TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + Elev + (1+CenteredTemp|Date), data=Aqua2[Aqua2$CloudCatFin == "WaterCld",])
-summary(TestMod)
-rsquared(list(TestMod))
+Residuals = rbind.data.frame(ResIceT, ResIceA, ResWatA, ResWatT, ResMA, ResMT)
+
+ggplot(Residuals, aes(Residuals)) + geom_histogram() + facet_grid(CldFlag~ATflag) + theme_classic()
 
 ## ------
 # Correlation plot
@@ -200,6 +224,7 @@ library(corrplot)
 # Exporting Terra2 and Aqua2 (Atl) and Terra2 and Aqua2 (SF)
 #write.csv(Aqua2, "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/Aqua2_Atl.csv", row.names = F)
 #write.csv(Terra2, "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/Terra2_Atl.csv", row.names = F)
+
 
 write.csv(Aqua2, "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/Aqua2_SF.csv", row.names = F)
 write.csv(Terra2, "T:/eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/Terra2_SF.csv", row.names = F)

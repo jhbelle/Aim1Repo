@@ -59,12 +59,12 @@ FirstCollocOnly <- ddply(G24, .(State, County, Site, Date, AquaTerraFlag), takef
 #xtabs(~ MissingMAIAC + AquaTerraFlag, G24)
 #xtabs(~AquaTerraFlag, FirstCollocOnly)
 #str(FirstCollocOnly)
-#summary(FirstCollocOnly[FirstCollocOnly$AquaTerraFlag == "A",52:58]*100)
+summary(FirstCollocOnly[FirstCollocOnly$AquaTerraFlag == "A",52:58]*100)
 #summary(FirstCollocOnly[FirstCollocOnly$AquaTerraFlag == "T",52:58]*100)
 
 MissingMAIAC <- subset(FirstCollocOnly, is.na(FirstCollocOnly$AOD47) & is.na(FirstCollocOnly$AOD55))
 #xtabs(~AquaTerraFlag, MissingMAIAC)
-#summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A",52:58]*100)
+summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A",52:58]*100)
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "T",52:58]*100)
 # Filter 2: Cloud product - characterize clouds as high, low or none
 # Was missing cloud product?
@@ -82,7 +82,8 @@ MissingMAIAC$Multi <- ifelse(MissingMAIAC$PMultiCld == 0, 0, 1)
 # Will need to double-check this categorization for each dataset
 MissingMAIAC$MAIACcat <- ifelse(MissingMAIAC$Cloud == 1 | MissingMAIAC$Partcloud == 1 | MissingMAIAC$CloudShadow == 1, "Cloud", ifelse(MissingMAIAC$Glint == 1 | MissingMAIAC$Clear == 1 | MissingMAIAC$Snow == 1, "Glint", NA))
 #xtabs(~MAIACcat + AquaTerraFlag, MissingMAIAC)
-#summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A" & MissingMAIAC$MAIACcat == "Cloud",52:58]*100)
+summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A" & MissingMAIAC$MAIACcat == "Cloud",52:58]*100)
+
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "T" & MissingMAIAC$MAIACcat == "Cloud",52:58]*100)
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A" & MissingMAIAC$MAIACcat == "Glint",52:58]*100)
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "T" & MissingMAIAC$MAIACcat == "Glint",52:58]*100)
@@ -122,7 +123,7 @@ MissingMAIAC <- subset(MissingMAIAC, !is.na(MissingMAIAC$MODMAIACRUCCld))
 # Make a categorical variable that combines the Yes Clouds in MODMAIACRUCCld with Cloud Phase
 MissingMAIAC$CloudCatFin <- ifelse(MissingMAIAC$MODMAIACRUCCld == "MaybeCld", "MaybeCld", ifelse(MissingMAIAC$MODMAIACRUCCld == "NoCld", "NoCld", ifelse(MissingMAIAC$CloudPhase == 1, "WaterCld", ifelse(MissingMAIAC$CloudPhase == 2, "IceCld", "UndetCld"))))
 xtabs(~CloudCatFin + AquaTerraFlag, MissingMAIAC)
-#summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A" & MissingMAIAC$CloudCatFin == "NoCld",35:41]*100)
+summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A" & MissingMAIAC$CloudCatFin == "NoCld",35:41]*100)
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "T" & MissingMAIAC$CloudCatFin == "NoCld",35:41]*100)
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A" & MissingMAIAC$CloudCatFin == "MaybeCld",35:41]*100)
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "T" & MissingMAIAC$CloudCatFin == "MaybeCld",35:41]*100)
