@@ -98,7 +98,13 @@ SpatialVars = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIAC
 EPAtoMAIAC = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/EPAtoMAIAC.csv", stringsAsFactors = F)[,c("State", "County", "Site", "Input_FID")]
 SpatialVars = merge(SpatialVars, EPAtoMAIAC, by.x="InputFID", by.y="Input_FID")
 MissingMAIAC = merge(MissingMAIAC, SpatialVars, by=c("State", "County", "Site"))
-MissingMAIAC$Elev.y= MissingMAIAC$Elev.y/1000
+#MissingMAIAC$Elev.y= MissingMAIAC$Elev.y/1000
+#MissingMAIAC$PRoadLengt = MissingMAIAC$PRoadLengt/1000
+
+#SpatialVars = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/AtlMAIACgrid_Pred/FinalCopy_AtlPolys/FinGridJoined2.csv", stringsAsFactors = F)[,c("InputFID", "RdLen", "Elev", "PForst", "NEIPM")]
+#EPAtoMAIAC = read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/AtlMAIACgrid_Pred/FinalCopy_AtlPolys/EPAtoMAIAC.csv", stringsAsFactors = F)[,c("State", "County", "Site", "Input_FID")]
+#SpatialVars = merge(SpatialVars, EPAtoMAIAC, by.x="InputFID", by.y="Input_FID")
+#MissingMAIAC = merge(MissingMAIAC, SpatialVars, by=c("State", "County", "Site"))
 # Make separate Terra and Aqua datasets
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T" & !is.na(MissingMAIAC$CenteredTemp) & (as.character(MissingMAIAC$Date, "%Y") == "2012" | as.character(MissingMAIAC$Date, "%Y")=="2013" | as.character(MissingMAIAC$Date, "%Y") == "2014"))
 Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A" & (as.character(MissingMAIAC$Date, "%Y") == "2012" | as.character(MissingMAIAC$Date, "%Y")=="2013" | as.character(MissingMAIAC$Date, "%Y") == "2014"))
@@ -109,14 +115,20 @@ library(piecewiseSEM)
 library(lme4)
 # Test fit
 mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|Date), Terra)
-mod = lmer(X24hrPM ~ AOD55 + (1+AOD55|Date), Terra)
-AIC(mod)
+mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|Date), Terra)
+mod = lmer(X24hrPM ~ AOD55 + PRoadLengt + PercForest + NEIPM + Elev.y + (1+AOD55|Date), Terra)
+#mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + RdLen + PForst + NEIPM + (1+AOD55+WindSpeed|Date), Terra)
+#mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + RdLen + PForst + NEIPM + (1+AOD55|Date), Terra)
+#mod = lmer(X24hrPM~AOD55 + Elev.y + RdLen + PForst + NEIPM + (1+AOD55+WindSpeed|Date), Terra)
 summary(mod)
 r.squaredGLMM(mod)
 
 moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|Date), Aqua)
-moda = lmer(X24hrPM~AOD55 + (1+AOD55|Date), Aqua)
-AIC(moda)
+moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|Date), Aqua)
+moda = lmer(X24hrPM~AOD55 +  PRoadLengt + PercForest + NEIPM + Elev.y + (1+AOD55|Date), Aqua)
+#moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + RdLen + PForst + NEIPM + (1+AOD55+WindSpeed|Date), Aqua)
+#moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + RdLen + PForst + NEIPM + (1+AOD55|Date), Aqua)
+#moda = lmer(X24hrPM~AOD55 + Elev.y + RdLen + PForst + NEIPM + (1+AOD55+WindSpeed|Date), Aqua)
 summary(moda)
 r.squaredGLMM(moda)
 
