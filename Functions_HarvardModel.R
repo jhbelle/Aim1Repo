@@ -5,7 +5,7 @@
 
 ## Function 1: AggMAIACRUC - A function that aggregates the MAIAC and RUC observations for each MAIAC pixel
 
-AggMAIACRUC <- function(datblock, day, AODmiss=-28672, AODscale=0.001, RUClatlon, RUCdat){
+AggMAIACRUC <- function(datblock, day, RUClatlon, RUCdat){
   require(rhdf5)  
   # Aggregate MAIAC data
   InputFID = datblock$InputFID[1]
@@ -22,7 +22,7 @@ AggMAIACRUC <- function(datblock, day, AODmiss=-28672, AODscale=0.001, RUClatlon
   Day = as.character(day, "%Y-%m-%d")
   Overpass = trimws(datblock$Overpass[1])
   # AOD
-  datblock$AOD55 = ifelse(datblock$AOD55 == AODmiss, NA, datblock$AOD55)
+  datblock$AOD55 = ifelse(datblock$AOD55 == -28672, NA, datblock$AOD55)*0.001
   AOD = mean(datblock$AOD55, na.rm=T)
   # Pull in RUC data
   CorIndex <- which(RUClatlon$Latitude. == RUCLat & RUClatlon$Longitude == RUCLon)
