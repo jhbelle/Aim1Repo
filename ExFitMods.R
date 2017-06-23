@@ -82,6 +82,7 @@ MissingMAIAC$pblh = MissingMAIAC$hpbl_surface/1000
 MissingMAIAC$prate <- MissingMAIAC$prate_surface*1000
 MissingMAIAC$CenteredTemp = MissingMAIAC$X2t_heightAboveGround - 273.15
 MissingMAIAC$cape2 = MissingMAIAC$cape_surface/1000
+MissingMAIAC$DOY = as.integer(as.character(MissingMAIAC$Date, "%j"))
 # Add station XY information
 #Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlStationLocs_XY.csv", stringsAsFactors = F)
 #CentroidX = 1076436.4 #Atl
@@ -106,6 +107,7 @@ MissingMAIAC = merge(MissingMAIAC, SpatialVars, by=c("State", "County", "Site"))
 #SpatialVars = merge(SpatialVars, EPAtoMAIAC, by.x="InputFID", by.y="Input_FID")
 #MissingMAIAC = merge(MissingMAIAC, SpatialVars, by=c("State", "County", "Site"))
 # Make separate Terra and Aqua datasets
+Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T" & !is.na(MissingMAIAC$CenteredTemp))
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T" & !is.na(MissingMAIAC$CenteredTemp) & (as.character(MissingMAIAC$Date, "%Y") == "2012" | as.character(MissingMAIAC$Date, "%Y")=="2013" | as.character(MissingMAIAC$Date, "%Y") == "2014"))
 Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A" & (as.character(MissingMAIAC$Date, "%Y") == "2012" | as.character(MissingMAIAC$Date, "%Y")=="2013" | as.character(MissingMAIAC$Date, "%Y") == "2014"))
 #rm(Clouds, Dat, FirstCollocOnly, G24, MissingMAIAC, OrigDat)
@@ -114,21 +116,60 @@ library(MuMIn)
 library(piecewiseSEM)
 library(lme4)
 # Test fit
-mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|Date), Terra)
-mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|Date), Terra)
-mod = lmer(X24hrPM ~ AOD55 + PRoadLengt + PercForest + NEIPM + Elev.y + (1+AOD55|Date), Terra)
+mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|DOY), Terra)
+mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|DOY), Terra)
+mod = lmer(X24hrPM ~ AOD55 + PRoadLengt + PercForest + NEIPM + Elev.y + (1+AOD55|DOY), Terra)
 #mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + RdLen + PForst + NEIPM + (1+AOD55+WindSpeed|Date), Terra)
 #mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + RdLen + PForst + NEIPM + (1+AOD55|Date), Terra)
 #mod = lmer(X24hrPM~AOD55 + Elev.y + RdLen + PForst + NEIPM + (1+AOD55+WindSpeed|Date), Terra)
 summary(mod)
 r.squaredGLMM(mod)
 
-moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|Date), Aqua)
-moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|Date), Aqua)
-moda = lmer(X24hrPM~AOD55 +  PRoadLengt + PercForest + NEIPM + Elev.y + (1+AOD55|Date), Aqua)
+moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|DOY), Aqua)
+moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|DOY), Aqua)
+moda = lmer(X24hrPM~AOD55 +  PRoadLengt + PercForest + NEIPM + Elev.y + (1+AOD55|DOY), Aqua)
 #moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + RdLen + PForst + NEIPM + (1+AOD55+WindSpeed|Date), Aqua)
 #moda = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + RdLen + PForst + NEIPM + (1+AOD55|Date), Aqua)
 #moda = lmer(X24hrPM~AOD55 + Elev.y + RdLen + PForst + NEIPM + (1+AOD55+WindSpeed|Date), Aqua)
 summary(moda)
 r.squaredGLMM(moda)
 
+# Calculate CV R2
+
+Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T" & !is.na(MissingMAIAC$CenteredTemp))
+Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T" & !is.na(MissingMAIAC$CenteredTemp) & (as.character(MissingMAIAC$Date, "%Y") == "2012" | as.character(MissingMAIAC$Date, "%Y")=="2013" | as.character(MissingMAIAC$Date, "%Y") == "2014"))
+Terra$CrossValSet <- sample(1:10, length(Terra$County), replace=T)
+for (i in seq(1,10)){
+  mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|Date), Terra[Terra$CrossValSet != i,])
+  #mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|DOY), Terra[Terra$CrossValSet != i,])
+  #mod = lmer(X24hrPM~AOD55 + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|DOY), Terra[Terra$CrossValSet != i,])
+  predvals = predict(mod, Terra[Terra$CrossValSet == i,], allow.new.levels=T)
+  if (exists("Outpred")){Outpred = c(Outpred, predvals)} else {Outpred = predvals}
+}
+
+Terra$rownames = rownames(Terra)
+rownames = as.character(names(Outpred))
+test = cbind.data.frame(rownames, Outpred)
+rm(Outpred)
+test$rownames = as.character(test$rownames)
+Terra = merge(Terra, test)
+summary(lm(X24hrPM ~ Outpred, Terra))
+
+Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A" & !is.na(MissingMAIAC$CenteredTemp))
+Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A" & !is.na(MissingMAIAC$CenteredTemp) & (as.character(MissingMAIAC$Date, "%Y") == "2012" | as.character(MissingMAIAC$Date, "%Y")=="2013" | as.character(MissingMAIAC$Date, "%Y") == "2014"))
+Aqua$CrossValSet <- sample(1:10, length(Aqua$County), replace=T)
+for (i in seq(1,10)){
+  mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|Date), Aqua[Aqua$CrossValSet != i,])
+  #mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|DOY), Aqua[Aqua$CrossValSet != i,])
+  #mod = lmer(X24hrPM~AOD55 + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|DOY), Aqua[Aqua$CrossValSet != i,])
+  predvals = predict(mod, Aqua[Aqua$CrossValSet == i,], allow.new.levels=T)
+  if (exists("Outpred")){Outpred = c(Outpred, predvals)} else {Outpred = predvals}
+}
+
+Aqua$rownames = rownames(Aqua)
+rownames = as.character(names(Outpred))
+test = cbind.data.frame(rownames, Outpred)
+rm(Outpred)
+test$rownames = as.character(test$rownames)
+Aqua = merge(Aqua, test)
+summary(lm(X24hrPM ~ Outpred, Aqua))
