@@ -60,9 +60,12 @@ for (day in seq(Startdate, Enddate, "day")){
     if (file.exists(hdfdat)){
       # Pull RUC lat lon      
       LatLonRUC <- as.data.frame(h5read(hdfdat, "Geolocation"))
-      # Do aggregation
-      OutIncRUC <- ddply(MAIACdat, .(InputFID), AggMAIACRUC, day=Day, RUClatlon=LatLonRUC, RUCdat=hdfdat)
+      # Do aggregation with RUC data
+      RUCLatLongs = unique(MAIACdat[,c("RUCLat", "RUCLon")])
+      Rucvars = adply(RUCLatLongs, 1, GetRUCVals, hdfdat=hdfdat, RUClatlon=LatLonRUC)
+      OutIncRUC = merge(MAIACdat, Rucvars)
       # Write output to file
+
       if (file.exists(OutAgg)){
         fwrite(OutIncRUC, OutAgg, append=T)
       } else { fwrite(OutIncRUC, OutAgg) }

@@ -37,3 +37,9 @@ AggMAIACRUC <- function(datblock, day, RUClatlon, RUCdat){
   Outp <- try(cbind.data.frame(InputFID, POINT_X, POINT_Y, PercForest, PRoadLength, RUCLat, RUCLon, NEIPM, Elev, Year, Day, Overpass, AOD, RUCvars))
   if (is.data.frame(Outp)) return(Outp)
 }
+
+GetRUCVals <- function(datblock, hdfdat, RUClatlon){ 
+    Index = which(RUClatlon$Latitude. == datblock$RUCLat & RUClatlon$Longitude == datblock$RUCLon)
+    outdat = as.data.frame(h5read(hdfdat, "Data"))[Index,] 
+    return(outdat)
+  }
