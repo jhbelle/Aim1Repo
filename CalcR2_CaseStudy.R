@@ -8,8 +8,8 @@
 
 
 # Read in data
-#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
-Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
+Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
+#Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
 Dat$Date <- as.Date(Dat$Date, "%Y-%m-%d")
 G24 <- Dat
 
@@ -28,14 +28,14 @@ G24 <- subset(G24, G24$Dist < 1000)
 # Remove duplicate MAIAC collocations
 takefirst <- function(datblock){ return(datblock[1,])}
 library(plyr)
-FirstCollocOnly <- ddply(G24, .(State, County, Site, Date, AquaTerraFlag), takefirst)
+#FirstCollocOnly <- ddply(G24, .(State, County, Site, Date, AquaTerraFlag), takefirst)
 
 
-MissingMAIAC <- FirstCollocOnly
+MissingMAIAC <- G24
 
 #Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_10km.csv", stringsAsFactors = F)
-Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
-#Clouds <- read.csv("E://CloudAgg_10km.csv")
+#Clouds <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CloudAgg_Atl10km.csv", stringsAsFactors = F)
+Clouds <- read.csv("E://CloudAgg_10km.csv")
 Clouds$Date <- as.Date(Clouds$Date, "%Y-%m-%d")
 Clouds$X <- NULL
 MissingMAIAC <- merge(MissingMAIAC, Clouds, all.x=T)
@@ -84,37 +84,50 @@ MissingMAIAC$CenteredTemp = MissingMAIAC$X2t_heightAboveGround - 273.15
 MissingMAIAC$cape2 = MissingMAIAC$cape_surface/1000
 MissingMAIAC$DOY = as.integer(as.character(MissingMAIAC$Date, "%j"))
 # Add station XY information
-Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlStationLocs_XY.csv", stringsAsFactors = F)
-CentroidX = 1076436.4 #Atl
-CentroidY = -544307.2 #Atl
-#Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifStationLocs_XY.csv", stringsAsFactors = F)
-#CentroidX = -2179644.1 #SF
-#CentroidY = 258174.0 #SF
+#Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlStationLocs_XY.csv", stringsAsFactors = F)
+#CentroidX = 1076436.4 #Atl
+#CentroidY = -544307.2 #Atl
+Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifStationLocs_XY.csv", stringsAsFactors = F)
+CentroidX = -2179644.1 #SF
+CentroidY = 258174.0 #SF
 StationLocs = Stationlocs[,c("State", "County", "Site", "POINT_X", "POINT_Y", "RASTERVALU")]
 MissingMAIAC <- merge(MissingMAIAC, StationLocs)
 MissingMAIAC$CenteredX = MissingMAIAC$POINT_X - CentroidX
 MissingMAIAC$CenteredY = MissingMAIAC$POINT_Y - CentroidY
 MissingMAIAC$Elev = MissingMAIAC$RASTERVALU/1000
-#SpatialVars = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/FinGridJoined.csv", stringsAsFactors = F)[,c("InputFID", "PercForest", "PRoadLengt", "NEIPM", "Elev", "POINT_X", "POINT_Y")]
-#EPAtoMAIAC = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/EPAtoMAIAC.csv", stringsAsFactors = F)[,c("State", "County", "Site", "Input_FID")]
-#SpatialVars = merge(SpatialVars, EPAtoMAIAC, by.x="InputFID", by.y="Input_FID")
-#MissingMAIAC = merge(MissingMAIAC, SpatialVars, by=c("State", "County", "Site"))
+SpatialVars = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/FinGridJoined.csv", stringsAsFactors = F)[,c("InputFID", "PercForest", "PRoadLengt", "NEIPM", "Elev", "POINT_X", "POINT_Y")]
+EPAtoMAIAC = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/EPAtoMAIAC.csv", stringsAsFactors = F)[,c("State", "County", "Site", "Input_FID")]
+SpatialVars = merge(SpatialVars, EPAtoMAIAC, by.x="InputFID", by.y="Input_FID")
+MissingMAIAC = merge(MissingMAIAC, SpatialVars, by=c("State", "County", "Site"))
 #MissingMAIAC$Elev.y= MissingMAIAC$Elev.y/1000
 #MissingMAIAC$PRoadLengt = MissingMAIAC$PRoadLengt/1000
 
-SpatialVars = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/AtlMAIACgrid_Pred/FinalCopy_AtlPolys/FinGridJoined2.csv", stringsAsFactors = F)[,c("InputFID", "RdLen", "Elev", "PForst", "NEIPM")]
-EPAtoMAIAC = read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/AtlMAIACgrid_Pred/FinalCopy_AtlPolys/EPAtoMAIAC.csv", stringsAsFactors = F)[,c("State", "County", "Site", "Input_FID")]
-SpatialVars = merge(SpatialVars, EPAtoMAIAC, by.x="InputFID", by.y="Input_FID")
-MissingMAIAC = merge(MissingMAIAC, SpatialVars, by=c("State", "County", "Site"))
+#SpatialVars = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/AtlMAIACgrid_Pred/FinalCopy_AtlPolys/FinGridJoined2.csv", stringsAsFactors = F)[,c("InputFID", "RdLen", "Elev", "PForst", "NEIPM")]
+#EPAtoMAIAC = read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/AtlMAIACgrid_Pred/FinalCopy_AtlPolys/EPAtoMAIAC.csv", stringsAsFactors = F)[,c("State", "County", "Site", "Input_FID")]
+#SpatialVars = merge(SpatialVars, EPAtoMAIAC, by.x="InputFID", by.y="Input_FID")
+#MissingMAIAC = merge(MissingMAIAC, SpatialVars, by=c("State", "County", "Site"))
 # Make Single observation for each date
-#MissingMAIAC = subset(MissingMAIAC, !is.na(MissingMAIAC$CenteredTemp))[,c("State", "County", "Site", "Date", "X24hrPM", "AquaTerraFlag", "AOD55", "r_heightAboveGround", "LogPM", "CloudAOD", "CloudRadius", "CloudEmmisivity", "Raining", "WindSpeed", "CloudCatFin", "pblh", "CenteredTemp", "cape2", "POINT_X.y", "POINT_Y.y", "Elev.y", "PercForest", "PRoadLengt", "NEIPM")]
-MissingMAIAC = subset(MissingMAIAC, !is.na(MissingMAIAC$CenteredTemp))[,c("State", "County", "Site", "InputFID", "Date", "X24hrPM", "AquaTerraFlag", "AOD55", "r_heightAboveGround", "LogPM", "CloudAOD", "CloudRadius", "CloudEmmisivity", "Raining", "WindSpeed", "CloudCatFin", "pblh", "CenteredTemp", "cape2", "POINT_X", "POINT_Y", "Elev.y", "PForst", "RdLen", "NEIPM")]
-colnames(MissingMAIAC) <- c("State", "County", "Site", "InputFID", "Date", "X24hrPM", "AquaTerraFlag", "AOD55", "r_heightAboveGround", "LogPM", "CloudAOD", "CloudRadius", "CloudEmmisivity", "Raining", "WindSpeed", "CloudCatFin", "pblh", "CenteredTemp", "cape2", "POINT_X.y", "POINT_Y.y", "Elev.y", "PercForest", "PRoadLengt", "NEIPM")
+MissingMAIAC = subset(MissingMAIAC, !is.na(MissingMAIAC$CenteredTemp))[,c("State", "County", "Site", "Date", "X24hrPM", "InputFID", "AquaTerraFlag", "AOD55", "r_heightAboveGround", "LogPM", "CloudAOD", "CloudRadius", "CloudEmmisivity", "Raining", "WindSpeed", "CloudCatFin", "pblh", "CenteredTemp", "cape2", "POINT_X.y", "POINT_Y.y", "Elev.y", "PercForest", "PRoadLengt", "NEIPM")]
+#MissingMAIAC = subset(MissingMAIAC, !is.na(MissingMAIAC$CenteredTemp))[,c("State", "County", "Site", "InputFID", "Date", "Time", "X24hrPM", "AquaTerraFlag", "AOD55", "r_heightAboveGround", "LogPM", "CloudAOD", "CloudRadius", "CloudEmmisivity", "Raining", "WindSpeed", "CloudCatFin", "pblh", "CenteredTemp", "cape2", "POINT_X", "POINT_Y", "Elev.y", "PForst", "RdLen", "NEIPM")]
+#colnames(MissingMAIAC) <- c("State", "County", "Site", "InputFID", "Date", "Time", "X24hrPM", "AquaTerraFlag", "AOD55", "r_heightAboveGround", "LogPM", "CloudAOD", "CloudRadius", "CloudEmmisivity", "Raining", "WindSpeed", "CloudCatFin", "pblh", "CenteredTemp", "cape2", "POINT_X.y", "POINT_Y.y", "Elev.y", "PercForest", "PRoadLengt", "NEIPM")
 Terra = subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T")
 Aqua = subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
 
-CombTA = merge(Terra, Aqua, by=c("State", "County", "Site", "InputFID", "Date", "X24hrPM"))
-CombTA$CrossValSet = sample(1:10, length(CombTA$County), replace=T)
+takefirst <- function(datblock){
+  TakeFirst = datblock[1,c("InputFID", "X24hrPM", "LogPM", "AquaTerraFlag", "r_heightAboveGround", "Raining", "WindSpeed", "pblh", "CenteredTemp", "cape2", "POINT_X.y", "POINT_Y.y", "Elev.y", "PercForest", "PRoadLengt", "NEIPM")]
+  AOD55 = mean(datblock$AOD55, na.rm=T)
+  CloudAOD = mean(ifelse(datblock$CloudAOD==0, NA, datblock$CloudAOD), na.rm=T)
+  CloudRadius = mean(ifelse(datblock$CloudRadius==0, NA, datblock$CloudRadius), na.rm=T)
+  CloudEmmisivity = mean(ifelse(datblock$CloudEmmisivity==0, NA, datblock$CloudEmmisivity), na.rm=T)
+  CloudCatFins = unique(datblock$CloudCatFin)
+  CloudCatFin = ifelse(length(CloudCatFins)== 1, CloudCatFins, ifelse("WaterCld" %in% CloudCatFins, "WaterCld", ifelse("IceCld" %in% CloudCatFins, "IceCld", "MaybeCld")))
+  return(cbind.data.frame(TakeFirst, AOD55, CloudAOD, CloudRadius, CloudEmmisivity, CloudCatFin))
+}
+Terra2 = ddply(Terra, .(State, County, Site, Date), takefirst)
+Aqua2 = ddply(Aqua, .(State, County, Site, Date), takefirst)
+CombTA = merge(Terra2, Aqua2, by=c("State", "County", "Site", "InputFID", "Date", "X24hrPM"))
+CombTA$CrossValSetT = sample(1:10, length(CombTA$County), replace=T)
+CombTA$CrossValSetA = sample(1:10, length(CombTA$County), replace=T)
 CombTA$rownames = rownames(CombTA)
 CombTA$DOY = as.integer(as.character(CombTA$Date, "%j"))
 CombTA$Year = as.integer(as.character(CombTA$Date, "%Y"))
@@ -129,10 +142,10 @@ library(lme4)
 
 # Fit models
 for (i in seq(1,10)){
-  mod = lmer(X24hrPM~AOD55.x + pblh.x + CenteredTemp.x + WindSpeed.x + r_heightAboveGround.x + Elev.y.x + NEIPM.x + PRoadLengt.x + PercForest.x + (1+AOD55.x|DOY), CombTA[CombTA$CrossValSet != i,])
-  moda = lmer(X24hrPM~AOD55.y + pblh.y + CenteredTemp.y + WindSpeed.y + r_heightAboveGround.y + Elev.y.y + NEIPM.y + PRoadLengt.y + PercForest.y + (1+AOD55.y|DOY), CombTA[CombTA$CrossValSet != i,])
-  predvalsT = predict(mod, CombTA[CombTA$CrossValSet == i,], allow.new.levels=T)
-  predvalsA = predict(moda, CombTA[CombTA$CrossValSet == i,], allow.new.levels=T)
+  mod = lmer(X24hrPM~AOD55.x + pblh.x + CenteredTemp.x + WindSpeed.x + r_heightAboveGround.x + Elev.y.x + NEIPM.x + PRoadLengt.x + PercForest.x + (1+AOD55.x|DOY), CombTA[CombTA$CrossValSetT != i,])
+  moda = lmer(X24hrPM~AOD55.y + pblh.y + CenteredTemp.y + WindSpeed.y + r_heightAboveGround.y + Elev.y.y + NEIPM.y + PRoadLengt.y + PercForest.y + (1+AOD55.y|DOY), CombTA[CombTA$CrossValSetA != i,])
+  predvalsT = predict(mod, CombTA[CombTA$CrossValSetT == i,], allow.new.levels=T)
+  predvalsA = predict(moda, CombTA[CombTA$CrossValSetA == i,], allow.new.levels=T)
   if (exists("PredA")){ PredA = c(PredA, predvalsA) } else PredA = predvalsA
   if (exists("PredT")){ PredT = c(PredT, predvalsT) } else PredT = predvalsT
 }
@@ -157,24 +170,25 @@ rm(PredT, PredA)
 ## --------
 
 for (i in seq(1,10)){
-  cloudt_w = try(lmer(LogPM.x ~ CenteredTemp.x + r_heightAboveGround.x + WindSpeed.x + cape2.x + pblh.x + Raining.x + CloudEmmisivity.x + CloudRadius.x + CloudAOD.x + (1|Date), CombTA[(CombTA$CrossValSet != i & CombTA$CloudCatFin.x == "WaterCld"),], na.action="na.omit"))
-  cloudt_i = try(lmer(LogPM.x ~ CenteredTemp.x + r_heightAboveGround.x + WindSpeed.x + cape2.x + pblh.x + Raining.x + CloudEmmisivity.x + CloudRadius.x + CloudAOD.x + (1|Date), CombTA[CombTA$CrossValSet != i & CombTA$CloudCatFin.x == "IceCld",]))
-  #cloudt_o = try(lmer(LogPM.x ~ CenteredTemp.x + r_heightAboveGround.x + WindSpeed.x + cape2.x + pblh.x + Raining.x + CloudEmmisivity.x + CloudRadius.x + CloudAOD.x + (1|Date), CombTA[CombTA$CrossValSet != i & (CombTA$CloudCatFin.x == "UndetCld" | CombTA$CloudCatFin.x == "MaybeCld"),]))
-  clouda_w = try(lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|Date), CombTA[CombTA$CrossValSet != i & CombTA$CloudCatFin.y == "WaterCld",]))
-  clouda_i = try(lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|Date), CombTA[CombTA$CrossValSet != i & CombTA$CloudCatFin.y == "IceCld",]))
-  #clouda_o = try(lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|Date), CombTA[CombTA$CrossValSet != i & (CombTA$CloudCatFin.y == "UndetCld" | CombTA$CloudCatFin.y == "MaybeCld"),]))
-  if (isLMM(cloudt_w)) predctw = predict(cloudt_w, CombTA[CombTA$CrossValSet == i & CombTA$CloudCatFin.x == "WaterCld",], allow.new.levels=T)
-  if (isLMM(cloudt_i)) predcti = predict(cloudt_i, CombTA[CombTA$CrossValSet == i & CombTA$CloudCatFin.x == "IceCld",], allow.new.levels=T)
-  if (isLMM(cloudt_o)) predcto = predict(cloudt_o, CombTA[CombTA$CrossValSet == i & (CombTA$CloudCatFin.x == "UnDetCld" | CombTA$CloudCatFin.x == "MaybeCld"),], allow.new.levels=T)
-  if (isLMM(clouda_w)) predcaw = predict(clouda_w, CombTA[CombTA$CrossValSet == i & CombTA$CloudCatFin.y == "WaterCld",], allow.new.levels=T)
-  if (isLMM(clouda_i)) predcai = predict(clouda_i, CombTA[CombTA$CrossValSet == i & CombTA$CloudCatFin.y == "IceCld",], allow.new.levels=T)
-  if (isLMM(clouda_o)) predcao = predict(clouda_o, CombTA[CombTA$CrossValSet == i & (CombTA$CloudCatFin.y == "UnDetCld" | CombTA$CloudCatFin.y == "MaybeCld"),], allow.new.levels=T)
+  cloudt_w = try(lmer(LogPM.x ~ CenteredTemp.x + r_heightAboveGround.x + WindSpeed.x + cape2.x + pblh.x + Raining.x + CloudEmmisivity.x + CloudRadius.x + CloudAOD.x + (1|DOY), CombTA[(CombTA$CrossValSetT != i & CombTA$CloudCatFin.x == "WaterCld"),], na.action="na.omit"))
+  cloudt_i = try(lmer(LogPM.x ~ CenteredTemp.x + r_heightAboveGround.x + WindSpeed.x + cape2.x + pblh.x + Raining.x + CloudEmmisivity.x + CloudRadius.x + CloudAOD.x + (1|DOY), CombTA[CombTA$CrossValSetT != i & CombTA$CloudCatFin.x == "IceCld",]))
+  #cloudt_o = try(lmer(LogPM.x ~ CenteredTemp.x + r_heightAboveGround.x + WindSpeed.x + cape2.x + pblh.x + Raining.x + CloudEmmisivity.x + CloudRadius.x + CloudAOD.x + (1|DOY), CombTA[CombTA$CrossValSet != i & (CombTA$CloudCatFin.x == "UndetCld" | CombTA$CloudCatFin.x == "MaybeCld"),]))
+  clouda_w = try(lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|DOY), CombTA[CombTA$CrossValSetA != i & CombTA$CloudCatFin.y == "WaterCld",]))
+  clouda_i = try(lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|DOY), CombTA[CombTA$CrossValSetA != i & CombTA$CloudCatFin.y == "IceCld",]))
+  #clouda_o = try(lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|DOY), CombTA[CombTA$CrossValSet != i & (CombTA$CloudCatFin.y == "UndetCld" | CombTA$CloudCatFin.y == "MaybeCld"),]))
+
+  if (!is.atomic(cloudt_w)) predctw = predict(cloudt_w, CombTA[CombTA$CrossValSetT == i & CombTA$CloudCatFin.x == "WaterCld",], allow.new.levels=T)
+  if (!is.atomic(cloudt_i)) predcti = predict(cloudt_i, CombTA[CombTA$CrossValSetT == i & CombTA$CloudCatFin.x == "IceCld",], allow.new.levels=T)
+  #if (!is.atomic(cloudt_o)) predcto = predict(cloudt_o, CombTA[CombTA$CrossValSetT == i & (CombTA$CloudCatFin.x == "UnDetCld" | CombTA$CloudCatFin.x == "MaybeCld"),], allow.new.levels=T)
+  if (!is.atomic(clouda_w)) predcaw = predict(clouda_w, CombTA[CombTA$CrossValSetA == i & CombTA$CloudCatFin.y == "WaterCld",], allow.new.levels=T)
+  if (!is.atomic(clouda_i)) predcai = predict(clouda_i, CombTA[CombTA$CrossValSetA == i & CombTA$CloudCatFin.y == "IceCld",], allow.new.levels=T)
+  #if (!is.atomic(clouda_o)) predcao = predict(clouda_o, CombTA[CombTA$CrossValSetA == i & (CombTA$CloudCatFin.y == "UnDetCld" | CombTA$CloudCatFin.y == "MaybeCld"),], allow.new.levels=T)
   if (exists("PredTw")){ PredTw = c(PredTw, predctw) } else PredTw = predctw
   if (exists("PredTi")){ PredTi = c(PredTi, predcti) } else PredTi = predcti
-  if (exists("PredTo")){ PredTo = c(PredTo, predcto) } else PredTo = predcto
+  #if (exists("PredTo")){ PredTo = c(PredTo, predcto) } else PredTo = predcto
   if (exists("PredAw")){ PredAw = c(PredAw, predcaw) } else PredAw = predcaw
   if (exists("PredAi")){ PredAi = c(PredAi, predcai) } else PredAi = predcai
-  if (exists("PredAo")){ PredAo = c(PredAo, predcao) } else PredAo = predcao
+  #if (exists("PredAo")){ PredAo = c(PredAo, predcao) } else PredAo = predcao
 }
 
 
@@ -188,10 +202,10 @@ colnames(PredTi) <- c("rownames", "PredTi")
 PredTi$rownames = as.character(PredTi$rownames)
 CombTA = merge(CombTA, PredTi, all.x=T)
 
-PredTo = cbind.data.frame(names(PredTo), exp(PredTo))
-colnames(PredTo) <- c("rownames", "PredTo")
-PredTo$rownames = as.character(PredTo$rownames)
-CombTA = merge(CombTA, PredTo, all.x=T)
+#PredTo = cbind.data.frame(names(PredTo), exp(PredTo))
+#colnames(PredTo) <- c("rownames", "PredTo")
+#PredTo$rownames = as.character(PredTo$rownames)
+#CombTA = merge(CombTA, PredTo, all.x=T)
 
 PredAw = cbind.data.frame(names(PredAw), exp(PredAw))
 colnames(PredAw) <- c("rownames", "PredAw")
@@ -203,15 +217,17 @@ colnames(PredAi) <- c("rownames", "PredAi")
 PredAi$rownames = as.character(PredAi$rownames)
 CombTA = merge(CombTA, PredAi, all.x=T)
 
-PredAo = cbind.data.frame(names(PredAo), exp(PredAo))
-colnames(PredAo) <- c("rownames", "PredAo")
-PredAo$rownames = as.character(PredAo$rownames)
-CombTA = merge(CombTA, PredAo, all.x=T)
+#PredAo = cbind.data.frame(names(PredAo), exp(PredAo))
+#colnames(PredAo) <- c("rownames", "PredAo")
+#PredAo$rownames = as.character(PredAo$rownames)
+#CombTA = merge(CombTA, PredAo, all.x=T)
 rm(PredTw, PredTi, PredTo, PredAw, PredAi, PredAo)
 
-CombTA$PredCldA = rowSums(CombTA[,c("PredAw", "PredAi", "PredAo")], na.rm = T)
+#CombTA$PredCldA = rowSums(CombTA[,c("PredAw", "PredAi", "PredAo")], na.rm = T)
+CombTA$PredCldA = rowSums(CombTA[,c("PredAw", "PredAi")], na.rm = T)
 CombTA$PredCldA = ifelse(CombTA$PredCldA == 0, NA, CombTA$PredCldA)
-CombTA$PredCldT = rowSums(CombTA[,c("PredTw", "PredTi", "PredTo")], na.rm = T)
+#CombTA$PredCldT = rowSums(CombTA[,c("PredTw", "PredTi", "PredTo")], na.rm = T)
+CombTA$PredCldT = rowSums(CombTA[,c("PredTw", "PredTi")], na.rm = T)
 CombTA$PredCldT = ifelse(CombTA$PredCldT == 0, NA, CombTA$PredCldT)
 
 CombTA$PredWCld = rowMeans(CombTA[,c("PredCldA", "PredCldT", "PredT", "PredA")], na.rm=T)
@@ -225,8 +241,31 @@ summary(lm(X24hrPM~PredWCld, CombTA))
 DailyMean = aggregate(X24hrPM~Date, CombTA, mean)
 colnames(DailyMean) <- c("Date", "DailyMean")
 CombTA = merge(CombTA, DailyMean, by="Date")
-
+CombTA$sqrtPM = sqrt(CombTA$X24hrPM)
+rm(Pred)
 for (i in seq(1,10)){
-  harvt = gam(X24hrPM~DailyMean + s(POINT_X.y.y, POINT_Y.y.y) + s(InputFID) + s(InputFID, DailyMean), data=CombTA[CombTA$CrossValSet != i,])
-  pred = predict(harvt, CombTA[CombTA$CrossValSet == i,], type="response")
+  harvt = gam(sqrtPM~ DailyMean + s(POINT_X.y.y, POINT_Y.y.y, k=10), data=CombTA[CombTA$CrossValSetT != i,], method="REML")
+  pred = predict(harvt, CombTA[CombTA$CrossValSetT == i,], type="response")
+  if (exists("Pred")){ Pred = c(Pred, pred) } else Pred = pred
 }
+
+Pred = cbind.data.frame(names(Pred), Pred^2)
+colnames(Pred) <- c("rownames", "Pred")
+Pred$rownames = as.character(Pred$rownames)
+CombTA = merge(CombTA, Pred, all.x=T)
+
+CombTA$PredH = rowMeans(CombTA[,c("PredT", "PredA", "Pred")], na.rm=T)
+summary(lm(X24hrPM~PredH, CombTA))
+
+## ----------
+# Fit final versions to transfer to cluster
+## ----------
+
+mainmod = lmer(X24hrPM~AOD55.y + pblh.y + CenteredTemp.y + WindSpeed.y + r_heightAboveGround.y + Elev.y.y + NEIPM.y + PRoadLengt.y + PercForest.y + (1+AOD55.y|DOY), CombTA)
+saveRDS(mainmod, "C:/Users/jhbelle/Documents/mainmodel.Rdata")
+
+harvmod = gam(sqrtPM ~ DailyMean + s(POINT_X.y.y, POINT_Y.y.y, k=10), data=CombTA, method="REML")
+saveRDS(harvmod, "C:/Users/jhbelle/Documents/harvmodel.Rdata")
+
+watcloud = lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|DOY), CombTA[(CombTA$CloudCatFin.x == "WaterCld"),], na.action="na.omit")
+saveRDS(watcloud, "C:/Users/jhbelle/Documents/watercloudmodel.Rdata")
