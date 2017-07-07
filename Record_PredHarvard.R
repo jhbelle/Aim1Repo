@@ -5,7 +5,7 @@
 ## Purpose: Record of commands used at the command line on cluster to read in file containing RUC, make predictions using Harvard Model, and save outputs
 ## ----------
 
-library(gam)
+library(mgcv)
 
 # Read in dataset - subset to day 1
 test = read.csv("/aura/AggregatedDat_NoCld.csv", nrows=82780)
@@ -39,10 +39,11 @@ harvmodel = readRDS("/aura/harvmodel.Rdata")
 
 harvardmodel2 = gam(pred ~ DailyMean + s(POINT_X, POINT_Y), data=Day1PredMain, method="REML")
 Day1PredAlt$PredAlt2 = predict(harvardmodel2, Day1PredAlt)
-Day1PredAlt$PredAlt = predict(harvardmodel, Day1PredAlt)^2
+Day1PredAlt$PredAlt = predict(harvmodel, Day1PredAlt)^2
 
 write.csv(Day1PredAlt, "/aura/Day1PredAlt.csv")
 
 Cld5km = read.csv("/aura/LinkedValsCloudCalif/DailyGridAOD_2012_001.csv")
 Day1PredCld = merge(Day1PredAlt, Cld5km, by.x="InputFID", by.y="US.id")
+
 Cld1kmDat = read.csv("/aura/LinkedFilesCloud/DailyGridAOD_2012_001.csv")

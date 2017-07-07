@@ -26,7 +26,7 @@ Opath ='E://MODIScloud_extr_1km/';
 
 
 % Cycle through each day in year, and get list of files for each
-for day=1:365
+for day=80:365
     filelist = dir(sprintf('%sMYD06_L2.A%u%03d.*.hdf', IPath, yr, day));
     % Initialize output structure for section data
     Varnames = {'MaskVal', 'CloudEffRad', 'CloudAOD', 'CloudWaterPath', 'hr', 'min'};

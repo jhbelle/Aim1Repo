@@ -169,12 +169,30 @@ ggplot(MissingMAIAC[MissingMAIAC$CloudCatFin != "NoCld" & MissingMAIAC$CloudCatF
 ## ------
 
 Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAboveGround))
+Terra2 <- subset(Terra2, Terra2$Year == 2012 | Terra2$Year == 2013 | Terra2$Year == 2014)
+Terra2$DOY = as.numeric(as.character(Terra2$Date, "%j"))
+Terra2 = subset(Terra2, Terra2$X24hrPM > 2)
+#library(lme4)
+#library(piecewiseSEM)
+#TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Terra2[Terra2$CloudCatFin == "IceCld",])
+#summary(TestMod)
+#rsquared(list(TestMod))
+Terra2$cvsample = sample(1:10, length(Terra2$LogPM), replace=T)
+rm(Outpred)
+for (i in seq(1,10)){
+  Mod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Terra2[Terra2$CloudCatFin == "WaterCld" & Terra2$cvsample != i,])
+  Pred = predict(Mod, Terra2[Terra2$cvsample == i & Terra2$CloudCatFin == "WaterCld",], allow.new.levels=T)
+  if (exists("Outpred")){Outpred = c(Outpred, Pred)} else {Outpred = Pred}
+}
 
-library(lme4)
-library(piecewiseSEM)
-TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Terra2[Terra2$CloudCatFin == "IceCld",])
-summary(TestMod)
-rsquared(list(TestMod))
+Terra2$rownames = rownames(Terra2)
+rownames = as.character(names(Outpred))
+test = cbind.data.frame(rownames, Outpred)
+test$Outpred = exp(test$Outpred)
+test$rownames = as.character(test$rownames)
+Terra2 = merge(Terra2, test)
+summary(lm(X24hrPM ~ Outpred, Terra2))
+
 ResIceT = cbind.data.frame(residuals(TestMod), rep("T", length(residuals(TestMod))), rep("IceCld", length(residuals(TestMod))))
 colnames(ResIceT) = c("Residuals", "ATflag", "CldFlag")
 TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Terra2[Terra2$CloudCatFin == "WaterCld",])

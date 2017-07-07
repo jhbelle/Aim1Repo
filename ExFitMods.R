@@ -138,9 +138,12 @@ r.squaredGLMM(moda)
 
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T" & !is.na(MissingMAIAC$CenteredTemp))
 Terra <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "T" & !is.na(MissingMAIAC$CenteredTemp) & (as.character(MissingMAIAC$Date, "%Y") == "2012" | as.character(MissingMAIAC$Date, "%Y")=="2013" | as.character(MissingMAIAC$Date, "%Y") == "2014"))
+Terra = subset(Terra, Terra$X24hrPM > 2)
+Rdlengths = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/RdLengths_AllRds.csv")[,c("Input_FID", "Count_", "RdLenkm")]
+Terra = merge(Terra, Rdlengths, by.x="InputFID", by.y="Input_FID")
 Terra$CrossValSet <- sample(1:10, length(Terra$County), replace=T)
 for (i in seq(1,10)){
-  mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|Date), Terra[Terra$CrossValSet != i,])
+  mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + RdLenkm + PercForest + (1+AOD55|DOY), Terra[Terra$CrossValSet != i,])
   #mod = lmer(X24hrPM~AOD55 + pblh + CenteredTemp + WindSpeed + r_heightAboveGround + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55+WindSpeed|DOY), Terra[Terra$CrossValSet != i,])
   #mod = lmer(X24hrPM~AOD55 + Elev.y + NEIPM + PRoadLengt + PercForest + (1+AOD55|DOY), Terra[Terra$CrossValSet != i,])
   predvals = predict(mod, Terra[Terra$CrossValSet == i,], allow.new.levels=T)
