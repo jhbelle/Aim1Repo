@@ -15,8 +15,8 @@
 % Change these parameters!!!!
 % -----------------------
 yr = 2012;
-IPath = 'E://MODIScloud_Jess/';
-Opath ='E://MODIScloud_extr_1km/';
+IPath = '/aura/MODIScloud_Jess/';
+Opath ='/aura/MODIScloud_extr_1km/';
 
 %yr = 2011; %- pass in through command line for each submission
 % -----------------------
@@ -26,7 +26,11 @@ Opath ='E://MODIScloud_extr_1km/';
 
 
 % Cycle through each day in year, and get list of files for each
-for day=80:365
+<<<<<<< HEAD
+for day=82:365
+=======
+for day=82:365
+>>>>>>> 1e745f2652fbc3b023dc2a536d347afa4ff52542
     filelist = dir(sprintf('%sMYD06_L2.A%u%03d.*.hdf', IPath, yr, day));
     % Initialize output structure for section data
     Varnames = {'MaskVal', 'CloudEffRad', 'CloudAOD', 'CloudWaterPath', 'hr', 'min'};

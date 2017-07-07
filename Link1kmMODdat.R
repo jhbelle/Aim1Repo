@@ -30,9 +30,9 @@ MODpaths = c("/gc_runs/MYD03_Calif/Extractions_Aqua_STop1/", "/gc_runs/MYD03_Cal
 #GridPaths = c("/gc_runs/MYD03_Calif/Gridded_Terra_STop/", "/gc_runs/MYD03_Calif/Gridded_Terra_STop2/", "/gc_runs/MYD03_Calif/Gridded_Terra_SBot/", "/gc_runs/MYD03_Calif/Gridded_Terra_SBot2/")
 GridPaths = c("/gc_runs/MYD03_Calif/Gridded_Aqua_STop1/", "/gc_runs/MYD03_Calif/Gridded_Aqua_STop2/", "/gc_runs/MYD03_Calif/Gridded_Aqua_SBot1/", "/gc_runs/MYD03_Calif/Gridded_Aqua_SBot2/")
 ## Location of data files - data from cloud product - linked by index/mask value
-DataPath = "/aura/MODIScloud_extr_1km/"
+#DataPath = "/aura/MODIScloud_extr_1km/"
 ## Location of output files
-OutPath = "/aura/LinkedFilesCloud/"
+OutPath = "/aura/LinkedFilesCloud2/"
 ## Scale value for AOD - from MODIS hdf files
 AODERscale = 0.009999999776482582
 # --------
@@ -47,16 +47,16 @@ for (Day in Startday:Endday){
       Mod$timestamp <- paste(sprintf("%02d:%02d", Mod$hr, Mod$min))
       Mod$UID <- sprintf("G%i_%03d_%s_P%f_%f", Year, Day, Mod$timestamp, Mod$Lat, Mod$Long)
       Mod$UID <- gsub("[[:punct:]]", "", Mod$UID)
-      Cloud <- read.csv(sprintf("%sExtr_%i_%03d_S1_%s.csv", DataPath, Year, Day, TAflag))
+      #Cloud <- read.csv(sprintf("%sExtr_%i_%03d_S1_%s.csv", DataPath, Year, Day, TAflag))
       ## If the gridding output file exists (a few days/sections had no data and files for those days weren't created during gridding), read it in
       Grid <- try(read.csv(sprintf("%sOutp_%i_%03d_S1.csv", GridPaths[s], Year, Day, TAflag), stringsAsFactors=FALSE))
       if (is.data.frame(Grid)) {
         ## Summarize MODIS data in each cell of the CMAQ grid - function CalcVals defined in function file
-        CombOut <- ddply(Grid, .(US.id), CalcVals, MODdat=Mod, Clouddat=Cloud, scale=AODERscale)
+        CombOut <- try(ddply(Grid, .(US.id), CalcVals, MODdat=Mod))
         rm(Mod, Grid)
         gc()
         ## Join output to that from previous section, if it exists
-        if (exists("OutpDay")){
+        if (exists("OutpDay") & is.data.frame(CombOut)){
           OutpDay <- rbind.data.frame(OutpDay, CombOut)
         } else {
           OutpDay <- CombOut
