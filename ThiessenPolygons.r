@@ -22,28 +22,28 @@ library(plyr)
 #Startday = as.numeric(args[2])
 #Ndays = as.numeric(args[3])
 Section = 1
-Startday=74
-Ndays=365
-AT="T"
+Startday=1
+Ndays=2
+AT="A"
 #Section = 8 #Ndays =365
 #Startday=1 ## Year to grid
-data.year = 2014
+data.year = 2012
 ## Location of grid polygon layer
-MAIACGrid = "T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/SFGrid.shp"
-MAIAClayer = "SFGrid"
+MAIACGrid = "/home/jhbelle/Data/FinalCopy_AtlPolys/Atl_MAIACGrid.shp"
+MAIAClayer = "Atl_MAIACGrid"
 ## Folder containing section-specific csv files with raw data in them -  GriddingExtractMODIS10km.m needs to be run first to pull the raw data from the hdf into section-specific csvs
-aquaDir <-  "E://MODIScloud_extr/"
+aquaDir <-  "/aqua/MODIS_Cld_Jess/Extractions_5km_Aqua/"
 ## Directory to put output in
-OutDir <- "E://GriddedSF5x5/"
+OutDir <- "/aqua/MODIS_Cld_Jess/Gridded_5km_Aqua/"
 ## Directory with GeoMetadata files downloaded from NASA ftp site
-GeoMetaDir <- "T://eohprojs/CDC_climatechange/Jess/MODIS_GeoMeta/TERRA/2014/"
-GeoMetaPrefix <- "MOD03_"
+GeoMetaDir <- "/gc_runs/MODIS_GeoMeta/AQUA/2012/"
+GeoMetaPrefix <- "MYD03_"
 ## ---------------
 # Load function file
 ## ---------------
 
-#source("/home/jhbelle/Aim1Repo/Functions_ThiessenPolygons.R")
-source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_ThiessenPolygons.R")
+source("/home/jhbelle/Aim1Repo/Functions_ThiessenPolygons.R")
+#source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_ThiessenPolygons.R")
 
 ## --------------
 ## Procedural code
@@ -53,7 +53,7 @@ US.grid <- readOGR(dsn=MAIACGrid, layer=MAIAClayer)
 #day=1
 for(day in Startday:Ndays){
   ## read in data from MYD04_L2 files
-  aquaRaw <- data.frame(read.csv(sprintf("%sExtr_%i_%03d_S%i_%s.csv", aquaDir, data.year, day, Section, AT),header=T,as.is=T))
+  aquaRaw <- data.frame(read.csv(sprintf("%sExtr_%i_%03d_S%i.csv", aquaDir, data.year, day, Section),header=T,as.is=T))
   colnames(aquaRaw)[1:2] <- c("aqua_lat","aqua_lon")
   ## Convert aquaRaw into spatial points data frame and reattach data needed later
   ## Define point coordinate locations
@@ -63,7 +63,7 @@ for(day in Startday:Ndays){
   ## Define projection coordinates are in
   proj4string(aquaRaw) <- CRS("+proj=longlat +datum=WGS84")
   ## Create timestamp variable from hour and minute fields stored in csv files containing MODIS data
-  aquaRaw@data$timestamp <- paste(sprintf("%02d:%02d", aquaRaw@data$hr, aquaRaw@data$min))
+  aquaRaw@data$timestamp <- paste(sprintf("%02d:%02d", as.integer(aquaRaw@data$hr), as.integer(aquaRaw@data$min)))
   ## Create UID's for each MODIS pixel - just mashes together the year, day, time, lat, and long.
   aquaRaw@data$UID <-sprintf("G%i_%03d_%s_P%f_%f", data.year, day, aquaRaw@data$timestamp, aquaRaw@data[,1], aquaRaw@data[,2])
   ## Project point layer to projection used in grid polygon layer (Should be same as original CMAQ points)

@@ -22,7 +22,7 @@ source("/home/jhbelle/Aim1Repo/Functions_HarvardModel.R")
 # Near table
 #NearMAIACEPA = read.csv("/home/jhbelle/Data/SFGridFin/EPAtoMAIAC.csv", stringsAsFactors=F)
 # MAIAC location
-MAIACloc = "/aura/MAIACoutputs_GriddedSummed/"
+MAIACloc = "/home/jhbelle/Data/Transfer_MAIAC/"
 # TA flag
 TAflag="A"
 # RUC location
@@ -31,9 +31,9 @@ RUCfolder = ifelse(TAflag=="A", "Aqua", ifelse(TAflag=="T", "Terra", print("WTF"
 # Startdate
 Startdate = as.Date("2012-01-01", "%Y-%m-%d")
 # Enddate
-Enddate = as.Date("2014-12-31", "%Y-%m-%d")
+Enddate = as.Date("2012-01-02", "%Y-%m-%d")
 # Location of saved aggregated outputs
-OutAgg = "/aura/AggregatedDat_NoCld.csv"
+OutAgg = "/aura/AggregatedDat_NoCld_Atl.csv"
 
 # Set up threading for ddply
 #registerDoMC(8)
@@ -46,7 +46,7 @@ OutAgg = "/aura/AggregatedDat_NoCld.csv"
 for (day in seq(Startdate, Enddate, "day")){
   Day = as.Date(day, origin=as.Date("1970-01-01", "%Y-%m-%d"))
   # Get list of MAIAC files on this day
-  filelist = list.files(path=sprintf("%s%s%s/", MAIACloc, TAflag, as.character(Day, "%Y")), pattern=sprintf("MAIACdat_%s_*", as.character(Day, "%Y%03j")), full.names=T)
+  filelist = list.files(path=sprintf("%s", MAIACloc), pattern=sprintf("MAIACdat_%s_*", as.character(Day, "%Y%03j")), full.names=T)
   # Read in MAIAC data joining together all files for day
   for (file in filelist){
     if (exists("MAIACdat")){

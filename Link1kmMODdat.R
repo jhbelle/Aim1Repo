@@ -17,22 +17,22 @@ source("/home/jhbelle/Aim1Repo/Functions_Link1kmMODdat_Grid.r")
 #args = commandArgs(trailingOnly=T)
 #Endday = as.numeric(args[2])
 #Startday = as.numeric(args[1])
-Endday=366
-Startday=60
+Endday=1
+Startday=1
 ## Year
 Year = 2012
 TAflag="A"
 ListBroken = c()
 ## Location of MODIS files - extracted from hdf section-specific csvs using GriddingExtractMODIS10km.m
 #MODpaths = c("/gc_runs/MYD03_Calif/Extractions_Terra_STop/", "/gc_runs/MYD03_Calif/Extractions_Terra_STop2/", "/gc_runs/MYD03_Calif/Extractions_Terra_SBot/", "/gc_runs/MYD03_Calif/Extractions_Terra_SBot2/")
-MODpaths = c("/gc_runs/MYD03_Calif/Extractions_Aqua_STop1/", "/gc_runs/MYD03_Calif/Extractions_Aqua_STop2/", "/gc_runs/MYD03_Calif/Extractions_Aqua_SBot1/", "/gc_runs/MYD03_Calif/Extractions_Aqua_SBot2/")
+MODpaths = c("/gc_runs/MOD03_Atl/Extractions_Aqua/Extr_2012_001_S1_h04v05.csv", "/gc_runs/MOD03_Atl/Extractions_Aqua/Extr_2012_001_S1_h04v04_S1.csv", "/gc_runs/MOD03_Atl/Extractions_Aqua/Extr_2012_001_S1_h04v04_S2.csv")
 ## Location of grid
 #GridPaths = c("/gc_runs/MYD03_Calif/Gridded_Terra_STop/", "/gc_runs/MYD03_Calif/Gridded_Terra_STop2/", "/gc_runs/MYD03_Calif/Gridded_Terra_SBot/", "/gc_runs/MYD03_Calif/Gridded_Terra_SBot2/")
-GridPaths = c("/gc_runs/MYD03_Calif/Gridded_Aqua_STop1/", "/gc_runs/MYD03_Calif/Gridded_Aqua_STop2/", "/gc_runs/MYD03_Calif/Gridded_Aqua_SBot1/", "/gc_runs/MYD03_Calif/Gridded_Aqua_SBot2/")
+GridPaths = c("/gc_runs/MOD03_Atl/Gridded_Aqua/Outp_2012_001_S1_A_h04v05.csv", "/gc_runs/MOD03_Atl/Gridded_Aqua/Outp_2012_001_S1_A_h04v04_S1.csv", "/gc_runs/MOD03_Atl/Gridded_Aqua/Outp_2012_001_S1_A_h04v04_S2.csv")
 ## Location of data files - data from cloud product - linked by index/mask value
 #DataPath = "/aura/MODIScloud_extr_1km/"
 ## Location of output files
-OutPath = "/aura/LinkedFilesCloud2/"
+OutPath = "/aura/"
 ## Scale value for AOD - from MODIS hdf files
 AODERscale = 0.009999999776482582
 # --------
@@ -42,14 +42,14 @@ for (Day in Startday:Endday){
   for (s in 1:length(GridPaths)){
     #print(section)
     ## Read in MODIS data, and create necessary variables - timestamp, UIDs and scaled AOD values
-    Mod <- try(read.csv(sprintf("%sExtr_%i_%03d_S1.csv", MODpaths[s], Year, Day)))
+    Mod <- try(read.csv(MODpaths[s]))
     if (is.data.frame(Mod)){
       Mod$timestamp <- paste(sprintf("%02d:%02d", Mod$hr, Mod$min))
       Mod$UID <- sprintf("G%i_%03d_%s_P%f_%f", Year, Day, Mod$timestamp, Mod$Lat, Mod$Long)
       Mod$UID <- gsub("[[:punct:]]", "", Mod$UID)
       #Cloud <- read.csv(sprintf("%sExtr_%i_%03d_S1_%s.csv", DataPath, Year, Day, TAflag))
       ## If the gridding output file exists (a few days/sections had no data and files for those days weren't created during gridding), read it in
-      Grid <- try(read.csv(sprintf("%sOutp_%i_%03d_S1.csv", GridPaths[s], Year, Day, TAflag), stringsAsFactors=FALSE))
+      Grid <- try(read.csv(GridPaths[s], stringsAsFactors=FALSE))
       if (is.data.frame(Grid)) {
         ## Summarize MODIS data in each cell of the CMAQ grid - function CalcVals defined in function file
         CombOut <- try(ddply(Grid, .(US.id), CalcVals, MODdat=Mod))

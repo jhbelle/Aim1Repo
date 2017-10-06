@@ -40,7 +40,7 @@ IV. Collocation processing
 
 VI. Gridding for case study predictions
   1) MAIAC processing
-    a) procmaiac.pro - 
+    a) procmaiac.pro - Extracts MAIAC data 
     b) qsub_extrmaiac.pro - submission idl pro file for procmaiac.pro - contains record of submissions made of script
   2) Cloud Extraction
     a) GEMOD1km_T.m - Extracts Terra M*D35 values to text file

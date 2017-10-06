@@ -16,13 +16,16 @@
 
 ;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2012, 1, 366, '/terra/MAIACdat/2012/', '/aura/MAIACoutputs_GriddedSummed/A2012/', 'MAIACAAOT.h01v04.', 26, 45
 
-procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2013, 1, 365, '/terra/MAIACdat/2013/', '/aura/MAIACoutputs_GriddedSummed/A2013/', 'MAIACAAOT.h01v04.', 26, 45
+;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2013, 1, 365, '/terra/MAIACdat/2013/', '/aura/MAIACoutputs_GriddedSummed/A2013/', 'MAIACAAOT.h01v04.', 26, 45
 
-procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2014, 1, 365, '/terra/MAIACdat/2014/', '/aura/MAIACoutputs_GriddedSummed/A2014/', 'MAIACAAOT.h01v04.', 26, 45
+;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2014, 1, 365, '/terra/MAIACdat/2014/', '/aura/MAIACoutputs_GriddedSummed/A2014/', 'MAIACAAOT.h01v04.', 26, 45
 
-procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2012, 1, 366, '/terra/MAIACdat/2012/', '/aura/MAIACoutputs_GriddedSummed/T2012/', 'MAIACTAOT.h01v04.', 26, 45
+;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2012, 1, 366, '/terra/MAIACdat/2012/', '/aura/MAIACoutputs_GriddedSummed/T2012/', 'MAIACTAOT.h01v04.', 26, 45
 
-procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2013, 1, 365, '/terra/MAIACdat/2013/', '/aura/MAIACoutputs_GriddedSummed/T2013/', 'MAIACTAOT.h01v04.', 26, 45
+;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2013, 1, 365, '/terra/MAIACdat/2013/', '/aura/MAIACoutputs_GriddedSummed/T2013/', 'MAIACTAOT.h01v04.', 26, 45
 
-procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2014, 1, 365, '/terra/MAIACdat/2014/', '/aura/MAIACoutputs_GriddedSummed/T2014/', 'MAIACTAOT.h01v04.', 26, 45
+;procMAIAC, '/home/jhbelle/Data/SFGridFin/FinGridJoined.csv', 2014, 1, 365, '/terra/MAIACdat/2014/', '/aura/MAIACoutputs_GriddedSummed/T2014/', 'MAIACTAOT.h01v04.', 26, 45
 
+;procMAIAC, '/home/jhbelle/Data/FinalCopy_AtlPolys/FinGridJoined2_h04v04.csv', 2012, 1, 2, '/home/jhbelle/Data/Transfer_MAIAC/', '/home/jhbelle/Data/Transfer_MAIAC/', 'MAIACAAOT.h04v04.', 26,59 
+
+procMAIAC, '/home/jhbelle/Data/FinalCopy_AtlPolys/FinGridJoined2_h04v05.csv', 2012, 1, 2, '/home/jhbelle/Data/Transfer_MAIAC/', '/home/jhbelle/Data/Transfer_MAIAC/', 'MAIACAAOT.h04v05.', 26, 59

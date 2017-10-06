@@ -5,10 +5,8 @@
 ## Purpose: Record of commands used at the command line on cluster to read in file containing RUC, make predictions using Harvard Model, and save outputs
 ## ----------
 
-<<<<<<< HEAD
 =======
 library(lme4)
->>>>>>> 1e745f2652fbc3b023dc2a536d347afa4ff52542
 library(mgcv)
 
 # Read in dataset - subset to day 1
@@ -44,20 +42,13 @@ Day1PredAlt$POINT_Y.y.y = Day1PredAlt$POINT_Y
 
 harvmodel = readRDS("/aura/harvmodel.Rdata")
 
-<<<<<<< HEAD
-harvardmodel2 = gam(pred ~ DailyMean + s(POINT_X, POINT_Y), data=Day1PredMain, method="REML")
-Day1PredAlt$PredAlt2 = predict(harvardmodel2, Day1PredAlt)
-=======
->>>>>>> 1e745f2652fbc3b023dc2a536d347afa4ff52542
 Day1PredAlt$PredAlt = predict(harvmodel, Day1PredAlt)^2
 
 write.csv(Day1PredAlt, "/aura/Day1PredAlt.csv")
 
 Cld5km = read.csv("/aura/LinkedValsCloudCalif/DailyGridAOD_2012_001.csv")
 Day1PredCld = merge(Day1PredAlt, Cld5km, by.x="InputFID", by.y="US.id")
-<<<<<<< HEAD
 
-=======
 Cld1kmDat = read.csv("/aura/LinkedFilesCloud2/DailyGridAOD_2012_001.csv")[,c("US.id", "Index", "hr", "min")]
 Cld1kmDat = unique(Cld1kmDat)
 Cld1kmVals = read.csv("/aura/MODIScloud_extr_1km/Extr_2012_001_S1_A.csv")
@@ -83,4 +74,3 @@ WaterClouds$PredWatCld = exp(predict(watermodel, WaterClouds))
 WaterClouds$DiffMineHarv = WaterClouds$PredWatCld - WaterClouds$PredAlt
 
 write.csv(WaterClouds, "/aura/Day1PredWaterCld.csv")
->>>>>>> 1e745f2652fbc3b023dc2a536d347afa4ff52542
