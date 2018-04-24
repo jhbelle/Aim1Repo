@@ -9,7 +9,7 @@
 ## Load libraries and functions
 library(plyr)
 library(stringr)
-source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_LinkMODdat_Grid.r")
+source("/home/jhbelle/Aim1Repo/Functions_LinkMODdat_Grid.r")
 # ----
 # Define relevant parameters
 # ----
@@ -17,18 +17,18 @@ source("T://eohprojs/CDC_climatechange/Jess/Dissertation/Aim1Repo/Functions_Link
 #args = commandArgs(trailingOnly=T)
 #Endday = as.numeric(args[2])
 #Startday = as.numeric(args[1])
-Endday=365
+Endday=2
 Startday=1
 ## Year
-Year = 2013
+Year = 2012
 TAflag="A"
 ListBroken = c()
 ## Location of MODIS files - extracted from hdf section-specific csvs using GriddingExtractMODIS10km.m
-MODpath = "E://MODIScloud_extr/"
+MODpath = "/aqua/MODIS_Cld_Jess/Extractions_5km_Aqua/"
 ## Location of grid
-GridPath = "E://GriddedSF5x5/"
+GridPath = "/aqua/MODIS_Cld_Jess/Gridded_5km_Aqua/"
 ## Location of output files
-OutPath = "E://LinkedValsCloudCalif/"
+OutPath = "/home/jhbelle/Links5kmCld/"
 ## Scale value for AOD - from MODIS hdf files
 Emisscale = 0.009999999776482582
 # --------
@@ -38,8 +38,8 @@ for (Day in Startday:Endday){
   for (section in 1:1){
     #print(section)
     ## Read in MODIS data, and create necessary variables - timestamp, UIDs and scaled AOD values
-    Mod <- read.csv(sprintf("%sExtr_%i_%03d_S%i_%s.csv", MODpath, Year, Day, section, TAflag))
-    Mod$timestamp <- paste(sprintf("%02d:%02d", Mod$hr, Mod$min))
+    Mod <- read.csv(sprintf("%sExtr_%i_%03d_S%i.csv", MODpath, Year, Day, section))
+    Mod$timestamp <- paste(sprintf("%02d:%02d", as.integer(Mod$hr), as.integer(Mod$min)))
     Mod$UID <- sprintf("G%i_%03d_%s_P%f_%f", Year, Day, Mod$timestamp, Mod$Lat, Mod$Long)
     Mod$UID <- gsub("[[:punct:]]", "", Mod$UID)
     ## If the gridding output file exists (a few days/sections had no data and files for those days weren't created during gridding), read it in
