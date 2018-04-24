@@ -8,26 +8,6 @@
 #  unzip $tile.zip -d $tile
 #done
 
-# Colorado
-mkdir ColoradoNED
-cd ColoradoNED
-for tile in "n38w104" "n38w105" "n39w104" "n39w105" "n40w104" "n40w105"
-do	
-  wget -nd --tries=45 https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/13/ArcGrid/$tile.zip
-  mkdir $tile
-  unzip $tile.zip -d $tile
-done
-
-# Indiana
-mkdir IndianaNED
-cd IndianaNED
-for tile in "n39w084" "n39w085" "n39w086" "n39w087" "n40w084" "n40w085" "n40w086" "n40w087" "n41w084" "n41w085" "n41w086" "n41w087"
-do	
-  wget -nd --tries=45 https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/13/ArcGrid/$tile.zip
-  mkdir $tile
-  unzip $tile.zip -d $tile
-done
-
 # California
 mkdir CaliforniaNED
 cd CaliforniaNED

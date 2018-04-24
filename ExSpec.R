@@ -33,7 +33,7 @@ S24$Season <- ifelse(S24$Month == 3 | S24$Month == 4 | S24$Month == 5, "Spring",
 Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
 #Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
 Dat$Date <- as.Date(Dat$Date, "%Y-%m-%d")
-G24 <- Dat
+G24 <- subset(Dat, Dat$Glint ==0)
 # Remove regular AOD values less than 0 - these are missing
 G24$AOD47 <- ifelse(G24$AOD47 < 0, NA, G24$AOD47)
 G24$AOD55 <- ifelse(G24$AOD55 < 0, NA, G24$AOD55)
@@ -54,16 +54,16 @@ takefirst <- function(datblock){ return(datblock[1,])}
 library(plyr)
 FirstCollocOnly <- ddply(G24, .(State, County, Site, Date, AquaTerraFlag), takefirst)
 # Subset data - remove anything with both AOD values missing - Filter 1
-#G24$MissingMAIAC <- ifelse(is.na(G24$AOD47) & is.na(G24$AOD55), 1, 0)
+G24$MissingMAIAC <- ifelse(is.na(G24$AOD47) & is.na(G24$AOD55), 1, 0)
 # Get tabulations of MAIAC by missing status and T/A pass
-#xtabs(~ MissingMAIAC + AquaTerraFlag, G24)
-#xtabs(~AquaTerraFlag, FirstCollocOnly)
+xtabs(~ MissingMAIAC + AquaTerraFlag, G24)
+xtabs(~AquaTerraFlag, FirstCollocOnly[FirstCollocOnly$Glint == 0,])
 #str(FirstCollocOnly)
 summary(FirstCollocOnly[FirstCollocOnly$AquaTerraFlag == "A",52:58]*100)
 #summary(FirstCollocOnly[FirstCollocOnly$AquaTerraFlag == "T",52:58]*100)
 
-MissingMAIAC <- subset(FirstCollocOnly, is.na(FirstCollocOnly$AOD47) & is.na(FirstCollocOnly$AOD55))
-#xtabs(~AquaTerraFlag, MissingMAIAC)
+MissingMAIAC <- subset(FirstCollocOnly, !(is.na(FirstCollocOnly$AOD47) & is.na(FirstCollocOnly$AOD55)) & FirstCollocOnly$Glint==0)
+xtabs(~AquaTerraFlag, MissingMAIAC)
 summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A",52:58]*100)
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "T",52:58]*100)
 # Filter 2: Cloud product - characterize clouds as high, low or none
@@ -81,7 +81,7 @@ MissingMAIAC$Snow <- ifelse(MissingMAIAC$sd_surface == 0, 0, 1)
 MissingMAIAC$Multi <- ifelse(MissingMAIAC$PMultiCld == 0, 0, 1)
 # Will need to double-check this categorization for each dataset
 MissingMAIAC$MAIACcat <- ifelse(MissingMAIAC$Cloud == 1 | MissingMAIAC$Partcloud == 1 | MissingMAIAC$CloudShadow == 1, "Cloud", ifelse(MissingMAIAC$Glint == 1 | MissingMAIAC$Clear == 1 | MissingMAIAC$Snow == 1, "Glint", NA))
-#xtabs(~MAIACcat + AquaTerraFlag, MissingMAIAC)
+xtabs(~MAIACcat + AquaTerraFlag, MissingMAIAC)
 summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "A" & MissingMAIAC$MAIACcat == "Cloud",52:58]*100)
 
 #summary(MissingMAIAC[MissingMAIAC$AquaTerraFlag == "T" & MissingMAIAC$MAIACcat == "Cloud",52:58]*100)
@@ -149,14 +149,30 @@ Aqua <- subset(MissingMAIAC, MissingMAIAC$AquaTerraFlag == "A")
 rm(Clouds, Dat, FirstCollocOnly, G24, MissingMAIAC, S24)
 
 ## ---------
-## Modeling - Individual-level (Preliminary) - treating fractions as separate y variables
+## Modeling - Individual-level (Preliminary) - No cloud models
 ## ---------
 
+Terra2 <- subset(Terra, !is.na(Terra$X2t_heightAboveGround))
+Mod = lmer(log(Sulfate) ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + (1|Date), Terra2)
+summary(Mod)
+confint(Mod)
+Mod = lmer(log(Nitrate) ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + (1|Date), Terra2)
+summary(Mod)
+confint(Mod)
+Mod = lmer(log(OC) ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + (1|Date), Terra2)
+summary(Mod)
+confint(Mod)
 
-## --------
-## Export data
-## --------
-
+Aqua2 <- subset(Aqua, !is.na(Aqua$X2t_heightAboveGround))
+Mod = lmer(log(Sulfate) ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + (1|Date), Aqua2)
+summary(Mod)
+confint(Mod)
+Mod = lmer(log(Nitrate) ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + (1|Date), Aqua2)
+summary(Mod)
+confint(Mod)
+Mod = lmer(log(OC) ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + (1|Date), Aqua2)
+summary(Mod)
+confint(Mod)
 ## ------
 ## Sulfate export
 ## ------
@@ -176,26 +192,26 @@ ConvDatS <- function(data, AQ, Mod, PMSpec="SMass", site){
 }
 Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAboveGround))
 
-#TIceAtl = ConvDatS(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
-#TWaterAtl = ConvDatS(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
-#TPossAtl = ConvDatS(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
+TIceAtl = ConvDatS(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
+TWaterAtl = ConvDatS(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
+TPossAtl = ConvDatS(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
 
-TIceSF = ConvDatS(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
-TWaterSF = ConvDatS(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
-TPossSF = ConvDatS(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
+#TIceSF = ConvDatS(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
+#TWaterSF = ConvDatS(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
+#TPossSF = ConvDatS(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
 
 Aqua2 <- subset(Aqua, Aqua$CloudCatFin != "NoCld" & !is.na(Aqua$X2t_heightAboveGround))
 
-#AIceAtl = ConvDatS(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
-#AWaterAtl = ConvDatS(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
-#APossAtl = ConvDatS(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
+AIceAtl = ConvDatS(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
+AWaterAtl = ConvDatS(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
+APossAtl = ConvDatS(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
 
-AIceSF = ConvDatS(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
-AWaterSF = ConvDatS(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
-APossSF = ConvDatS(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
+#AIceSF = ConvDatS(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
+#AWaterSF = ConvDatS(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
+#APossSF = ConvDatS(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
 
-#SMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
-SMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
+SMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
+#SMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
 
 ## ------
 ## Nitrate export
@@ -216,26 +232,26 @@ ConvDatN <- function(data, AQ, Mod, PMSpec="NMass", site){
 }
 Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAboveGround))
 
-#TIceAtl = ConvDatN(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
-#TWaterAtl = ConvDatN(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
-#TPossAtl = ConvDatN(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
+TIceAtl = ConvDatN(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
+TWaterAtl = ConvDatN(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
+TPossAtl = ConvDatN(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
 
-TIceSF = ConvDatN(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
-TWaterSF = ConvDatN(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
-TPossSF = ConvDatN(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
+#TIceSF = ConvDatN(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
+#TWaterSF = ConvDatN(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
+#TPossSF = ConvDatN(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
 
 Aqua2 <- subset(Aqua, Aqua$CloudCatFin != "NoCld" & !is.na(Aqua$X2t_heightAboveGround))
 
-#AIceAtl = ConvDatN(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
-#AWaterAtl = ConvDatN(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
-#APossAtl = ConvDatN(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
+AIceAtl = ConvDatN(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
+AWaterAtl = ConvDatN(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
+APossAtl = ConvDatN(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
 
-AIceSF = ConvDatN(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
-AWaterSF = ConvDatN(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
-APossSF = ConvDatN(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
+#AIceSF = ConvDatN(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
+#AWaterSF = ConvDatN(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
+#APossSF = ConvDatN(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
 
-#NMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
-NMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
+NMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
+#NMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
 
 ## -------
 # OC export
@@ -256,37 +272,37 @@ ConvDatOC <- function(data, AQ, Mod, PMSpec="OCMass", site){
 }
 Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAboveGround))
 
-#TIceAtl = ConvDatOC(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
-#TWaterAtl = ConvDatOC(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
-#TPossAtl = ConvDatOC(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
+TIceAtl = ConvDatOC(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
+TWaterAtl = ConvDatOC(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
+TPossAtl = ConvDatOC(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
 
-TIceSF = ConvDatOC(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
-TWaterSF = ConvDatOC(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
-TPossSF = ConvDatOC(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
+#TIceSF = ConvDatOC(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
+#TWaterSF = ConvDatOC(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
+#TPossSF = ConvDatOC(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
 
 Aqua2 <- subset(Aqua, Aqua$CloudCatFin != "NoCld" & !is.na(Aqua$X2t_heightAboveGround))
 
-#AIceAtl = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
-#AWaterAtl = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
-#APossAtl = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
+AIceAtl = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
+AWaterAtl = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
+APossAtl = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
 
-AIceSF = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
-AWaterSF = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
-APossSF = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
+#AIceSF = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
+#AWaterSF = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
+#APossSF = ConvDatOC(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
 
-#OCMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
-OCMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
+OCMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
+#OCMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
 
 ## -----------
 # Combine and plot
 ## -----------
 
-#AllMassAtl = rbind.data.frame(OCMassAtl, NMassAtl, SMassAtl)
-#write.csv(AllMassAtl, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/SpecMassResultsAtl.csv", row.names=F)
+AllMassAtl = rbind.data.frame(OCMassAtl, NMassAtl, SMassAtl)
+write.csv(AllMassAtl, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/SpecMassResultsAtl.csv", row.names=F)
 
 
-AllMassSF = rbind.data.frame(OCMassSF, NMassSF, SMassSF)
-write.csv(AllMassSF, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/SpecMassResultsSF.csv", row.names=F)
+#AllMassSF = rbind.data.frame(OCMassSF, NMassSF, SMassSF)
+#write.csv(AllMassSF, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/SpecMassResultsSF.csv", row.names=F)
 
 
 library(ggplot2)

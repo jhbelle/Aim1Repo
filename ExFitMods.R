@@ -11,8 +11,8 @@
 Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
 #Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
 Dat$Date <- as.Date(Dat$Date, "%Y-%m-%d")
-G24 <- Dat
-
+#G24 <- Dat
+G24 <- subset(Dat, Dat$Glint == 0)
 # Remove regular AOD values less than 0 - these are missing
 G24$AOD47 <- ifelse(G24$AOD47 < 0, NA, G24$AOD47)
 G24$AOD55 <- ifelse(G24$AOD55 < 0, NA, G24$AOD55)

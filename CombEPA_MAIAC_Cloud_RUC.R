@@ -12,7 +12,7 @@ library(plyr)
 source("/home/jhbelle/Aim1Repo/Functions_CombEPA_MAIAC_Cloud_RUC.R")
 
 ## -----
-## Combine EPA with cloud and MAIAC - run locally first time
+## Combine EPA with cloud and MAIAC - run locally first time - commented out after run
 ## -----
 
 # Read in EPA observations

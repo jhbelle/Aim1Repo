@@ -19,7 +19,7 @@ source("Functions_EPA_Proc.R")
 ## --------------
 #For each region, need list of all monitors and days with a 24hour gravimetric average
 # Read in files output from EPA_Anal.R
-G24hr <- read.csv("/home/jhbelle/EPAdata/CleanedData/G24hr.csv")
+#G24hr <- read.csv("/home/jhbelle/EPAdata/CleanedData/G24hr.csv")
 G24hr <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/G24hr.csv", stringsAsFactors = F)
 # Subset to California, 2009 and reexport
 Calif2009 <- subset(G24hr, G24hr$StudyArea == "Calif" & substr(as.character(G24hr$Date), 1, 4) == 2009)[,c("State", "County", "Site", "Latitude", "Longitude", "Date", "X24hrPM")]

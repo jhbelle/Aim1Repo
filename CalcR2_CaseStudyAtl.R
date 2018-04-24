@@ -121,11 +121,13 @@ Aqua2 = ddply(Aqua, .(State, County, Site, Date), takefirst)
 CombTA = merge(Terra2, Aqua2, by=c("State", "County", "Site", "InputFID", "Date", "X24hrPM"))
 CombTA$CrossValSetT = sample(1:10, length(CombTA$County), replace=T)
 CombTA$CrossValSetA = sample(1:10, length(CombTA$County), replace=T)
-CombTA$rownames = rownames(CombTA)
+RoadLengths = read.csv("T:/eohprojs/CDC_climatechange/Jess/Dissertation/AtlMAIACgrid_Pred/FinalCopy_AtlPolys/AllRoadLengths.csv")[,c("Input_FID", "Count_", "Sum_RdLen")]
+CombTA = merge(CombTA, RoadLengths, by.x="InputFID", by.y="Input_FID")
 CombTA$DOY = as.integer(as.character(CombTA$Date, "%j"))
 CombTA$Year = as.integer(as.character(CombTA$Date, "%Y"))
 CombTA = subset(CombTA, CombTA$Year == 2012 | CombTA$Year == 2013 | CombTA$Year == 2014)
 CombTA = subset(CombTA, CombTA$X24hrPM > 2)
+CombTA$rownames = rownames(CombTA)
 #Rdlengths = read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/SFMAIACgrid_Pred/SFGridFin/RdLengths_AllRds.csv")[,c("Input_FID", "Count_", "RdLenkm")]
 #CombTA = merge(CombTA, Rdlengths, by.x="InputFID", by.y="Input_FID")
 
@@ -139,8 +141,8 @@ library(lme4)
 
 # Fit models
 for (i in seq(1,10)){
-  mod = lmer(X24hrPM~AOD55.x + pblh.x + CenteredTemp.x + WindSpeed.x + r_heightAboveGround.x + Elev.y.x + NEIPM.x + PercForest.x + PRoadLengt.x + (1+AOD55.x|DOY), CombTA[CombTA$CrossValSetT != i,])
-  moda = lmer(X24hrPM~AOD55.y + pblh.y + CenteredTemp.y + WindSpeed.y + r_heightAboveGround.y + Elev.y.y + NEIPM.y + PercForest.y + PRoadLengt.y + (1+AOD55.y|DOY), CombTA[CombTA$CrossValSetA != i,])
+  mod = lmer(X24hrPM~AOD55.x + pblh.x + CenteredTemp.x + WindSpeed.x + r_heightAboveGround.x + Elev.y.x + NEIPM.x + PercForest.x + PRoadLengt.x + Sum_RdLen + (1+AOD55.x|DOY), CombTA[CombTA$CrossValSetT != i,])
+  moda = lmer(X24hrPM~AOD55.y + pblh.y + CenteredTemp.y + WindSpeed.y + r_heightAboveGround.y + Elev.y.y + NEIPM.y + PercForest.y + PRoadLengt.y + Sum_RdLen + (1+AOD55.y|DOY), CombTA[CombTA$CrossValSetA != i,])
   predvalsT = predict(mod, CombTA[CombTA$CrossValSetT == i,], allow.new.levels=T)
   predvalsA = predict(moda, CombTA[CombTA$CrossValSetA == i,], allow.new.levels=T)
   if (exists("PredA")){ PredA = c(PredA, predvalsA) } else PredA = predvalsA
@@ -264,20 +266,20 @@ summary(lm(X24hrPM~PredH, CombTA))
 # Fit final versions to transfer to cluster
 ## ----------
 
-mainmoda = lmer(X24hrPM~AOD55.y + pblh.y + CenteredTemp.y + WindSpeed.y + r_heightAboveGround.y + Elev.y.y + PercForest.y + NEIPM.y + RdLenkm + (1+AOD55.y|DOY), CombTA)
-mainmod = lmer(X24hrPM~AOD55.x + pblh.x + CenteredTemp.x + WindSpeed.x + r_heightAboveGround.x + Elev.y.y + NEIPM.x + PercForest.x + RdLenkm + (1+AOD55.x|DOY), CombTA)
+mainmoda = lmer(X24hrPM~AOD55.y + pblh.y + CenteredTemp.y + WindSpeed.y + r_heightAboveGround.y + Elev.y.y + PercForest.y + NEIPM.y + PRoadLengt.y + (1+AOD55.y|DOY), CombTA)
+mainmod = lmer(X24hrPM~AOD55.x + pblh.x + CenteredTemp.x + WindSpeed.x + r_heightAboveGround.x + Elev.y.y + NEIPM.x + PercForest.x + PRoadLengt.x + (1+AOD55.x|DOY), CombTA)
 summary(mainmod)
 summary(mainmoda)
-saveRDS(mainmod, "C:/Users/jhbelle/Documents/mainmodel.Rdata")
-saveRDS(mainmoda, "C:/Users/jhbelle/Documents/mainmodela.Rdata")
+saveRDS(mainmod, "C:/Users/jhbelle/Documents/Atlmainmodel.Rdata")
+saveRDS(mainmoda, "C:/Users/jhbelle/Documents/Atlmainmodela.Rdata")
 
 for (m in seq(1,12)){
-  harvmod = gam(sqrtPM~ DailyMean.x + s(POINT_X.y.y, POINT_Y.y.y, k=10), data=CombTA[CombTA$Month == m,])
-  saveRDS(harvmod, sprintf("C://Users/jhbelle/Documents/harvmodel_%i.Rdata", m))
+  harvmod = gam(sqrtPM~ DailyMean + s(POINT_X.y.y, POINT_Y.y.y, k=10), data=CombTA[CombTA$Month == m,])
+  saveRDS(harvmod, sprintf("C://Users/jhbelle/Documents/Atlharvmodel_%i.Rdata", m))
 }
 
 watcloud = lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|DOY), CombTA[(CombTA$CloudCatFin.x == "WaterCld"),], na.action="na.omit")
-saveRDS(watcloud, "C:/Users/jhbelle/Documents/watercloudmodela.Rdata")
+saveRDS(watcloud, "C:/Users/jhbelle/Documents/Atlwatercloudmodela.Rdata")
 
 icecloud = lmer(LogPM.y ~ CenteredTemp.y + r_heightAboveGround.y + WindSpeed.y + cape2.y + pblh.y + Raining.y + CloudEmmisivity.y + CloudRadius.y + CloudAOD.y + (1|DOY), CombTA[(CombTA$CloudCatFin.x == "IceCld"),], na.action="na.omit")
-saveRDS(icecloud, "C:/Users/jhbelle/Documents/icecloudmodela.Rdata")
+saveRDS(icecloud, "C:/Users/jhbelle/Documents/Atlicecloudmodela.Rdata")

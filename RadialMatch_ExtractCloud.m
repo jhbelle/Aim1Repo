@@ -9,10 +9,10 @@
 % -----------------------
 % Change these parameters!!!!
 % -----------------------
-Collocsfile = '/aqua/Jess/Data/AtlG24hr.csv';
-FPath = '/aqua/MODIS_Cld_Jess/';
-OutpFile1km = '/aqua/Jess/Data/Cld1km/';
-OutpFile5km = '/aqua/Jess/Data/Cld5km/';
+Collocsfile = '/aqua/Jess/Data/AtlG24hr.csv'; % Produced from the series EPA_Proc.R; EPA_Anal.R, EPA_Colloc.R
+FPath = '/aqua/MODIS_Cld_Jess/'; % File path where M*D06_L2 hdf files are located - These were deleted and not saved
+OutpFile1km = '/aqua/Jess/Data/Cld1km/'; % Output location of 1 km parameters within M*D06_L2
+OutpFile5km = '/aqua/Jess/Data/Cld5km/'; % Output location of 5 km parameters within M*D06_L2
 % -----------------------
 
 % Open collocation file

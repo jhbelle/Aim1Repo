@@ -5,9 +5,10 @@
 ## Program version: grib_api; bash
 ## Author: J.H. Belle
 ## Purpose: Save data of interest from the RUC/RAP archives to text files for later processing
+## 
 ## ---------------------
 
-source /home/jhbelle/.profile
+source /home/jhbelle/.profile # You would source your own profile here - the important line is: export PATH=$PATH:/aqua/Jess/CDO/cdo-install/bin
 
 # Define variables
 #var=( sp 10u 10v cape cin prate sd hpbl h h vis cape cin r )
@@ -16,7 +17,7 @@ source /home/jhbelle/.profile
 #lev=( surface )
 var=( 2t )
 lev=( heightAboveGround )
-day=2012-04-01
+day=2007-01-01
 while [ "$day" != 2012-05-01 ]; do
     #echo $day
     year=$(date +%Y -d "$day")

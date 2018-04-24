@@ -35,7 +35,7 @@
 Rscript EPA_Proc.R # Creates study-site specific data files of all EPA observations over 2007-2015; EPA observations downloaded as national annual summary files from AirData website
 Rscript EPA_Anal.R # Compares hourly to 24hr and speciated to 24 hr results as a sanity check and so cleaning can be done; Does mass reconstruction for speciated observations; Cleans and outputs final datasets by type of EPA observations for full study period - This file outputs the G24hr csv file used for cloud, RUC/RAP and MAIAC collocations
 Rscript EPA_Colloc.R # Makes a text file for use in mapping stations in ArcGIS - used to create figure 1 showing station locations at study areas
-Rscript EPA_Rep.R # Calculates representativeness from G24hr and MODIS geoMetaData files 
+ 
 
 # MODIS cloud
 sh wget_cloud_atl.sh # Downloads cloud product - not actually versioned as part of directory - see data location for script

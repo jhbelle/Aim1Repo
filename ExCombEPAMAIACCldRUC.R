@@ -23,11 +23,11 @@
 #Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifG24_MAIACCldRUC_10km.csv", stringsAsFactors = F)
 Dat <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlG24_MAIACCldRUC.csv", stringsAsFactors = F)
 Dat$Date <- as.Date(Dat$Date, "%Y-%m-%d")
-G24 <- Dat
-
+G24 <- subset(Dat, Dat$Glint == 0)
+#G24 = Dat
 # Remove regular AOD values less than 0 - these are missing
-G24$AOD47 <- ifelse(G24$AOD47 < 0, NA, G24$AOD47)
-G24$AOD55 <- ifelse(G24$AOD55 < 0, NA, G24$AOD55)
+G24$AOD47 <- ifelse(G24$AOD47 < 0 , NA, G24$AOD47)
+G24$AOD55 <- ifelse(G24$AOD55 == -28.672, NA, G24$AOD55)
 
 # Add in surface temperature
 #Temps <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifTemps.csv", stringsAsFactors = F)[,c(1:3,8,10)]
@@ -55,13 +55,13 @@ FirstCollocOnly <- ddply(G24, .(State, County, Site, Date, AquaTerraFlag), takef
 #G24$MissingMAIAC <- ifelse(is.na(G24$AOD47) & is.na(G24$AOD55), 1, 0)
 # Get tabulations of MAIAC by missing status and T/A pass
 #xtabs(~ MissingMAIAC + AquaTerraFlag, G24)
-#xtabs(~AquaTerraFlag, FirstCollocOnly)
+xtabs(~AquaTerraFlag, FirstCollocOnly[FirstCollocOnly$Glint == 0,])
 #aggregate(OrigPM ~ AquaTerraFlag, FirstCollocOnly, mean)
 #aggregate(OrigPM ~ AquaTerraFlag, FirstCollocOnly, median)
 
-MissingMAIAC <- subset(FirstCollocOnly, is.na(FirstCollocOnly$AOD47) & is.na(FirstCollocOnly$AOD55))
-#xtabs(~AquaTerraFlag, MissingMAIAC)
-#xtabs(~AquaTerraFlag + Glint + Cloud, MissingMAIAC)
+MissingMAIAC <- subset(FirstCollocOnly, (is.na(FirstCollocOnly$AOD47) & is.na(FirstCollocOnly$AOD55)) & FirstCollocOnly$Glint != 1 )
+xtabs(~AquaTerraFlag, MissingMAIAC)
+xtabs(~AquaTerraFlag + Glint + Cloud, MissingMAIAC)
 #aggregate(OrigPM ~ AquaTerraFlag, MissingMAIAC, mean)
 #aggregate(OrigPM ~ AquaTerraFlag + Cloud + Glint, MissingMAIAC, mean)
 #aggregate(OrigPM ~ AquaTerraFlag, MissingMAIAC, median)
@@ -86,7 +86,7 @@ MissingMAIAC$Snow <- ifelse(MissingMAIAC$sd_surface == 0, 0, 1)
 MissingMAIAC$Multi <- ifelse(MissingMAIAC$PMultiCld == 0, 0, 1)
 # Will need to double-check this categorization for each dataset
 MissingMAIAC$MAIACcat <- ifelse(MissingMAIAC$Cloud == 1 | MissingMAIAC$Partcloud == 1 | MissingMAIAC$CloudShadow == 1, "Cloud", ifelse(MissingMAIAC$Glint == 1 | MissingMAIAC$Clear == 1 | MissingMAIAC$Snow == 1, "Glint", NA))
-#xtabs(~MAIACcat + AquaTerraFlag, MissingMAIAC)
+xtabs(~MAIACcat + AquaTerraFlag, MissingMAIAC)
 #aggregate(OrigPM ~ MAIACcat + AquaTerraFlag, MissingMAIAC, mean)
 #aggregate(OrigPM ~ MAIACcat + AquaTerraFlag, MissingMAIAC, median)
 # Toss MAIAC variables
@@ -129,6 +129,11 @@ MissingMAIAC <- subset(MissingMAIAC, !is.na(MissingMAIAC$MODMAIACRUCCld))
 # Make a categorical variable that combines the Yes Clouds in MODMAIACRUCCld with Cloud Phase
 MissingMAIAC$CloudCatFin <- ifelse(MissingMAIAC$MODMAIACRUCCld == "MaybeCld", "MaybeCld", ifelse(MissingMAIAC$MODMAIACRUCCld == "NoCld", "NoCld", ifelse(MissingMAIAC$CloudPhase == 1, "WaterCld", ifelse(MissingMAIAC$CloudPhase == 2, "IceCld", "UndetCld"))))
 xtabs(~CloudCatFin + AquaTerraFlag, MissingMAIAC)
+MissingMAIAC$Sites = paste(MissingMAIAC$State, MissingMAIAC$County, MissingMAIAC$Site, sep= "-")
+xtabs(~CloudCatFin + AquaTerraFlag + Sites, MissingMAIAC)
+xtabs(~AquaTerraFlag + Sites, MissingMAIAC)
+xtabs(~CloudCatFin + AquaTerraFlag + Season, MissingMAIAC)
+xtabs(~AquaTerraFlag + Season, MissingMAIAC)
 #xtabs(~CloudCatFin + AquaTerraFlag + Raining + Season, MissingMAIAC)
 #aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, mean)
 #aggregate(OrigPM ~ CloudCatFin + AquaTerraFlag, MissingMAIAC, median)
@@ -142,12 +147,12 @@ MissingMAIAC$prate <- MissingMAIAC$prate_surface*1000
 MissingMAIAC$CenteredTemp = MissingMAIAC$X2t_heightAboveGround - 273.15
 MissingMAIAC$cape2 = MissingMAIAC$cape_surface/1000
 # Add station XY information
-Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlStationLocs_XY.csv", stringsAsFactors = F)
-CentroidX = 1076436.4 #Atl
-CentroidY = -544307.2 #Atl
-#Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifStationLocs_XY.csv", stringsAsFactors = F)
-#CentroidX = -2179644.1 #SF
-#CentroidY = 258174.0 #SF
+#Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/AtlStationLocs_XY.csv", stringsAsFactors = F)
+#CentroidX = 1076436.4 #Atl
+#CentroidY = -544307.2 #Atl
+Stationlocs <- read.csv("T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/CalifStationLocs_XY.csv", stringsAsFactors = F)
+CentroidX = -2179644.1 #SF
+CentroidY = 258174.0 #SF
 StationLocs = Stationlocs[,c("State", "County", "Site", "POINT_X", "POINT_Y", "RASTERVALU")]
 MissingMAIAC <- merge(MissingMAIAC, StationLocs)
 MissingMAIAC$CenteredX = MissingMAIAC$POINT_X - CentroidX
@@ -169,9 +174,19 @@ ggplot(MissingMAIAC[MissingMAIAC$CloudCatFin != "NoCld" & MissingMAIAC$CloudCatF
 ## ------
 
 Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAboveGround))
-Terra2 <- subset(Terra2, Terra2$Year == 2012 | Terra2$Year == 2013 | Terra2$Year == 2014)
+Terra2 <- subset(Terra,!is.na(Terra$X2t_heightAboveGround))
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + (1|Date), data=Terra2)
+summary(TestMod)
+confint(TestMod)
+rsquared(list(TestMod))
+Aqua2 <- subset(Aqua,!is.na(Aqua$X2t_heightAboveGround))
+TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + (1|Date), data=Aqua2)
+summary(TestMod)
+confint(TestMod)
+rsquared(list(TestMod))
+#Terra2 <- subset(Terra2, Terra2$Year == 2012 | Terra2$Year == 2013 | Terra2$Year == 2014)
 Terra2$DOY = as.numeric(as.character(Terra2$Date, "%j"))
-Terra2 = subset(Terra2, Terra2$X24hrPM > 2)
+#Terra2 = subset(Terra2, Terra2$X24hrPM > 2)
 #library(lme4)
 #library(piecewiseSEM)
 #TestMod = lmer(LogPM ~ CenteredTemp + r_heightAboveGround + WindSpeed + cape2 + pblh + Raining + CloudEmmisivity + CloudRadius + CloudAOD + (1|Date), data=Terra2[Terra2$CloudCatFin == "IceCld",])
@@ -267,30 +282,30 @@ ConvDat <- function(data, AQ, Mod, PMSpec="TotMass", site){
 
 Terra2 <- subset(Terra, Terra$CloudCatFin != "NoCld" & !is.na(Terra$X2t_heightAboveGround))
 
-TIceAtl = ConvDat(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
-TWaterAtl = ConvDat(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
-TPossAtl = ConvDat(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
+#TIceAtl = ConvDat(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="Atl")
+#TWaterAtl = ConvDat(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="Atl")
+#TPossAtl = ConvDat(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="Atl")
 
-#TIceSF = ConvDat(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
-#TWaterSF = ConvDat(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
-#TPossSF = ConvDat(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
+TIceSF = ConvDat(Terra2[Terra2$CloudCatFin == "IceCld",], "T", "Ice", site="SF")
+TWaterSF = ConvDat(Terra2[Terra2$CloudCatFin == "WaterCld",], "T", "Water", site="SF")
+TPossSF = ConvDat(Terra2[Terra2$CloudCatFin == "UndetCld" | Terra2$CloudCatFin == "MaybeCld",], "T", "Maybe", site="SF")
 
 Aqua2 <- subset(Aqua, Aqua$CloudCatFin != "NoCld" & !is.na(Aqua$X2t_heightAboveGround))
 
-AIceAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
-AWaterAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
-APossAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
+#AIceAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="Atl")
+#AWaterAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="Atl")
+#APossAtl = ConvDat(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="Atl")
 
-#AIceSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
-#AWaterSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
-#APossSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
+AIceSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "IceCld",], "A", "Ice", site="SF")
+AWaterSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "WaterCld",], "A", "Water", site="SF")
+APossSF = ConvDat(Aqua2[Aqua2$CloudCatFin == "UndetCld" | Aqua2$CloudCatFin == "MaybeCld",], "A", "Maybe", site="SF")
 
-TotMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
-#TotMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
+#TotMassAtl = rbind.data.frame(TIceAtl, TWaterAtl, TPossAtl, AIceAtl, AWaterAtl, APossAtl)
+TotMassSF = rbind.data.frame(TIceSF, TWaterSF, TPossSF, AIceSF, AWaterSF, APossSF)
 
 # Export TotMassSF
-#write.csv(TotMassSF, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/TotMassResults.csv", row.names=F)
-write.csv(TotMassAtl, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/TotMassResultsAtl.csv", row.names=F)
+write.csv(TotMassSF, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/TotMassResults.csv", row.names=F)
+#write.csv(TotMassAtl, "T://eohprojs/CDC_climatechange/Jess/Dissertation/EPAcleaned/TotMassResultsAtl.csv", row.names=F)
 
 #SigPred = ifelse((TotMassSF$`2.5 %` < 0 & TotMassSF$`97.5 %` < 0) | (TotMassSF$`2.5 %` > 0 & TotMassSF$`97.5 %` > 0), 1, 0)
 SigPred = ifelse((TotMassAtl$`2.5 %` < 0 & TotMassAtl$`97.5 %` < 0) | (TotMassAtl$`2.5 %` > 0 & TotMassAtl$`97.5 %` > 0), 1, 0)
